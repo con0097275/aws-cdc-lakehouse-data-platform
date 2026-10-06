@@ -1,0 +1,19 @@
+# Session 02 deployment — BLOCKED at the anti-automation guard
+# Captured: 2026-08-13T06:19:33Z
+
+Both mutating steps call lib.sh confirm_destructive(), which contains:
+
+    if [[ ! -t 0 ]]; then
+      die "refusing to run non-interactively; a human must type the confirmation phrase"
+    fi
+
+This is DECISION_LOG S02A-3, and validate-docs check 14 asserts it stays wired up.
+It refused this agent, which is the control working as designed - not a defect.
+
+Everything else is staged and verified:
+  - bootstrap script amended to SSE-S3 (ADR-030); bash -n clean; dry run correct
+  - backend "s3" {} enabled in terraform/envs/dev/versions.tf
+  - terraform/envs/dev/terraform.tfvars written (gitignored), real auto_destroy_after
+  - make check: 14 passed, 0 failed; 6 scripts bash -n clean
+
+AWS state at this point: UNCHANGED. No bucket, no cluster, no spend.

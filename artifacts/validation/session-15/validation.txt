@@ -1,0 +1,70 @@
+# Session 15 — validation transcript
+# Captured: 2026-08-14T17:58:19Z
+
+=== LIVE AWS STATE (nothing applied) ===
+  MSK clusters : 0
+  EC2 running  : 0
+  => no Prometheus, no Grafana, no pipeline. NO SLI HAS BEEN MEASURED.
+
+=== REUSE, NOT REBUILD ===
+  The toolbox already runs prometheus/grafana/alertmanager on the docker network
+  'kafka-observability', with MSK JMX/node scraping and (S04) EC2 service discovery
+  by tag:Component. Session 15 ADDS scrape jobs, recording rules and alerts to that.
+  A test asserts scrape-additions.yml contains ONLY scrape_configs — a global: or
+  alerting: block would replace the existing Prometheus rather than extend it.
+
+=== THE BRIDGE: PUSHGATEWAY, NOT SCRAPE, NOT CLOUDWATCH ===
+  Half the required metrics are not Prometheus-native: freshness, reconciliation
+  difference and DQ pass rate live in Iceberg ops.* tables, and batch jobs are too
+  short-lived to scrape (an EOD run lasts ~20 min, scrape interval is 30s).
+  Pushgateway = one more container on a docker network that already exists.
+  NOT CloudWatch custom metrics: billed per metric/month, ~20 series x 12 datasets.
+
+  The trap it introduces, and the fix:
+    Pushed metrics are STICKY. A job that pushes freshness=3min and never runs again
+    leaves Prometheus reporting 3 minutes FOREVER — pipeline dead, dashboard green.
+    Every push emits cdc_lakehouse_pushed_timestamp_seconds, and PipelineMetricsStale
+    keys off THAT. It is the only signal separating 'healthy' from 'gone'.
+
+=== ALERTS ===
+  13 alerts: {'page': 5, 'ticket': 8}
+  runbook links: 13/13
+  SLOs covered : ['cdc_completeness', 'data_quality', 'eod_completion', 'nrt_freshness', 'pipeline_availability']
+  recording rules: 14 SLIs defined once
+  grafana panels : 13
+
+=== FAILURE DRILLS (10) — dry-run, evidence recorded ===
+  drill-1-connect-restart.md
+  drill-10-schema-failure.md
+  drill-2-debezium-restart.md
+  drill-3-spark-restart.md
+  drill-4-checkpoint-loss.md
+  drill-5-kafka-replay.md
+  drill-6-l1-recovery.md
+  drill-7-l2-rerun.md
+  drill-8-l3-rebuild.md
+  drill-9-late-event.md
+  local-recovery-evidence.txt
+
+  NO destructive action against managed MSK (acceptance criterion). Drills 5 and 6
+  are CONSUMER-side: resetting a consumer group offset is reversible. MSK holds the
+  only copy of in-flight events at 24h retention; destroying part of it to TEST
+  resilience risks the very data loss the drill exists to prevent.
+
+=== RECOVERY DEMONSTRATED LOCALLY (real Spark + Iceberg, no AWS) ===
+  === L3 rebuild is deterministic (drill 8) ===
+  2 passed, 28 deselected in 17.44s
+  === Late event wins on rebuild; partition overwritten not appended (drill 9) ===
+  2 passed, 28 deselected in 15.44s
+  === Replay is idempotent — no duplicate facts (drill 5) ===
+  4 passed, 12 deselected in 24.94s
+  === L2 window/watermark recovery semantics (drill 7) ===
+  8 passed, 18 deselected in 0.04s
+
+=== TESTS ===
+............................                                             [100%]
+28 passed in 0.20s
+
+=== FULL SUITE ===
+347 passed, 5 warnings in 122.74s (0:02:02)
+Closing down clientserver connection

@@ -1,0 +1,23 @@
+# Locally demonstrated recovery — real Spark + Iceberg, no AWS
+# Captured: 2026-08-14T17:51:57Z
+
+Acceptance: 'At least one controlled recovery per layer demonstrated or clearly
+marked untested.' The drills above are NOT_RUN because no infrastructure is deployed.
+These four recovery PROPERTIES are demonstrable without AWS and were executed here.
+
+=== L3 rebuild is deterministic (drill 8) ===
+..                                                                       [100%]
+2 passed, 28 deselected in 17.44s
+
+=== Late event wins on rebuild; partition overwritten not appended (drill 9) ===
+..                                                                       [100%]
+2 passed, 28 deselected in 15.44s
+
+=== Replay is idempotent — no duplicate facts (drill 5) ===
+....                                                                     [100%]
+4 passed, 12 deselected in 24.94s
+
+=== L2 window/watermark recovery semantics (drill 7) ===
+........                                                                 [100%]
+8 passed, 18 deselected in 0.04s
+

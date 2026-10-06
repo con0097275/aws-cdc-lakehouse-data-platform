@@ -1,0 +1,20 @@
+bootstrap=b-2.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098,b-1.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098,b-3.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098
+topics=cdc.oracle.COREBANK.ACCOUNT,cdc.oracle.COREBANK.BRANCH,cdc.oracle.COREBANK.CUSTOMER,cdc.oracle.COREBANK.LOAN,cdc.oracle.COREBANK.TRANSACTION
+Caused by: java.io.IOException: com.amazon.ws.emr.hadoop.fs.shaded.com.amazonaws.services.s3.model.AmazonS3Exception: User: arn:aws:sts::111122223333:assumed-role/kafka-dev-lab-dev-spark-stream/00g8tlee3db1gu25,00g8ttlamg3oag27 is not authorized to perform: kms:Decrypt on resource: arn:aws:kms:ap-southeast-1:111122223333:key/2746e5f4-fbfc-4fd9-bc54-41137880887d because no identity-based policy allows the kms:Decrypt action (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: 2GV17JVAEM01SDF1; S3 Extended Request ID: zOB8hnhysKl2gSzEAlb6ZDGlLNSqBc/NXeh/CAt9zHl6RwnC7PY0dx7DWNA+qEJnJf6aL/UVXwJBMyW+Xbfw5nQQtWGgii9R; Proxy: null), S3 Extended Request ID: zOB8hnhysKl2gSzEAlb6ZDGlLNSqBc/NXeh/CAt9zHl6RwnC7PY0dx7DWNA+qEJnJf6aL/UVXwJBMyW+Xbfw5nQQtWGgii9R
+Exception in thread "main" java.io.IOException: Unexpected end of stream pos=0, contentLength=432340
+26/09/20 15:57:49 ERROR S3FSInputStream: Unable to recover reading from stream
+Exception in thread "main" java.io.IOException: Unexpected end of stream pos=0, contentLength=432340
+26/09/20 15:57:49 ERROR S3FSInputStream: Unable to recover reading from stream...
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttlamg3oag27/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-full-cdc-oracle-2 run=00g8ttmtou1hh027
+STATE e2e-full-cdc-oracle-2 00g8ttmtou1hh027 FAILED
+ModuleNotFoundError: No module named 'full_cdc_job'. Please refer to user guide on how to use python libraries with EMR Serverless.
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttmtou1hh027/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-full-cdc-oracle-3 run=00g8ttogndv8j827
+STATE e2e-full-cdc-oracle-3 00g8ttogndv8j827 FAILED
+Job failed, please check complete logs in configured logging destination. ExitCode: 1. Last few exceptions: TypeError: Object of type datetime is not JSON serializable
+    raise TypeError(f'Object of type {o.__class__.__name__} '...
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttogndv8j827/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-full-cdc-oracle-4 run=00g8ttqj4bgrbg27
+STATE e2e-full-cdc-oracle-4 00g8ttqj4bgrbg27 SUCCESS
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttqj4bgrbg27/SPARK_DRIVER/stdout.gz

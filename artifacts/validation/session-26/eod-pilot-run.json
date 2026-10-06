@@ -1,0 +1,64 @@
+{
+  "config_version": "cfg-8e6c7de68875c117",
+  "cob": "2026-08-18",
+  "cob_is_working_day": true,
+  "run_plan": {
+    "turn_1": [
+      "mart_account_balance_daily"
+    ]
+  },
+  "task": {
+    "execution_id": "coord-demo:EOD:mart_account_balance_daily:2026-08-18:1",
+    "job_id": "mart_account_balance_daily",
+    "job_name": "Account balance daily mart",
+    "flow_mode": "EOD",
+    "turn": 1,
+    "attempt_number": 1,
+    "date_of_data": "2026-08-18",
+    "dbt_selector": "mart_account_balance_daily",
+    "resource_profile": "small",
+    "required_upstreams": [],
+    "optional_upstreams": []
+  },
+  "before": {
+    "status": "PLANNED",
+    "attempt": 1,
+    "turn": 1,
+    "watermark": null,
+    "history_rows": 0
+  },
+  "gate": {
+    "ready": true,
+    "pinned_snapshot": {
+      "kafka_dev_lab_dev_snapshot.fact_account_daily_snapshot": 99887766
+    }
+  },
+  "after": {
+    "status": "SUCCEEDED",
+    "attempt": 1,
+    "turn": 1,
+    "validation": "PASSED",
+    "spark_app_id": "fake-1",
+    "history_rows": 1
+  },
+  "watermark": {
+    "last_success_execution_id": "coord-demo:EOD:mart_account_balance_daily:2026-08-18:1",
+    "last_success_date_of_data": "2026-08-18"
+  },
+  "history_row_keys": [
+    "affected_dates",
+    "affected_key_count",
+    "after_direct",
+    "after_full",
+    "airflow_dag_id",
+    "airflow_dag_run_id",
+    "airflow_task_id",
+    "application",
+    "application_args",
+    "attempt_number",
+    "before_direct",
+    "before_full",
+    "bytes_read",
+    "bytes_written"
+  ]
+}

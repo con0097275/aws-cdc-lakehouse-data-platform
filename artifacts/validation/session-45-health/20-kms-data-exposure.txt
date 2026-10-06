@@ -1,0 +1,22 @@
+objects in bucket: 4385; written on 2026-09-17: 1429
+
+prefix / key -> count
+  query-results/athena         28b39c6a-5fe  896 <-- DELETED 2026-09-24
+  logs/emr                     28b39c6a-5fe  129 <-- DELETED 2026-09-24
+  warehouse/full_cdc           28b39c6a-5fe  124 <-- DELETED 2026-09-24
+  warehouse/ops                28b39c6a-5fe  119 <-- DELETED 2026-09-24
+  warehouse/snapshot           28b39c6a-5fe  80 <-- DELETED 2026-09-24
+  warehouse/stream             28b39c6a-5fe  70 <-- DELETED 2026-09-24
+  artifacts/code               28b39c6a-5fe  9 <-- DELETED 2026-09-24
+  artifacts/cdc                28b39c6a-5fe  1 <-- DELETED 2026-09-24
+  artifacts/code               7f03af9e-509  1
+
+objects at risk: 1428
+  query-results/athena: 896
+  logs/emr: 129
+  warehouse/full_cdc: 124
+  warehouse/ops: 119
+  warehouse/snapshot: 80
+  warehouse/stream: 70
+  artifacts/code: 9
+  artifacts/cdc: 1

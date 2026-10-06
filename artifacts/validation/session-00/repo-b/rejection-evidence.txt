@@ -1,0 +1,59 @@
+# Repo B evidence — ~/terraform-kafka-kraft/terraform-kafka-main
+# Captured: 2026-08-13T03:49:19Z. READ-ONLY. Repo B was not modified.
+# Verdict: REJECTED as a platform source. 8 disqualifiers, re-verified below.
+
+## D1 — nine ports open to 0.0.0.0/0 (violates CLAUDE.md 3.3)
+10:  allowed_ports = [22, 80, 3000, 8080, 443, 7071, 9090, 9092, 9097]
+14:resource "aws_security_group" "allowed_ports" {
+15:  name = "sg_allowed_ports"
+19:    for_each = local.allowed_ports
+24:      cidr_blocks = [ "0.0.0.0/0" ]
+32:    cidr_blocks     = ["0.0.0.0/0"]
+43:  vpc_security_group_ids = [aws_security_group.allowed_ports.id]
+57:  vpc_security_group_ids = [aws_security_group.allowed_ports.id]
+
+## D2 — Kafka listener is PLAINTEXT, no TLS/SASL/IAM (violates CLAUDE.md 3.5)
+~/terraform-kafka-kraft/terraform-kafka-main/resources_00_tmp/scripts/setupKafkaService.sh:42:listeners=PLAINTEXT://:9092,CONTROLLER://:9097
+~/terraform-kafka-kraft/terraform-kafka-main/resources_00_tmp/scripts/setupKafkaService.sh:43:advertised.listeners=PLAINTEXT://${CURRENT_NODE_PUBLIC_IP}:9092
+~/terraform-kafka-kraft/terraform-kafka-main/resources_00_tmp/scripts/setupKafkaService.sh:46:inter.broker.listener.name=PLAINTEXT
+
+## D3 — SSH key pair + default VPC (violates CLAUDE.md 3.4)
+5:pem_file = "/Users/sachin/work/keys/aws/sjlearning_2024/sachin-kp-us-east-1.pem"
+6:pem_key_name = "sachin-kp-us-east-1"
+5:data "aws_vpc" "default" {
+16:  vpc_id = data.aws_vpc.default.id
+
+## D4 — NO version pinning at all (violates CLAUDE.md 3.9)
+  $ grep -rn 'required_version|required_providers' *.tf
+  (no output — nothing is pinned)
+
+## D5 — not executable here: upstream author's macOS key path
+5:pem_file = "/Users/sachin/work/keys/aws/sjlearning_2024/sachin-kp-us-east-1.pem"
+
+## D6 — wrong region, region-locked AMI
+1:aws_region="us-east-1"
+4:ami_image = "ami-027979a480e532c35"
+
+## D7 — null_resource with triggers.always_run = timestamp() (non-idempotent)
+70:    always_run = timestamp()
+105:    always_run = timestamp()
+141:    always_run = timestamp()
+170:    always_run = timestamp()
+
+## D8 — no IAM roles, instance profile, KMS, SSM or CloudWatch
+  $ grep -cE 'aws_iam_role|aws_iam_instance_profile|aws_kms|aws_ssm|aws_cloudwatch' main.tf
+0
+
+## Permitted residual use (control C2): JMX exporter rules, READ-ONLY reference
+total 192
+drwxr-xr-x 2 operator operator   4096 Aug  6 22:50 .
+drwxr-xr-x 4 operator operator   4096 Aug  6 22:50 ..
+-rw-r--r-- 1 operator operator 178304 Jul 26 18:06 kafka-overview.json
+-rw-r--r-- 1 operator operator   4192 Jul 26 18:06 kafka_kraft.yml
+
+## Git history
+  fatal: not a git repository (or any of the parent directories): .git
+
+## Terraform state
+  ls: cannot access '~/terraform-kafka-kraft/terraform-kafka-main/*.tfstate*': No such file or directory
+  => repo B has no state: it was never applied to this account.

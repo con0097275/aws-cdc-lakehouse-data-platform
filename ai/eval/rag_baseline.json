@@ -1,0 +1,1120 @@
+{
+  "backend": "bm25",
+  "cases": 61,
+  "chunking_version": "chunking:v2-heading-aware",
+  "corpus_version": "corpus:b639b715eabf0e37",
+  "dataset_id": "rag_golden_v2",
+  "embedding_cost_usd": 0.0,
+  "embedding_version": null,
+  "error_rate": 0.0,
+  "evaluation_version": "evaluation:rag_golden_v2-v2",
+  "groundedness": 0.5614,
+  "hallucination_rate": 0.0,
+  "hit_rate": 0.6557,
+  "latency_p50_ms": 1.36,
+  "latency_p95_ms": 1.86,
+  "mean_reciprocal_rank": 0.486,
+  "negative_correct": 0.25,
+  "per_case": [
+    {
+      "category": "architecture",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_01",
+      "latency_ms": 1.93,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/L1_FULL_CDC.md",
+        "docs/adr/ADR-047-ai-platform-boundary.md",
+        "docs/L3_SNAPSHOT.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_02",
+      "latency_ms": 1.61,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/DATA_GOVERNANCE.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/adr/ADR-033-logical-vs-physical-layer-naming.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_03",
+      "latency_ms": 1.61,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/L3_SNAPSHOT.md",
+        "docs/L1_FULL_CDC.md",
+        "docs/REPORTING_FRAMEWORK.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_04",
+      "latency_ms": 1.31,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/LINEAGE.md",
+        "docs/adr/ADR-047-ai-platform-boundary.md",
+        "docs/L2_REALTIME_STREAM.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_05",
+      "latency_ms": 1.39,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-033-logical-vs-physical-layer-naming.md",
+        "docs/TARGET_ARCHITECTURE.md",
+        "reporting/layers.yaml"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "arch_06",
+      "latency_ms": 1.37,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/AI_USE_CASE.md",
+        "docs/adr/ADR-044-dbt-spark-execution-mechanism.md",
+        "docs/ARCHITECTURE_AND_TEST_GUIDE.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_07",
+      "latency_ms": 1.25,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-010-airflow-executor.md",
+        "docs/adr/ADR-010-airflow-executor.md",
+        "docs/AIRFLOW_K8S.md"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "arch_08",
+      "latency_ms": 1.15,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-024-cutoff-timezone-utc.md",
+        "docs/L1_FULL_CDC.md",
+        "docs/DATA_CONTRACTS.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "mode_01",
+      "latency_ms": 1.26,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-040-five-reporting-execution-modes.md",
+        "docs/adr/ADR-040-five-reporting-execution-modes.md",
+        "docs/AI_DATA_CONTRACTS.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "mode_02",
+      "latency_ms": 1.29,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-041-stream-batch-vs-streaming-rt.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/NEW_DATAMART.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "mode_03",
+      "latency_ms": 1.72,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/KIMBALL_MODEL.md",
+        "docs/REPORTING_REFERENCE_EVIDENCE.md",
+        "docs/DATA_CONTRACTS.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "mode_04",
+      "latency_ms": 1.35,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/runbooks/checkpoint-recovery.md",
+        "docs/adr/ADR-042-datamart-merge-semantics-and-idempotency.md",
+        "docs/FOUR_FLOWS.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "mode_05",
+      "latency_ms": 1.27,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "DECISION_LOG.md",
+        "docs/KIMBALL_MODEL.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "mode_06",
+      "latency_ms": 1.29,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/FOUR_FLOWS.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/adr/ADR-047-ai-platform-boundary.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "wm_01",
+      "latency_ms": 1.15,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/runbooks/watermark-investigation.md",
+        "docs/adr/ADR-043-watermark-and-rerun-semantics.md",
+        "docs/REPORTING_FRAMEWORK.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "wm_02",
+      "latency_ms": 1.49,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/runbooks/watermark-investigation.md",
+        "docs/adr/ADR-043-watermark-and-rerun-semantics.md",
+        "docs/adr/ADR-043-watermark-and-rerun-semantics.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "wm_03",
+      "latency_ms": 2.06,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/runbooks/fulfill-backfill.md",
+        "docs/runbooks/streaming-rt-restart.md",
+        "docs/runbooks/auto-correct-repair.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "wm_04",
+      "latency_ms": 1.44,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/DEPENDENCY_ORCHESTRATION.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/runbooks/manual-rerun.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "wm_05",
+      "latency_ms": 1.55,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-036-reporting-runtime-state-store.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/REPORTING_INFRA_GAP_ANALYSIS.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "dbt_01",
+      "latency_ms": 1.25,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/KIMBALL_MODEL.md",
+        "dbt::mart_account_balance_monthly",
+        "reporting/jobs/mart_account_balance_daily.yaml"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "dbt_02",
+      "latency_ms": 1.19,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "reporting/jobs/mart_account_balance_monthly.yaml",
+        "dbt::mart_account_balance_monthly",
+        "docs/FOUR_FLOWS.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dbt_03",
+      "latency_ms": 1.29,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/POWERBI.md",
+        "dbt::mart_account_balance_daily",
+        "aiplatform/features/customer_behavior.yaml"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dbt_04",
+      "latency_ms": 1.55,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/NEW_DATAMART.md",
+        "docs/adr/ADR-037-dependency-graph-and-dbt-manifest.md",
+        "docs/runbooks/dependency-investigation.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "dbt_05",
+      "latency_ms": 1.26,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/DEPENDENCY_ORCHESTRATION.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/adr/ADR-046-blocked-dependency-status.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dbt_06",
+      "latency_ms": 1.56,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 3,
+      "top_sources": [
+        "docs/DBT_SPARK.md",
+        "docs/REPORTING_FRAMEWORK.md",
+        "docs/adr/ADR-044-dbt-spark-execution-mechanism.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dbt_07",
+      "latency_ms": 1.39,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/AI_TARGET_ARCHITECTURE.md",
+        "docs/AI_TARGET_ARCHITECTURE_PROPOSAL.md",
+        "docs/adr/ADR-044-dbt-spark-execution-mechanism.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_01",
+      "latency_ms": 1.44,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/eod-retry.md",
+        "docs/REPORTING_FRAMEWORK.md",
+        "docs/runbooks/dependency-investigation.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_02",
+      "latency_ms": 1.19,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/INTERVIEW_GUIDE.md",
+        "docs/RUNBOOK.md",
+        "docs/RUNBOOK.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_03",
+      "latency_ms": 1.52,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/iceberg-rollback.md",
+        "docs/ATHENA.md",
+        "docs/runbooks/iceberg-rollback.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_04",
+      "latency_ms": 1.18,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/DR.md",
+        "docs/TARGET_ARCHITECTURE.md",
+        "DECISION_LOG.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "fail_05",
+      "latency_ms": 1.16,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md",
+        "docs/REPORTING_REFERENCE_EVIDENCE.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_06",
+      "latency_ms": 1.43,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/runbooks/watermark-investigation.md",
+        "docs/adr/ADR-038-turn-and-topological-ordering.md",
+        "docs/RUNBOOK.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_07",
+      "latency_ms": 1.55,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 3,
+      "top_sources": [
+        "docs/runbooks/dependency-investigation.md",
+        "docs/REPORTING_FRAMEWORK.md",
+        "docs/adr/ADR-046-blocked-dependency-status.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "fail_08",
+      "latency_ms": 1.23,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/streaming-rt-restart.md",
+        "docs/AI_TARGET_ARCHITECTURE.md",
+        "docs/AI_TARGET_ARCHITECTURE_PROPOSAL.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "rb_01",
+      "latency_ms": 1.24,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/stop-and-resume.md",
+        "docs/runbooks/stop-and-resume.md",
+        "docs/VERIFY_END_TO_END.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "rb_02",
+      "latency_ms": 1.26,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 5,
+      "top_sources": [
+        "docs/AIRFLOW_K8S.md",
+        "docs/VERIFY_END_TO_END.md",
+        "docs/AIRFLOW_K8S.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "rb_03",
+      "latency_ms": 1.21,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/new-mart.md",
+        "docs/runbooks/new-mart.md",
+        "docs/runbooks/airflow-access.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "rb_04",
+      "latency_ms": 1.76,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/runbooks/streaming-rt-restart.md",
+        "docs/REPORTING_FRAMEWORK.md",
+        "docs/RUNBOOK.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "rb_05",
+      "latency_ms": 1.33,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/runbooks/rebuild-from-scratch.md",
+        "docs/runbooks/streaming-rt-restart.md",
+        "docs/L1_FULL_CDC.md"
+      ]
+    },
+    {
+      "category": "security",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "sec_01",
+      "latency_ms": 1.13,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/adr/ADR-031-secret-store.md",
+        "docs/adr/ADR-019-powerbi-import-vs-directquery.md",
+        "docs/EXISTING_PLATFORM_AUDIT.md"
+      ]
+    },
+    {
+      "category": "security",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "sec_02",
+      "latency_ms": 1.53,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 3,
+      "top_sources": [
+        "CLAUDE.md",
+        "docs/KIMBALL_MODEL.md",
+        "docs/adr/ADR-012-athena-core-query-engine.md"
+      ]
+    },
+    {
+      "category": "cost",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "cost_01",
+      "latency_ms": 1.24,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/VERIFY_END_TO_END.md",
+        "docs/adr/ADR-053-offline-online-feature-policy.md",
+        "docs/adr/ADR-019-powerbi-import-vs-directquery.md"
+      ]
+    },
+    {
+      "category": "cost",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "cost_02",
+      "latency_ms": 1.24,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/adr/ADR-001-kafka-platform-absorption.md",
+        "docs/runbooks/rebuild-from-scratch.md",
+        "docs/adr/ADR-011-kubernetes-runtime.md"
+      ]
+    },
+    {
+      "category": "cost",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "cost_03",
+      "latency_ms": 1.51,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 2,
+      "top_sources": [
+        "docs/PRICE_REFERENCE.md",
+        "docs/adr/ADR-022-private-egress.md",
+        "docs/COST.md"
+      ]
+    },
+    {
+      "category": "data_contract",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "dc_01",
+      "latency_ms": 1.32,
+      "negative": false,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "DECISION_LOG.md",
+        "docs/SLO.md",
+        "docs/adr/ADR-033-logical-vs-physical-layer-naming.md"
+      ]
+    },
+    {
+      "category": "data_contract",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dc_02",
+      "latency_ms": 1.31,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/DATA_CONTRACTS.md",
+        "docs/adr/ADR-005-source-database-lab.md",
+        "docs/ARCHITECTURE_AND_TEST_GUIDE.md"
+      ]
+    },
+    {
+      "category": "data_contract",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dc_03",
+      "latency_ms": 1.39,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/DATA_CONTRACTS.md",
+        "docs/adr/ADR-005-source-database-lab.md",
+        "docs/ARCHITECTURE_AND_TEST_GUIDE.md"
+      ]
+    },
+    {
+      "category": "data_contract",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dc_04",
+      "latency_ms": 1.3,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 4,
+      "top_sources": [
+        "docs/AI_DATA_CONTRACTS.md",
+        "docs/AI_DATA_CONTRACTS.md",
+        "aiplatform/models/customer_activity_lapse_30d.yaml"
+      ]
+    },
+    {
+      "category": "data_contract",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "dc_05",
+      "latency_ms": 1.37,
+      "negative": false,
+      "paraphrase": false,
+      "rank": 1,
+      "top_sources": [
+        "docs/KIMBALL_MODEL.md",
+        "docs/adr/ADR-054-point-in-time-feature-correctness.md",
+        "aiplatform/features/customer_behavior.yaml"
+      ]
+    },
+    {
+      "category": "architecture",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_01",
+      "latency_ms": 1.86,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "reporting/layers.yaml",
+        "docs/APPROVAL_GATES.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md"
+      ]
+    },
+    {
+      "category": "reporting_modes",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_02",
+      "latency_ms": 1.66,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "docs/runbooks/fulfill-backfill.md",
+        "docs/AI_DATA_CONTRACTS.md",
+        "docs/adr/ADR-050-structured-query-vs-rag-routing.md"
+      ]
+    },
+    {
+      "category": "cost",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": true,
+      "id": "para_03",
+      "latency_ms": 1.45,
+      "negative": false,
+      "paraphrase": true,
+      "rank": 2,
+      "top_sources": [
+        "docs/CAPABILITY_MATRIX.md",
+        "docs/COST.md",
+        "docs/DR.md"
+      ]
+    },
+    {
+      "category": "recovery",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_04",
+      "latency_ms": 1.79,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "docs/runbooks/rebuild-from-scratch.md",
+        "docs/runbooks/iceberg-rollback.md",
+        "docs/DATA_CONTRACTS.md"
+      ]
+    },
+    {
+      "category": "watermark",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_05",
+      "latency_ms": 1.74,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "docs/adr/ADR-043-watermark-and-rerun-semantics.md",
+        "docs/adr/ADR-046-blocked-dependency-status.md",
+        "docs/REPORTING_FRAMEWORK.md"
+      ]
+    },
+    {
+      "category": "security",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_06",
+      "latency_ms": 2.06,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "governance/dq/rules.yml",
+        "docs/adr/ADR-002-connect-runtime.md",
+        "docs/AI_TARGET_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "category": "runbook",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "para_07",
+      "latency_ms": 1.52,
+      "negative": false,
+      "paraphrase": true,
+      "rank": null,
+      "top_sources": [
+        "docs/SLO.md",
+        "docs/adr/ADR-011-kubernetes-runtime.md",
+        "docs/RUNBOOK.md"
+      ]
+    },
+    {
+      "category": "dbt",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "para_08",
+      "latency_ms": 1.79,
+      "negative": false,
+      "paraphrase": true,
+      "rank": 1,
+      "top_sources": [
+        "dbt::mart_account_balance_daily",
+        "docs/L2_REALTIME_STREAM.md",
+        "docs/KIMBALL_MODEL.md"
+      ]
+    },
+    {
+      "category": "negative",
+      "difficulty": "easy",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": true,
+      "hit": true,
+      "id": "neg_01",
+      "latency_ms": 1.2,
+      "negative": true,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": []
+    },
+    {
+      "category": "negative",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "neg_02",
+      "latency_ms": 1.36,
+      "negative": true,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/adr/ADR-011-kubernetes-runtime.md",
+        "docs/adr/ADR-010-airflow-executor.md",
+        "docs/runbooks/airflow-access.md"
+      ]
+    },
+    {
+      "category": "negative",
+      "difficulty": "medium",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "neg_03",
+      "latency_ms": 1.24,
+      "negative": true,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/POWERBI.md",
+        "governance/catalog/domains.yml",
+        "docs/adr/ADR-049-vector-store-selection.md"
+      ]
+    },
+    {
+      "category": "negative",
+      "difficulty": "hard",
+      "error": null,
+      "forbidden_present": [],
+      "grounded": false,
+      "hit": false,
+      "id": "neg_04",
+      "latency_ms": 1.25,
+      "negative": true,
+      "paraphrase": false,
+      "rank": null,
+      "top_sources": [
+        "docs/adr/ADR-005-source-database-lab.md",
+        "DECISION_LOG.md",
+        "docs/REPORTING_ARCHITECTURE_DISCOVERY.md"
+      ]
+    }
+  ],
+  "recall_at_1": 0.3684,
+  "recall_at_3": 0.5614,
+  "recall_at_5": 0.6842,
+  "retrieval_cost_usd": 0.0,
+  "source_correctness": 0.6842,
+  "top_k": 5
+}

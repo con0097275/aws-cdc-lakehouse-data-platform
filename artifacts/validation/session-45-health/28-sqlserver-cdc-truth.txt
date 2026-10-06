@@ -1,0 +1,21 @@
+=== tables tracked by CDC in 'digital' ===
+app_user
+channel
+digital_event
+merchant
+payment_method
+
+=== capture instances + row counts ===
+dbo_app_user
+dbo_channel
+dbo_digital_event
+dbo_merchant
+dbo_payment_method
+
+=== seeded row counts ===
+app_user=0
+channel=0
+digital_event=0
+merchant=0
+payment_method=0
+

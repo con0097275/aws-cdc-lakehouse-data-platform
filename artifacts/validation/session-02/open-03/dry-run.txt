@@ -1,0 +1,86 @@
+-------------------------------------------------------------------------------
+OPEN-03 - prior evidence (read this before approving any spend)
+-------------------------------------------------------------------------------
+  The reference repository already recorded a live answer, from this same account,
+  17 days before today:
+
+    kafka-kraft-aws/kafka-aws-production-lab/docs/VERSIONS.md:16
+      "kafka.t3.small is no longer accepted for new clusters - a live CreateCluster
+       call (2026-07-26) returned `Unsupported InstanceType`; valid values are
+       kafka.m5.*, kafka.m7g.* and express.m7g.*"
+
+    kafka-kraft-aws/kafka-aws-production-lab/terraform/variables.tf:71
+      "kafka.t3.small was retired for new clusters (live CreateCluster error,
+       2026-07-26)"
+
+  Session 01 declined to close OPEN-03 on that basis because DECISION_LOG.md S00-4
+  established that repo A's own status documents had already been wrong once, and
+  because $432/month is worth one API call to confirm.
+
+  Stage 1 below confirms or refutes it for $0.00. That is the recommended action.
+
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+WARNING: DRY RUN. Nothing below contacts AWS. Re-run with --execute to probe.
+
+-------------------------------------------------------------------------------
+Stage 1 - zero-resource probe (cost: $0.00, creates nothing)
+-------------------------------------------------------------------------------
+  instance type = kafka.t3.small
+  subnets       = subnet-00000000000000001, subnet-00000000000000002  (deliberately non-existent)
+  The request cannot succeed. We are reading which validation error comes back.
+
+  Request body:
+    {
+      "ClusterName": "kafka-dev-lab-dev-t3probe-stage1",
+      "KafkaVersion": "3.9.x.kraft",
+      "NumberOfBrokerNodes": 2,
+      "BrokerNodeGroupInfo": {
+        "InstanceType": "kafka.t3.small",
+        "ClientSubnets": ["subnet-00000000000000001", "subnet-00000000000000002"],
+        "StorageInfo": { "EbsStorageInfo": { "VolumeSize": 1 } }
+      }
+    }
+
+  [dry-run] aws kafka create-cluster --cli-input-json <the body above>
+  [dry-run] no API call was made
+
+-------------------------------------------------------------------------------
+Stage 2 - BILLABLE probe
+-------------------------------------------------------------------------------
+  This creates a real MSK cluster:
+      2 x kafka.t3.small at 0.0578 USD/hr = 0.1156 USD/hr
+      2 x 1 GiB gp3 storage        = negligible
+
+  MSK provisioning takes 15-30 minutes and there is no way to shorten it. Budget
+  ~0.06 USD if deletion succeeds promptly, and note that a cluster which cannot be
+  deleted while CREATING will keep billing until it reaches ACTIVE or FAILED.
+
+  This stage is only worth running if stage 1 came back inconclusive.
+
+  [dry-run] would discover the default VPC and its first 2 subnets
+  [dry-run] would call: aws kafka create-cluster --cluster-name kafka-dev-lab-dev-t3probe ...
+  [dry-run] would then call: aws kafka delete-cluster --cluster-arn <arn>
+  [dry-run] no API call was made
+
+-------------------------------------------------------------------------------
+Next
+-------------------------------------------------------------------------------
+  Record the outcome in DECISION_LOG.md under OPEN-03, whichever way it went.
+  If rejected: docs/COST.md and docs/VERSIONS.md already assume kafka.m7g.large.
+  If accepted: re-derive docs/COST.md section 3.3 - ~8 windows/month becomes ~26.

@@ -1,0 +1,34 @@
+# Session 11 — validation transcript
+# Captured: 2026-08-14T15:43:17Z
+
+=== LIVE AWS STATE ===
+  MSK clusters       : 0
+  EC2 running        : 0
+  EMR Serverless apps: 0
+  => unapplied. dbt ran ENTIRELY LOCALLY against a temp Iceberg warehouse; $0.00.
+
+=== TOOL VERSIONS (verified, not assumed) ===
+  Core:
+    - installed: 1.9.4 
+    - latest:    1.12.2 - Update available!
+    - spark:    1.9.2 - Update available!
+  pyspark: 3.5.0
+
+=== dbt build (local Iceberg) ===
+  [0m11:36:03  [32mCompleted successfully[0m
+  [0m11:36:03  Done. PASS=47 WARN=0 ERROR=0 SKIP=0 TOTAL=47
+
+=== idempotency: 3 runs of tag:mart ===
+  :: loading settings :: url = jar:file:~/.local/lib/python3.10/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+    mart_customer_360_daily                rows=2
+    mart_channel_performance_daily         rows=2
+    mart_transaction_monitoring_10m        rows=2
+    mart_account_balance_daily             rows=2
+  --- customer_360 detail ---
+    cust=100 txn=150.00 bal=500.00 status=CERTIFIED
+    cust=101 txn=25.00 bal=250.00 status=PROVISIONAL_NRT
+
+=== PYTHON SUITE ===
+........................................................................ [ 68%]
+...................................................................      [100%]
+211 passed in 125.94s (0:02:05)

@@ -1,0 +1,26 @@
+# The dbt manifest is AUTHORITATIVE for model-to-model dependencies (ADR-087).
+# No custom dbt lineage is emitted anywhere else -- a second dbt graph restating
+# this one is the S11-3 objection, and it is what governance/lineage/openlineage.yml
+# already did.
+# write_semantics: PATCH so ingestion cannot overwrite derived ownership.
+# convert_urns_to_lowercase is pinned FALSE to match Glue, which has no such
+# switch; letting it default to true would split one table into two urns (ADR-090).
+# `use_identifiers` was removed -- the CLI deprecated it and warns on every run.
+
+source:
+  type: dbt
+  config:
+    manifest_path: dbt/target/manifest.json
+    catalog_path: dbt/target/catalog.json
+    run_results_paths:
+    - dbt/target/run_results.json
+    target_platform: glue
+    env: DEV
+    convert_urns_to_lowercase: false
+    write_semantics: PATCH
+    include_column_lineage: true
+sink:
+  type: datahub-rest
+  config:
+    server: ${DATAHUB_GMS_URL}
+    token: ${DATAHUB_GMS_TOKEN}

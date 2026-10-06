@@ -1,0 +1,68 @@
+# Session 16 — validation transcript (OPTIONAL session)
+# Captured: 2026-08-14T18:19:46Z
+
+=== LIVE AWS STATE ===
+  MSK clusters : 0
+  EC2 running  : 0
+  => NO Bedrock call was made. Tier 2 has never been invoked.
+
+=== THE DECISION: is AI worth it here? ===
+  Finding: most of the value is RETRIEVAL AND CITATION, not generation.
+  'Who owns X', 'what is downstream of X', 'which runbook covers ALERT' are LOOKUPS
+  with exact answers in artefacts Sessions 14-15 already produced. An LLM in front of
+  a dictionary adds cost, latency and hallucination to an already-correct answer.
+
+  Tier 1 (structured lookup + BM25): $0.00, ALWAYS ON
+  Tier 2 (Bedrock generation)      : per token, DEFAULT OFF
+  The assistant is USEFUL WITH THE LLM OFF — the test of load-bearing vs decorative.
+
+=== CORPUS ===
+  708 chunks from 59 files
+  EXCLUDED by design: terraform/, artifacts/, spark/, tfvars, tfstate
+  (not indexing a file catches everything in it; redaction catches only what it recognises)
+
+=== EVALUATION (golden question set) ===
+  [PASS] retrieval  what is the airspeed velocity of an unladen swallow         
+
+  {'total': 14, 'passed': 14, 'score': 1.0, 'routing_correct': 14, 'total_cost_usd': 0.0, 'free_answers': 14}
+
+  First run scored 9/14 and exposed THREE REAL BUGS:
+    1. route ordering — lineage questions matched the generic 'explain X' pattern first
+    2. find_runbook compared the WHOLE question to an alert name instead of searching in it
+    3. a 600-char truncation cut the sentence that answered the question
+  One golden question was also simply wrong (named no dataset, so retrieval was correct).
+
+=== MUTATION CHECKS ===
+| # | Guard reverted | Result |
+|---|---|---|
+| A1 | statement allow-list disabled | initially **PASSED** -> guard was NOT verified; fixed, now **FAILS** (3 tests) |
+| A2 | inspect only the first statement (stacking bypass) | **FAILED** `test_statement_stacking_is_refused` |
+| A3 | table allow-list hardcoded instead of read from the registry | **FAILED** `test_pii_tables_are_refused` |
+| A4 | comment-stripping moved after inspection | initially **PASSED** -> guard was NOT verified; fixed, now **FAILS** |
+
+## A1 and A4 initially passed — the important finding
+
+Two of four guards were NOT independently verified, and the mutation run is what exposed it.
+
+**A1**: disabling the statement allow-list left every test green, because the belt-and-braces
+FORBIDDEN_TOKENS deny-list caught them all. Fixed by adding cases no deny-list would catch
+(MSCK REPAIR, ANALYZE TABLE, COMMENT ON) — the verbs nobody thinks to deny are exactly the
+reason an allow-list exists.
+
+**A4**: comment-stripping does NOT catch a write hidden behind a comment — the allow-list
+already does. Its real job is the opposite direction: without it the deny-list sees DROP
+inside a comment and refuses a valid SELECT. A guard with false positives gets disabled by
+whoever hits it, which is how a security control dies. The docstring said the wrong thing
+and the test now asserts the right one.
+
+A test suite that passes with a guard removed is not protecting that guard. Four sessions of
+mutation checking have each found something; this is the first time it found that the
+REASONING was wrong rather than the code.
+
+=== TESTS ===
+.....................................................                    [100%]
+53 passed in 0.46s
+
+=== FULL SUITE ===
+400 passed, 5 warnings in 125.56s (0:02:05)
+Closing down clientserver connection

@@ -1,0 +1,3 @@
+eod_info: [['oracle.coredb.corebank.account', '2026-09-20', 'CERTIFIED', 'CERTIFIED', '320', 'PASS', 'PASS', '2026-09-20 10:50:03', 'eod-2026-09-20-162312Z']]
+eod_run_hist: [['1', 'BUILT_NOT_CERTIFIED', '0', 'FAIL', '00g8ttsc72ut7g27'], ['1', 'CERTIFIED', '320', 'PASS', '00g8tu3lrktbl827'], ['2', 'BUILT_NOT_CERTIFIED', '0', 'FAIL', '00g8ttv9ksp0v027'], ['3', 'BUILT_NOT_CERTIFIED', '0', 'FAIL', '00g8tu16hiuje027']]
+EOD snapshot rows: [['320', '320']]

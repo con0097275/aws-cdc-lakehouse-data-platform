@@ -1,0 +1,35 @@
+# Session 20 evidence — pre-deployment verification
+Date: 2026-08-15T11:01:13Z
+Account: 111122223333  Region: ap-southeast-1  Profile: my-aws-profile
+
+## Cheap-tier plan (enable_kafka_platform=false), LOCAL state, NOT applied
+  32 to add, 0 to change, 0 to destroy
+  hourly while running : $0.0000/hr
+  6-hour window        : $0.00
+  30 days 24/7         : $0.00
+  KMS CMKs (floor)     : $1.00/month
+  NAT gateways         : 0   (CLAUDE.md 4.2 requires 0)
+  Secrets Manager      : 0   (ADR-031 requires 0)
+
+## Resources by type
+    1  aws_athena_workgroup
+    1  aws_budgets_budget
+    7  aws_glue_catalog_database
+    1  aws_kms_alias
+    1  aws_kms_key
+    1  aws_s3_bucket
+    1  aws_s3_bucket_lifecycle_configuration
+    1  aws_s3_bucket_ownership_controls
+    1  aws_s3_bucket_policy
+    1  aws_s3_bucket_public_access_block
+    1  aws_s3_bucket_server_side_encryption_configuration
+    1  aws_s3_bucket_versioning
+   13  aws_s3_object
+    1  terraform_data
+
+## Live AWS state at time of review
+  MSK clusters      : 0
+  EC2 non-terminated: 0
+  EMR Serverless    : 0
+  State bucket      : DOES NOT EXIST
+  Tagged kafka-dev-lab: 0

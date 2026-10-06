@@ -1,0 +1,13 @@
+=== terraform state resource count
+299
+=== cd7c3d82 usage: any alias/grants?
+{
+    "Desc": "KMS key for kafka-dev-lab-dev MSK lab",
+    "Usage": "ENCRYPT_DECRYPT"
+}
+=== 28b39c6a description
+{
+    "Desc": "kafka-dev-lab-dev data lake encryption (S01-11)",
+    "Deletion": 1790270730.923,
+    "State": "PendingDeletion"
+}

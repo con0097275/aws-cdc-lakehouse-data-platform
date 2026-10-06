@@ -1,0 +1,22 @@
+# Session 08 — validation transcript (REVISED under architect+data-engineer review)
+# Captured: 2026-08-14T09:35:22Z
+
+=== LIVE AWS STATE ===
+  MSK clusters : 0
+  EC2 running  : 0
+  => stack unapplied; L3 against live L2 data was NOT run
+
+=== FULL SUITE ===
+........................................................................ [ 63%]
+..........................................                               [100%]
+114 passed in 49.23s
+
+=== PER-SUITE COUNTS ===
+  test_ordering              17
+  test_envelope              15
+  test_quarantine            10
+  test_l1_local_spark        7
+  test_l2_window             26
+  test_l2_local_spark        9
+  test_l3_snapshot           30
+  ^ test_l3_snapshot was 17 before this review; +13 regression tests added

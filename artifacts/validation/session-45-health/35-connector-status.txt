@@ -1,0 +1,57 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+connector status
+-------------------------------------------------------------------------------
+{
+  "sqlserver-digital-source": {
+    "status": {
+      "name": "sqlserver-digital-source",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "10.42.0.121:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "RUNNING",
+          "worker_id": "10.42.0.121:8083"
+        }
+      ],
+      "type": "source"
+    }
+  },
+  "oracle-corebank-source": {
+    "status": {
+      "name": "oracle-corebank-source",
+      "connector": {
+        "state": "RUNNING",
+        "worker_id": "10.42.0.121:8083"
+      },
+      "tasks": [
+        {
+          "id": 0,
+          "state": "RUNNING",
+          "worker_id": "10.42.0.121:8083"
+        }
+      ],
+      "type": "source"
+    }
+  }
+}
+

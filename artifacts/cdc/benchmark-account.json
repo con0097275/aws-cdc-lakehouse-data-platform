@@ -1,0 +1,238 @@
+{
+ "claims": {
+  "auto_correct": "auto_correct: per-table is cheaper on 5/9 metrics, more expensive on 3. athena_bytes_scanned 86 -> 122 (+41.9%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 95991 (-95.1%); planning_time_ms 209 -> 456 (+118.2%); runtime_ms 730 -> 2264 (+210.1%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 47995.5 (-65.9%); output_rows 1 -> 1 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "eod_source_scan": "eod_source_scan: per-table is cheaper on 7/9 metrics, more expensive on 1. athena_bytes_scanned 89193 -> 11231 (-87.4%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 95991 (-95.1%); planning_time_ms 219 -> 207 (-5.5%); runtime_ms 628 -> 708 (+12.7%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 47995.5 (-65.9%); output_rows 321 -> 321 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "fulfill": "fulfill: per-table is cheaper on 8/9 metrics, more expensive on 0. athena_bytes_scanned 153 -> 78 (-49.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 95991 (-95.1%); planning_time_ms 489 -> 119 (-75.7%); runtime_ms 1772 -> 580 (-67.3%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 47995.5 (-65.9%); output_rows 320 -> 320 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "one_table_one_day": "one_table_one_day: per-table is cheaper on 8/9 metrics, more expensive on 0. athena_bytes_scanned 75 -> 0 (-100.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 95991 (-95.1%); planning_time_ms 606 -> 152 (-74.9%); runtime_ms 1662 -> 690 (-58.5%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 47995.5 (-65.9%); output_rows 320 -> 320 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "one_table_seven_days": "one_table_seven_days: per-table is cheaper on 7/9 metrics, more expensive on 2. athena_bytes_scanned 926 -> 0 (-100.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 95991 (-95.1%); planning_time_ms 177 -> 178 (+0.6%); runtime_ms 668 -> 719 (+7.6%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 47995.5 (-65.9%); output_rows 961 -> 641 (-33.3%); partitions_scanned 3 -> 2 (-33.3%)"
+ },
+ "cob_date": "2026-08-22",
+ "detail": {
+  "legacy": {
+   "auto_correct": {
+    "bytes_scanned": 86,
+    "planning_ms": 209,
+    "query_id": "5265c7cc-2470-4190-bc3b-c13e78cfd395",
+    "rows": 1,
+    "runtime_ms": 730,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'oracle' AND source_table = 'ACCOUNT' AND op IN ('u','d') AND event_date > DATE '2026-08-22' - INTERVAL '3' DAY",
+    "total_ms": 842
+   },
+   "eod_source_scan": {
+    "bytes_scanned": 89193,
+    "planning_ms": 219,
+    "query_id": "c036818e-83b9-48e4-acab-fbb72bbc83b7",
+    "rows": 321,
+    "runtime_ms": 628,
+    "sql": "SELECT COUNT(DISTINCT dv_event_id) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'oracle' AND source_table = 'ACCOUNT' AND source_commit_ts < TIMESTAMP '2026-08-22 00:00:00'",
+    "total_ms": 734
+   },
+   "fulfill": {
+    "bytes_scanned": 153,
+    "planning_ms": 489,
+    "query_id": "ff60c755-9eb7-4063-a3f2-6f1c97a585d2",
+    "rows": 320,
+    "runtime_ms": 1772,
+    "sql": "SELECT COUNT(*), MAX(source_commit_ts) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'oracle' AND source_table = 'ACCOUNT' AND event_date = DATE '2026-08-22'",
+    "total_ms": 2082
+   },
+   "one_table_one_day": {
+    "bytes_scanned": 75,
+    "planning_ms": 606,
+    "query_id": "49b65403-c09b-4fba-9250-9a11549cceb9",
+    "rows": 320,
+    "runtime_ms": 1662,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'oracle' AND source_table = 'ACCOUNT' AND event_date = DATE '2026-08-22'",
+    "total_ms": 1814
+   },
+   "one_table_seven_days": {
+    "bytes_scanned": 926,
+    "planning_ms": 177,
+    "query_id": "9004c7a9-489d-4e14-b87b-431436308c81",
+    "rows": 961,
+    "runtime_ms": 668,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'oracle' AND source_table = 'ACCOUNT' AND event_date > DATE '2026-08-22' - INTERVAL '7' DAY AND event_date <= DATE '2026-08-22'",
+    "total_ms": 785
+   }
+  },
+  "per_table": {
+   "auto_correct": {
+    "bytes_scanned": 122,
+    "planning_ms": 456,
+    "query_id": "610ec044-034c-4045-a4b8-9bdb9c4ab61d",
+    "rows": 1,
+    "runtime_ms": 2264,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_oracle_coredb_corebank_account\" WHERE op IN ('u','d') AND event_date > DATE '2026-08-22' - INTERVAL '3' DAY",
+    "total_ms": 2576
+   },
+   "eod_source_scan": {
+    "bytes_scanned": 11231,
+    "planning_ms": 207,
+    "query_id": "b06b5619-9abe-48f1-b2ca-77e6a8d835d2",
+    "rows": 321,
+    "runtime_ms": 708,
+    "sql": "SELECT COUNT(DISTINCT dv_event_id) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_oracle_coredb_corebank_account\" WHERE source_commit_ts < TIMESTAMP '2026-08-22 00:00:00'",
+    "total_ms": 829
+   },
+   "fulfill": {
+    "bytes_scanned": 78,
+    "planning_ms": 119,
+    "query_id": "13c88f5a-5913-481c-82a0-02e4fb556627",
+    "rows": 320,
+    "runtime_ms": 580,
+    "sql": "SELECT COUNT(*), MAX(source_commit_ts) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_oracle_coredb_corebank_account\" WHERE event_date = DATE '2026-08-22'",
+    "total_ms": 697
+   },
+   "one_table_one_day": {
+    "bytes_scanned": 0,
+    "planning_ms": 152,
+    "query_id": "134bf8b1-a9fb-44b1-ace6-85b3055e6efa",
+    "rows": 320,
+    "runtime_ms": 690,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_oracle_coredb_corebank_account\" WHERE event_date = DATE '2026-08-22'",
+    "total_ms": 832
+   },
+   "one_table_seven_days": {
+    "bytes_scanned": 0,
+    "planning_ms": 178,
+    "query_id": "693d14c9-b68e-4054-980b-8716ab141cc1",
+    "rows": 641,
+    "runtime_ms": 719,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_oracle_coredb_corebank_account\" WHERE event_date > DATE '2026-08-22' - INTERVAL '7' DAY AND event_date <= DATE '2026-08-22'",
+    "total_ms": 1220
+   }
+  }
+ },
+ "measurements": {
+  "complete": {
+   "auto_correct": true,
+   "eod_source_scan": true,
+   "fulfill": true,
+   "one_table_one_day": true,
+   "one_table_seven_days": true
+  },
+  "scenarios": {
+   "auto_correct": {
+    "legacy": {
+     "athena_bytes_scanned": 86.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 1.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 209.0,
+     "runtime_ms": 730.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 122.0,
+     "avg_file_size_bytes": 47995.5,
+     "file_count": 2.0,
+     "output_rows": 1.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 456.0,
+     "runtime_ms": 2264.0,
+     "spark_input_bytes": 95991.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "eod_source_scan": {
+    "legacy": {
+     "athena_bytes_scanned": 89193.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 321.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 219.0,
+     "runtime_ms": 628.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 11231.0,
+     "avg_file_size_bytes": 47995.5,
+     "file_count": 2.0,
+     "output_rows": 321.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 207.0,
+     "runtime_ms": 708.0,
+     "spark_input_bytes": 95991.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "fulfill": {
+    "legacy": {
+     "athena_bytes_scanned": 153.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 320.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 489.0,
+     "runtime_ms": 1772.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 78.0,
+     "avg_file_size_bytes": 47995.5,
+     "file_count": 2.0,
+     "output_rows": 320.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 119.0,
+     "runtime_ms": 580.0,
+     "spark_input_bytes": 95991.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "one_table_one_day": {
+    "legacy": {
+     "athena_bytes_scanned": 75.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 320.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 606.0,
+     "runtime_ms": 1662.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 0.0,
+     "avg_file_size_bytes": 47995.5,
+     "file_count": 2.0,
+     "output_rows": 320.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 152.0,
+     "runtime_ms": 690.0,
+     "spark_input_bytes": 95991.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "one_table_seven_days": {
+    "legacy": {
+     "athena_bytes_scanned": 926.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 961.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 177.0,
+     "runtime_ms": 668.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 0.0,
+     "avg_file_size_bytes": 47995.5,
+     "file_count": 2.0,
+     "output_rows": 641.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 178.0,
+     "runtime_ms": 719.0,
+     "spark_input_bytes": 95991.0,
+     "spark_input_files": 2.0
+    }
+   }
+  }
+ },
+ "table_id": "oracle.coredb.corebank.account"
+}

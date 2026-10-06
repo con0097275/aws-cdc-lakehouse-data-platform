@@ -1,0 +1,22 @@
+# Session 07 — validation transcript
+# Captured: 2026-08-14T08:01:54Z
+
+=== LIVE AWS STATE ===
+  MSK clusters : 0
+  EC2 running  : 0
+  => stack unapplied; EOD against live L1 data was NOT run
+
+  system timezone offset: +0700   <- why the UTC bug was reproducible here
+
+=== FULL TEST SUITE (these RAN) ===
+........................................................................ [ 85%]
+............                                                             [100%]
+84 passed in 26.43s
+
+=== SESSION 07 SUITES ===
+...................................                                      [100%]
+35 passed in 22.29s
+
+=== TERRAFORM (unchanged this session) ===
+[32m[1mSuccess![0m The configuration is valid.
+[0m

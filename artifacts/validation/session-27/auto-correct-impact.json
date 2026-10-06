@@ -1,0 +1,93 @@
+[
+  {
+    "scenario": "late insert",
+    "dates": [
+      "2026-08-18"
+    ],
+    "keys": [
+      "acct-1"
+    ],
+    "deletes": [],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "late update",
+    "dates": [
+      "2026-08-17"
+    ],
+    "keys": [
+      "acct-2"
+    ],
+    "deletes": [],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "late delete",
+    "dates": [
+      "2026-08-18"
+    ],
+    "keys": [
+      "acct-3"
+    ],
+    "deletes": [
+      "acct-3"
+    ],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "3 changes, same key",
+    "dates": [
+      "2026-08-18"
+    ],
+    "keys": [
+      "acct-4"
+    ],
+    "deletes": [
+      "acct-4"
+    ],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "outside lookback",
+    "dates": [],
+    "keys": [],
+    "deletes": [],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "certified -> escalated",
+    "dates": [],
+    "keys": [],
+    "deletes": [],
+    "escalated": [
+      "2026-08-18"
+    ],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "forced repair",
+    "dates": [
+      "2026-08-16",
+      "2026-08-17",
+      "2026-08-18",
+      "2026-08-19"
+    ],
+    "keys": [],
+    "deletes": [],
+    "escalated": [],
+    "path": "DERIVED"
+  },
+  {
+    "scenario": "feed unavailable",
+    "dates": 4,
+    "keys": [],
+    "deletes": [],
+    "escalated": [],
+    "path": "FULL_WINDOW_FALLBACK"
+  }
+]

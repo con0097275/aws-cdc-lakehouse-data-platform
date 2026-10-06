@@ -1,0 +1,100 @@
+[
+  {
+    "metric_id": "total_closing_balance",
+    "sql_hash": "sql:5b4d8d0bded549fc",
+    "executed": true,
+    "sql_value": 4120.0,
+    "expected_value": 4120.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "avg_balance_per_account",
+    "sql_hash": "sql:0409538e23a60ab0",
+    "executed": true,
+    "sql_value": 1030.0,
+    "expected_value": 1030.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "total_debit_amount",
+    "sql_hash": "sql:5e65891e7ad66a41",
+    "executed": true,
+    "sql_value": 90.0,
+    "expected_value": 90.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "total_credit_amount",
+    "sql_hash": "sql:757697b1381d1111",
+    "executed": true,
+    "sql_value": 150.0,
+    "expected_value": 150.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "net_cash_flow",
+    "sql_hash": "sql:ad9fbb65fcb21faa",
+    "executed": true,
+    "sql_value": 60.0,
+    "expected_value": 60.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "total_txn_count",
+    "sql_hash": "sql:ba412a2b39bf47a7",
+    "executed": true,
+    "sql_value": 18.0,
+    "expected_value": 18,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  },
+  {
+    "metric_id": "active_account_count",
+    "sql_hash": "sql:a52db386758e52cd",
+    "executed": true,
+    "sql_value": 4.0,
+    "expected_value": 4.0,
+    "row_count": 4,
+    "weakest_status": "CERTIFIED",
+    "match": true,
+    "error": null,
+    "notes": [
+      "caller must verify weakest_status >= RECONCILED"
+    ]
+  }
+]

@@ -1,0 +1,3 @@
+captured_at: 20260929T223227Z
+repo: /path/to/aws-cdc-lakehouse
+with_aws: 0

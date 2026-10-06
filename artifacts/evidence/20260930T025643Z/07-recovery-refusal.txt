@@ -1,0 +1,43 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from datetime import date
+from cdc.impact import LineageImpactService
+from cdc.lineage_graph import build_static_graph
+from cdc.urns import UrnMinter, default_catalog
+from cdc.metadata_plane import load
+from cdc.assets import AssetId
+from cdc.incidents import *
+m = UrnMinter(load().environment, default_catalog()); g = build_static_graph(m)
+s = LineageImpactService(g, environment='dev', minter=m)
+inc = Incident('inc-demo', 'eod:oracle_coredb_corebank_account', FailureClass.DQ_VIOLATION,
+               'BLOCKER', scope=AffectedScope(cob_dates=(date(2026,9,28),)),
+               root_cause_status=RootCauseStatus.CONFIRMED)
+p, a, why = s.plan(inc, root_urn=m.dataset_urn(AssetId.parse('eod:oracle_coredb_corebank_account')),
+                   policy=RecoveryPolicy(max_attempts=2, max_blast_radius=40),
+                   lineage_version='lin-demo')
+print('plan_id        :', p.plan_id)
+print('blast radius   :', p.blast_radius)
+print('turns          :', [len(t) for t in p.turns])
+print('weakest edge   :', p.weakest_evidence.value)
+print('cost class     :', p.cost_class.value)
+print('approval       :', a.value)
+for r in why: print('   reason:', r)
+print()
+print('turn plan:')
+for i, t in enumerate(p.turns): print(f'  turn {i}: ' + ', '.join(t))
+
+
+plan_id        : rp1:f56feb8f93dbad2f
+blast radius   : 14
+turns          : [1, 1, 2, 2, 5, 3]
+weakest edge   : derived
+cost class     : medium
+approval       : AUTOMATIC
+
+turn plan:
+  turn 0: curated:banking_account
+  turn 1: curated:dim_account
+  turn 2: curated:fact_account_daily_snapshot, curated:fact_transaction
+  turn 3: mart:stg_fact_account_daily_snapshot, mart:stg_fact_transaction
+  turn 4: mart:int_customer_daily_balance, mart:int_customer_daily_txn, mart:mart_account_balance_daily, mart:mart_channel_performance_daily, mart:mart_transaction_monitoring_10m
+  turn 5: mart:mart_account_balance_monthly, mart:mart_account_risk_daily, mart:mart_customer_360_daily

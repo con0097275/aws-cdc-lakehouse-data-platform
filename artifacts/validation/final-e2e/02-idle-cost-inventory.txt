@@ -1,0 +1,59 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+2. STOPPED-BUT-BILLING — stopping does NOT stop these
+-------------------------------------------------------------------------------
+WARNING: this is the section that surprises people
+  EBS volumes                0
+    ...unattached            0
+  EBS snapshots              0
+  Elastic IPs                0
+    ...unassociated          0
+    an EIP is FREE while attached to a running instance and BILLED when it is not —
+    so stopping an instance can INCREASE what its address costs
+-------------------------------------------------------------------------------
+3. ALWAYS-BILLING — only DESTROY stops these
+-------------------------------------------------------------------------------
+  NAT gateways               0
+    CLAUDE.md 4.2: no NAT by default. Any NAT here is an unplanned ~$0.05/hr + data.
+  VPC endpoints              0
+    Interface endpoints bill hourly per AZ; Gateway endpoints (S3/DynamoDB) are free.
+  S3 buckets                 46
+  KMS customer keys          15
+    Only CUSTOMER-managed keys bill (~$1/mo). AWS-managed (alias/aws/*) are FREE —
+    check KeyManager before assuming, see below.
+  CloudWatch log grps        3
+    ...no retention          3
+WARNING:   a log group with NO retention grows forever and is billed forever
+
+  KMS key manager (AWS = free, CUSTOMER = billed):
+    CUSTOMER  None
+    CUSTOMER  None
+    AWS       alias/aws/backup
+    CUSTOMER  None
+    AWS       alias/aws/ebs
+    CUSTOMER  None
+    AWS       alias/aws/secretsmanager
+    AWS       alias/aws/s3
+    CUSTOMER  None
+    CUSTOMER  None
+    AWS       alias/aws/dynamodb
+    AWS       alias/aws/elasticfilesystem
+    CUSTOMER  None
+    AWS       alias/aws/codecommit
+    CUSTOMER  None

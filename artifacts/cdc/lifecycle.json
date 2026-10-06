@@ -1,0 +1,340 @@
+{
+ "note": "Source-table onboarding lifecycle (ADR-066). Written by the cdc-table-* commands; not hand-edited.",
+ "schema": 1,
+ "tables": {
+  "oracle.coredb.corebank.loan": {
+   "history": [
+    {
+     "at": "2026-09-10T13:30:58.408039+00:00",
+     "evidence": {
+      "config_hash": "2f6a374d6b9081cb",
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "mode_available": true,
+      "onboarding_mode": "changes_only",
+      "precheck": {
+       "engine": "oracle",
+       "findings": [
+        {
+         "check": "table_exists",
+         "detail": "corebank.loan declared with 8 columns",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "primary_key",
+         "detail": "registry and source DDL agree: ['LOAN_ID']",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "supplemental_logging",
+         "detail": "ALL COLUMN supplemental logging declared for corebank.loan",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "logminer_archivelog",
+         "detail": "ARCHIVELOG enablement is declared",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "capture_privileges",
+         "detail": "all 6 LogMiner grants declared",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "schema_history",
+         "detail": "schema history topic configured: cdc.oracle.schema-history",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        }
+       ],
+       "passed": true,
+       "table_id": "oracle.coredb.corebank.loan"
+      }
+     },
+     "from": "DRAFT",
+     "reason": "cdc-table-validate",
+     "to": "VALIDATED"
+    },
+    {
+     "at": "2026-09-10T13:30:58.493722+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95"
+     },
+     "from": "VALIDATED",
+     "reason": "cdc-table-provision: targets planned",
+     "to": "PLANNED"
+    },
+    {
+     "at": "2026-09-10T13:30:58.493992+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "targets": {
+       "eod": "eod_oracle_coredb_corebank_loan",
+       "eod_identifier": "glue_catalog.kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_loan",
+       "full_cdc": "cdc_oracle_coredb_corebank_loan",
+       "full_cdc_identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_loan",
+       "realtime": "rt_oracle_coredb_corebank_loan",
+       "realtime_identifier": "glue_catalog.kafka_dev_lab_dev_stream.rt_oracle_coredb_corebank_loan"
+      }
+     },
+     "from": "PLANNED",
+     "reason": "cdc-table-provision --confirm-applied",
+     "to": "PROVISIONED"
+    },
+    {
+     "at": "2026-09-10T14:08:46.345539+00:00",
+     "evidence": {
+      "full_cdc_rows": "observed 4 -- c=2 u=1 d=1; tombstone correctly not a row",
+      "topic_has_events": "observed 5 -- cdc.oracle.COREBANK.LOAN end-offsets, incl. tombstone"
+     },
+     "from": "PROVISIONED",
+     "reason": "cdc-table-smoke: capture proven by observed evidence",
+     "to": "CAPTURING"
+    },
+    {
+     "at": "2026-09-10T14:08:46.345942+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95"
+     },
+     "from": "CAPTURING",
+     "reason": "cdc-table-smoke started",
+     "to": "VALIDATING"
+    },
+    {
+     "at": "2026-09-10T14:08:46.349092+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "results": {
+       "passed": true,
+       "results": [
+        {
+         "detail": "observed 'RUNNING' -- oracle-corebank-source, task 0 RUNNING",
+         "name": "connector_running",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- changes_only: history starts at capture. 3 pre-existing rows are deliberately absent; a backfill is a separate act",
+         "name": "snapshot_complete",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 5 -- cdc.oracle.COREBANK.LOAN end-offsets, incl. tombstone",
+         "name": "topic_has_events",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 4 -- c=2 u=1 d=1; tombstone correctly not a row",
+         "name": "full_cdc_rows",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- ingested within minutes of the source change; SLA 60m",
+         "name": "lag_within_sla",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 4 -- calendar_day window, lower bound midnight 2026-09-06",
+         "name": "realtime_rows",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 'CERTIFIED' -- COB 2026-09-10, ops.eod_run, dq PASS recon PASS",
+         "name": "eod_status",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- independent Athena count below cutoff_utc: 2 keys - 1 delete = 1 row; EOD wrote 1",
+         "name": "reconciliation",
+         "status": "PASS"
+        }
+       ],
+       "table_id": "oracle.coredb.corebank.loan"
+      }
+     },
+     "from": "VALIDATING",
+     "reason": "cdc-table-smoke",
+     "to": "ACTIVE"
+    }
+   ],
+   "state": "ACTIVE",
+   "table_id": "oracle.coredb.corebank.loan"
+  },
+  "sqlserver.digital.dbo.payment_method": {
+   "history": [
+    {
+     "at": "2026-09-10T13:30:58.592171+00:00",
+     "evidence": {
+      "config_hash": "caa3c8fce717be9e",
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "mode_available": true,
+      "onboarding_mode": "changes_only",
+      "precheck": {
+       "engine": "sqlserver",
+       "findings": [
+        {
+         "check": "table_exists",
+         "detail": "dbo.payment_method declared with 6 columns",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "primary_key",
+         "detail": "registry and source DDL agree: ['payment_method_id']",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "cdc_enabled_database",
+         "detail": "sys.sp_cdc_enable_db is declared",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "cdc_enabled_table",
+         "detail": "payment_method is in the sp_cdc_enable_table list (a capture instance is created per table). Note this is DECLARED state: sp_cdc_enable_table succeeds even when SQL Server Agent is not running, so confirm the capture job live.",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "capture_instance_role",
+         "detail": "capture instances are gated by role 'cdc_reader'",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        },
+        {
+         "check": "schema_history",
+         "detail": "schema history topic configured: cdc.sqlserver.schema-history",
+         "evidence_kind": "declared",
+         "remediation": "",
+         "severity": "PASS"
+        }
+       ],
+       "passed": true,
+       "table_id": "sqlserver.digital.dbo.payment_method"
+      }
+     },
+     "from": "DRAFT",
+     "reason": "cdc-table-validate",
+     "to": "VALIDATED"
+    },
+    {
+     "at": "2026-09-10T13:30:58.676486+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95"
+     },
+     "from": "VALIDATED",
+     "reason": "cdc-table-provision: targets planned",
+     "to": "PLANNED"
+    },
+    {
+     "at": "2026-09-10T13:30:58.676986+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "targets": {
+       "eod": "eod_sqlserver_digital_dbo_payment_method",
+       "eod_identifier": "glue_catalog.kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_payment_method",
+       "full_cdc": "cdc_sqlserver_digital_dbo_payment_method",
+       "full_cdc_identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_payment_method",
+       "realtime": "rt_sqlserver_digital_dbo_payment_method",
+       "realtime_identifier": "glue_catalog.kafka_dev_lab_dev_stream.rt_sqlserver_digital_dbo_payment_method"
+      }
+     },
+     "from": "PLANNED",
+     "reason": "cdc-table-provision --confirm-applied",
+     "to": "PROVISIONED"
+    },
+    {
+     "at": "2026-09-10T14:08:46.429511+00:00",
+     "evidence": {
+      "full_cdc_rows": "observed 5 -- c=3 u=1 d=1; typed payload, hex LSN ordering",
+      "topic_has_events": "observed 6 -- cdc.sqlserver.digital.dbo.payment_method end-offsets, incl. tombstone"
+     },
+     "from": "PROVISIONED",
+     "reason": "cdc-table-smoke: capture proven by observed evidence",
+     "to": "CAPTURING"
+    },
+    {
+     "at": "2026-09-10T14:08:46.430018+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95"
+     },
+     "from": "CAPTURING",
+     "reason": "cdc-table-smoke started",
+     "to": "VALIDATING"
+    },
+    {
+     "at": "2026-09-10T14:08:46.433063+00:00",
+     "evidence": {
+      "config_version": "cdccfg-c763425d5f4b3b95",
+      "results": {
+       "passed": true,
+       "results": [
+        {
+         "detail": "observed 'RUNNING' -- sqlserver-digital-source, task 0 RUNNING",
+         "name": "connector_running",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- changes_only: table created live and captured from creation, so no pre-capture history exists",
+         "name": "snapshot_complete",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 6 -- cdc.sqlserver.digital.dbo.payment_method end-offsets, incl. tombstone",
+         "name": "topic_has_events",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 5 -- c=3 u=1 d=1; typed payload, hex LSN ordering",
+         "name": "full_cdc_rows",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- ingested within minutes of the source change; SLA 60m",
+         "name": "lag_within_sla",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 5 -- rolling_hours window, lower bound 14:01:09 = 72h back",
+         "name": "realtime_rows",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed 'CERTIFIED' -- COB 2026-09-10, ops.eod_run, dq PASS recon PASS",
+         "name": "eod_status",
+         "status": "PASS"
+        },
+        {
+         "detail": "observed True -- independent Athena count below cutoff_utc: 3 keys - 1 delete = 2 rows; EOD wrote 2",
+         "name": "reconciliation",
+         "status": "PASS"
+        }
+       ],
+       "table_id": "sqlserver.digital.dbo.payment_method"
+      }
+     },
+     "from": "VALIDATING",
+     "reason": "cdc-table-smoke",
+     "to": "ACTIVE"
+    }
+   ],
+   "state": "ACTIVE",
+   "table_id": "sqlserver.digital.dbo.payment_method"
+  }
+ }
+}

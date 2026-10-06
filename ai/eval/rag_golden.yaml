@@ -1,0 +1,95 @@
+# RAG golden set (AI-P4).
+#
+# EVERY case is grounded in a document that exists in this repository, and every
+# `key_facts` string is asserted to appear in that document by
+# `spark/tests/test_ai_eval.py::TestDatasetGrounding`. A question whose answer is not in the
+# corpus is a question about a fact we do not have, and scoring against it measures nothing.
+#
+# `paraphrase: true` marks cases deliberately phrased in SYNONYMS rather than repository
+# vocabulary. These are the only cases that can show whether dense retrieval earns its cost:
+# BM25 is strongest exactly where question and corpus share words, so a set written in house
+# jargon flatters it and resolves nothing (ADR-049).
+version: 2
+dataset_id: rag_golden_v2
+cases:
+
+# ---------------------------------------------------- CDC / lakehouse architecture
+- {id: arch_01, category: architecture, difficulty: easy, question: "What is FULL_CDC and why is it canonical?", expect_source: docs/L1_FULL_CDC.md, key_facts: ["append-only"]}
+- {id: arch_02, category: architecture, difficulty: easy, question: "What does the REALTIME layer contain?", expect_source: docs/L2_REALTIME_STREAM.md, key_facts: ["REALTIME"]}
+- {id: arch_03, category: architecture, difficulty: medium, question: "How is the EOD snapshot derived and what cutoff does it use?", expect_source: docs/L3_SNAPSHOT.md, key_facts: ["cutoff"]}
+- {id: arch_04, category: architecture, difficulty: medium, question: "Are REALTIME and EOD siblings or a chain?", expect_source: docs/TARGET_ARCHITECTURE.md, key_facts: ["sibling"]}
+- {id: arch_05, category: architecture, difficulty: hard, question: "Which logical layer maps to which Glue database?", expect_source: docs/adr/ADR-033-logical-vs-physical-layer-naming.md, key_facts: ["database"]}
+- {id: arch_06, category: architecture, difficulty: medium, question: "What runs Spark jobs in this platform?", expect_source: docs/adr/ADR-008-spark-runtime.md, key_facts: ["EMR Serverless"]}
+- {id: arch_07, category: architecture, difficulty: medium, question: "Which executor does Airflow use?", expect_source: docs/adr/ADR-010-airflow-executor.md, key_facts: ["KubernetesExecutor"]}
+- {id: arch_08, category: architecture, difficulty: hard, question: "Why is the cutoff timezone UTC?", expect_source: docs/adr/ADR-024-cutoff-timezone-utc.md, key_facts: ["UTC"]}
+
+# ------------------------------------------------------------------ reporting modes
+- {id: mode_01, category: reporting_modes, difficulty: easy, question: "What are the five reporting execution modes?", expect_source: docs/adr/ADR-040-five-reporting-execution-modes.md, key_facts: ["AUTO_CORRECT", "FULFILL", "STREAM_BATCH"]}
+- {id: mode_02, category: reporting_modes, difficulty: medium, question: "What is the difference between STREAM_BATCH and STREAMING_RT?", expect_source: docs/adr/ADR-041-stream-batch-vs-streaming-rt.md, key_facts: ["STREAM_BATCH", "STREAMING_RT"]}
+- {id: mode_03, category: reporting_modes, difficulty: medium, question: "Which flow repairs a late-arriving CDC event?", expect_source: docs/adr/ADR-040-five-reporting-execution-modes.md, key_facts: ["AUTO_CORRECT"]}
+- {id: mode_04, category: reporting_modes, difficulty: hard, question: "What is the accuracy ladder and its ordering?", expect_source: docs/adr/ADR-042-datamart-merge-semantics-and-idempotency.md, key_facts: ["CERTIFIED"]}
+- {id: mode_05, category: reporting_modes, difficulty: medium, question: "What merge strategy do the datamarts use?", expect_source: docs/adr/ADR-042-datamart-merge-semantics-and-idempotency.md, key_facts: ["MERGE"]}
+- {id: mode_06, category: reporting_modes, difficulty: easy, question: "What are the four flows in this platform?", expect_source: docs/FOUR_FLOWS.md, key_facts: ["EOD"]}
+
+# ------------------------------------------------------------------- watermarks
+- {id: wm_01, category: watermark, difficulty: easy, question: "What advances a watermark?", expect_source: docs/adr/ADR-043-watermark-and-rerun-semantics.md, key_facts: ["watermark"]}
+- {id: wm_02, category: watermark, difficulty: medium, question: "Can a failed run advance the watermark?", expect_source: docs/adr/ADR-043-watermark-and-rerun-semantics.md, key_facts: ["watermark"], forbidden_facts: ["a failed run advances the watermark"]}
+- {id: wm_03, category: watermark, difficulty: medium, question: "How do I investigate a watermark that has not moved?", expect_source: docs/runbooks/watermark-investigation.md, key_facts: ["watermark"]}
+- {id: wm_04, category: watermark, difficulty: hard, question: "What is a rerun attempt number and how does it differ from a turn?", expect_source: docs/adr/ADR-043-watermark-and-rerun-semantics.md, key_facts: ["rerun"]}
+- {id: wm_05, category: watermark, difficulty: medium, question: "Where is the runtime state for reporting kept?", expect_source: docs/adr/ADR-036-reporting-runtime-state-store.md, key_facts: ["DynamoDB"]}
+
+# ----------------------------------------------------------------- dbt / lineage
+- {id: dbt_01, category: dbt, difficulty: easy, question: "What is the grain of mart_account_balance_daily?", expect_source: "dbt::mart_account_balance_daily", key_facts: ["account_sk"]}
+- {id: dbt_02, category: dbt, difficulty: medium, question: "Which columns does mart_account_balance_monthly expose?", expect_source: "dbt::mart_account_balance_monthly", key_facts: ["Columns"]}
+- {id: dbt_03, category: dbt, difficulty: medium, question: "Is closing_balance additive across dates?", expect_source: "dbt::mart_account_balance_daily", key_facts: ["SEMI-ADDITIVE"]}
+- {id: dbt_04, category: dbt, difficulty: hard, question: "How is the job dependency graph derived from dbt?", expect_source: docs/adr/ADR-037-dependency-graph-and-dbt-manifest.md, key_facts: ["manifest"]}
+- {id: dbt_05, category: dbt, difficulty: medium, question: "How are execution turns computed?", expect_source: docs/adr/ADR-038-turn-and-topological-ordering.md, key_facts: ["topological"]}
+- {id: dbt_06, category: dbt, difficulty: medium, question: "How does dbt run against EMR Serverless?", expect_source: docs/adr/ADR-044-dbt-spark-execution-mechanism.md, key_facts: ["session"]}
+- {id: dbt_07, category: dbt, difficulty: hard, question: "What lineage does the platform record beyond dbt?", expect_source: docs/LINEAGE.md, key_facts: ["lineage"]}
+
+# --------------------------------------------------------------- failure / recovery
+- {id: fail_01, category: recovery, difficulty: easy, question: "How do I retry a failed EOD run?", expect_source: docs/runbooks/eod-retry.md, key_facts: ["EOD"]}
+- {id: fail_02, category: recovery, difficulty: medium, question: "What do I do when a streaming checkpoint is corrupt?", expect_source: docs/runbooks/checkpoint-recovery.md, key_facts: ["checkpoint"]}
+- {id: fail_03, category: recovery, difficulty: medium, question: "How do I roll an Iceberg table back to an earlier snapshot?", expect_source: docs/runbooks/iceberg-rollback.md, key_facts: ["snapshot"]}
+- {id: fail_04, category: recovery, difficulty: hard, question: "What is the RPO and RTO for this platform?", expect_source: docs/DR.md, key_facts: ["RPO"]}
+- {id: fail_05, category: recovery, difficulty: medium, question: "How do I backfill a range of dates?", expect_source: docs/runbooks/fulfill-backfill.md, key_facts: ["FULFILL"]}
+- {id: fail_06, category: recovery, difficulty: medium, question: "How do I rerun a single job by hand?", expect_source: docs/runbooks/manual-rerun.md, key_facts: ["rerun"]}
+- {id: fail_07, category: recovery, difficulty: hard, question: "What happens to a downstream job when its upstream fails?", expect_source: docs/adr/ADR-046-blocked-dependency-status.md, key_facts: ["WAITING_DEPENDENCY"]}
+- {id: fail_08, category: recovery, difficulty: medium, question: "How do I restart the realtime streaming application?", expect_source: docs/runbooks/streaming-rt-restart.md, key_facts: ["stream"]}
+
+# ------------------------------------------------------------------------ runbooks
+- {id: rb_01, category: runbook, difficulty: easy, question: "How do I stop the lab for the night?", expect_source: docs/runbooks/stop-and-resume.md, key_facts: ["MSK"]}
+- {id: rb_02, category: runbook, difficulty: medium, question: "How do I reach the Airflow UI?", expect_source: docs/runbooks/airflow-access.md, key_facts: ["SSM"]}
+- {id: rb_03, category: runbook, difficulty: medium, question: "How do I add a new datamart?", expect_source: docs/runbooks/new-mart.md, key_facts: ["mart"]}
+- {id: rb_04, category: runbook, difficulty: hard, question: "How do I investigate why a job did not start?", expect_source: docs/runbooks/dependency-investigation.md, key_facts: ["dependency"]}
+- {id: rb_05, category: runbook, difficulty: medium, question: "How do I rebuild the platform from scratch?", expect_source: docs/runbooks/rebuild-from-scratch.md, key_facts: ["ARCHIVELOG"]}
+
+# ------------------------------------------------------------------ security / cost
+- {id: sec_01, category: security, difficulty: easy, question: "Where are secrets stored?", expect_source: docs/adr/ADR-031-secret-store.md, key_facts: ["SSM"]}
+- {id: sec_02, category: security, difficulty: medium, question: "Which query engine is the default and why?", expect_source: docs/adr/ADR-012-athena-core-query-engine.md, key_facts: ["Athena"]}
+- {id: cost_01, category: cost, difficulty: easy, question: "What is the monthly budget of record?", expect_source: docs/adr/ADR-030-budget-of-record-and-release-schedule.md, key_facts: ["30"]}
+- {id: cost_02, category: cost, difficulty: medium, question: "What is the most expensive component in the stack?", expect_source: docs/COST.md, key_facts: ["MSK"]}
+- {id: cost_03, category: cost, difficulty: hard, question: "Why is there no NAT gateway?", expect_source: docs/adr/ADR-022-private-egress.md, key_facts: ["NAT"]}
+
+# ---------------------------------------------------------------- data contracts
+- {id: dc_01, category: data_contract, difficulty: medium, question: "What identifies a CDC event uniquely?", expect_source: docs/DATA_CONTRACTS.md, key_facts: ["event_id"]}
+- {id: dc_02, category: data_contract, difficulty: hard, question: "How is event ordering determined for Oracle sources?", expect_source: docs/DATA_CONTRACTS.md, key_facts: ["SCN"]}
+- {id: dc_03, category: data_contract, difficulty: hard, question: "How is event ordering determined for SQL Server sources?", expect_source: docs/DATA_CONTRACTS.md, key_facts: ["LSN"]}
+- {id: dc_04, category: data_contract, difficulty: medium, question: "What is the point-in-time rule for features?", expect_source: docs/adr/ADR-054-point-in-time-feature-correctness.md, key_facts: ["event time"]}
+- {id: dc_05, category: data_contract, difficulty: medium, question: "What is the Kimball model used here?", expect_source: docs/KIMBALL_MODEL.md, key_facts: ["dim"]}
+
+# ---------------------------------------------- PARAPHRASED — synonyms, not repo jargon
+- {id: para_01, category: architecture, difficulty: hard, paraphrase: true, question: "Which storage layer keeps the complete unaltered history of every database change?", expect_source: docs/L1_FULL_CDC.md, key_facts: ["append-only"]}
+- {id: para_02, category: reporting_modes, difficulty: hard, paraphrase: true, question: "If yesterday's numbers were published and a correction arrives later, what fixes them?", expect_source: docs/adr/ADR-040-five-reporting-execution-modes.md, key_facts: ["AUTO_CORRECT"]}
+- {id: para_03, category: cost, difficulty: hard, paraphrase: true, question: "What single piece of infrastructure eats most of the money here?", expect_source: docs/COST.md, key_facts: ["MSK"]}
+- {id: para_04, category: recovery, difficulty: hard, paraphrase: true, question: "Everything broke overnight — how far back could we lose data and how long to get running again?", expect_source: docs/DR.md, key_facts: ["RPO"]}
+- {id: para_05, category: watermark, difficulty: hard, paraphrase: true, question: "A scheduled task claims success but the progress marker never moved. Where do I look?", expect_source: docs/runbooks/watermark-investigation.md, key_facts: ["watermark"]}
+- {id: para_06, category: security, difficulty: hard, paraphrase: true, question: "Where does the system keep passwords so they never appear in source control?", expect_source: docs/adr/ADR-031-secret-store.md, key_facts: ["SSM"]}
+- {id: para_07, category: runbook, difficulty: hard, paraphrase: true, question: "How do I shut everything down to avoid being charged overnight?", expect_source: docs/runbooks/stop-and-resume.md, key_facts: ["MSK"]}
+- {id: para_08, category: dbt, difficulty: hard, paraphrase: true, question: "Which figures cannot simply be summed up over a time range?", expect_source: "dbt::mart_account_balance_daily", key_facts: ["SEMI-ADDITIVE"]}
+
+# --------------------------------------------------- NEGATIVE — no answer in the corpus
+- {id: neg_01, category: negative, difficulty: easy, expect_no_answer: true, question: "What is the airspeed velocity of an unladen swallow?"}
+- {id: neg_02, category: negative, difficulty: medium, expect_no_answer: true, question: "What is our Kubernetes cluster's Istio mesh configuration?"}
+- {id: neg_03, category: negative, difficulty: medium, expect_no_answer: true, question: "How many customers churned in Q3 2025?"}
+- {id: neg_04, category: negative, difficulty: hard, expect_no_answer: true, question: "What is the SLA of our Snowflake warehouse?"}

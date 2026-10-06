@@ -1,0 +1,51 @@
+{
+  "captured_at": "2026-09-29T22:08:03.845466+00:00",
+  "health": {
+    "detail": "URLError: [Errno 111] Connection refused",
+    "reachable": false
+  },
+  "metrics": {
+    "degraded": 1,
+    "failed": 3,
+    "transport_error": 9
+  },
+  "note": "A refused connection returns immediately, so the observed 1.5 s is far under the 31.5 s bound. That bound is for a server that HANGS \u2014 worth knowing before someone concludes it is not being applied.",
+  "phase": "DRP11 scenarios 7 and 8 \u2014 LIVE",
+  "precondition": "operator ran `datahub-local.sh down --execute`; GMS NOT reachable",
+  "regression": "spark/tests/test_drp2_datahub.py::TestPlaneDownLive (hermetic, closed port)",
+  "scenario_7_openlineage_outage_policy": {
+    "data_flow": {
+      "attempts": 3,
+      "degraded": true,
+      "elapsed_seconds": 1.5,
+      "flow": "eod_build",
+      "ok": false,
+      "policy": "BEST_EFFORT",
+      "raised": false,
+      "verdict": "PASS \u2014 the job continues; the failure is recorded, not thrown",
+      "worst_case_seconds": 31.5
+    }
+  },
+  "scenario_8_datahub_down": {
+    "business_data": {
+      "touched": false,
+      "verdict": "PASS \u2014 no write path to business data exists in the metadata client"
+    },
+    "impact_analysis": {
+      "flow": "lineage_impact",
+      "policy": "REQUIRED",
+      "raised": true,
+      "verdict": "PASS \u2014 refuses rather than guessing a blast radius"
+    },
+    "metadata_flow": {
+      "flow": "metadata_ingestion",
+      "policy": "REQUIRED",
+      "raised": true,
+      "verdict": "PASS \u2014 fails rather than reporting success for work that could not happen"
+    },
+    "read_path": {
+      "raised": "URLError",
+      "verdict": "PASS \u2014 an unreachable server and an empty lineage do not look the same"
+    }
+  }
+}

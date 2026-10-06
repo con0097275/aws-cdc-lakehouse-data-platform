@@ -1,0 +1,8 @@
+uploaded sqlserver/99-verify-cdc.sql
+uploaded oracle/99-verify-cdc.sql
+b7065c0f2d4a3a1a0eeed1f2692b4521  /opt/source-lab/sqlserver/99-verify-cdc.sql
+1d9d6fb56205c3f50f181cf1053a01aa  /opt/source-lab/oracle/99-verify-cdc.sql
+
+local:
+b7065c0f2d4a3a1a0eeed1f2692b4521  docker/source-lab/sqlserver/99-verify-cdc.sql
+1d9d6fb56205c3f50f181cf1053a01aa  docker/source-lab/oracle/99-verify-cdc.sql

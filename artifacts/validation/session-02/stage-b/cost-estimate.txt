@@ -1,0 +1,60 @@
+============================================================================
+INCREMENTAL AWS COST — Session 02 Stage B saved plan
+Prices: docs/PRICE_REFERENCE.md, ap-southeast-1, collected 2026-08-12
+Status: static-validated. No apply has occurred.
+============================================================================
+
+Plan: 113 to add, 0 to change, 0 to destroy.
+
+--- WHILE RUNNING (hourly) ---
+  MSK brokers              3 x kafka.m7g.large                        $ 0.7650/hr
+  MSK broker storage       3 x 20 GiB @ 0.1200/GB-Mo                  $ 0.0099/hr
+  Toolbox EC2              t3.small                                   $ 0.0264/hr
+  Toolbox EBS              30 GiB gp3 @ 0.0960/GB-Mo                  $ 0.0039/hr
+  TOTAL                                                               $ 0.8052/hr
+
+  6-hour window : $  4.83
+  4-hour window : $  3.22
+  24 hours      : $ 19.32
+  30 days 24/7  : $587.80   <-- 19.6x the $30 monthly budget
+
+--- ALWAYS-ON FLOOR (survives `terraform destroy` of compute) ---
+  KMS CMKs                 2 (platform + lake)                        $ 2.0000/mo
+  CloudWatch alarms        6 - EPHEMERAL, destroyed with the cluster  $ 0.0000/mo
+  S3 lake storage          ~0 GiB at first apply                      $ 0.0000/mo
+  VPC gateway endpoints    S3 + DynamoDB - FREE                       $ 0.0000/mo
+  Glue interface endpoint  NOT created (enable_emr_serverless=false)  $ 0.0000/mo
+  Glue Data Catalog        7 databases, first 1M objects free         $ 0.0000/mo
+  Athena workgroup         no charge; bytes scanned only              $ 0.0000/mo
+  IAM roles/policies       43 resources                               $ 0.0000/mo
+  AWS Budget               first 2 budgets free                       $ 0.0000/mo
+  TOTAL                                                               $ 2.0000/mo
+
+--- AGAINST docs/COST.md ---
+  COST.md floor (ADR-030)            $2.28/mo
+  This plan's floor                  $2.00/mo
+  Delta                              $-0.28/mo
+
+  The plan's floor is LOWER than docs/COST.md's $2.28 because this stack does not yet
+  create the things that make up the rest of it: Secrets Manager is gone entirely
+  (ADR-031 -> SSM SecureString, and no SSM parameters are created here beyond the
+  Grafana one inside kafka_platform), lake storage is empty at first apply, and the
+  Terraform state bucket is bootstrapped OUT OF BAND (ADR-021) so it is not in this plan.
+  The 6 CloudWatch alarms are inside kafka_platform's lifecycle, so they cost $0.60/mo
+  only while the cluster exists - which is ADR-030 S01R-4 working as designed.
+
+--- WHAT IS NOT IN THIS PLAN, BY DESIGN ---
+  NAT Gateway                  CLAUDE.md 4.2 - a root precondition fails the plan if enabled
+  Glue interface endpoint      gated on enable_emr_serverless (risk R10)
+  EMR Serverless               flag off - Session 06
+  Source lab / CDC runtime     flags off - Sessions 03/04
+  Airflow / k3s                flag off - Session 12
+  Redshift Serverless / Trino  flags off; ADR-026 precondition blocks both at once
+  Secrets Manager              ADR-031 - SSM SecureString instead
+  Terraform state bucket       ADR-021 - bootstrapped out of band, never in this state
+
+--- THE NUMBER THAT MATTERS ---
+
+  Applying this plan and walking away costs $587.80/month.
+  The budget is $30. Destroy at the end of every window (ADR-027 - destroy, not stop).
+  At $0.8052/hr the entire monthly budget is gone in 37 hours.

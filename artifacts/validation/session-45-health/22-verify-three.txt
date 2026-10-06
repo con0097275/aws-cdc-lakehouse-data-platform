@@ -1,0 +1,20 @@
+=== READ an object encrypted with the pending-deletion key
+
+An error occurred (KMS.KMSInvalidStateException) when calling the GetObject operation: arn:aws:kms:ap-southeast-1:111122223333:key/28b39c6a-5feb-4841-895f-320fc3ce75c8 is pending deletion.
+=== READ one encrypted with the enabled key (control)
+{
+    "AcceptRanges": "bytes",
+    "LastModified": "Thu, 10 Sep 2026 11:15:11 GMT",
+=== .env keys on source-lab (NAMES ONLY)
+ORACLE_CDC_PASSWORD
+ORACLE_IMAGE
+ORACLE_PASSWORD
+PRIVATE_IP
+SQLSERVER_CDC_PASSWORD
+SQLSERVER_IMAGE
+SQLSERVER_MEMORY_MB
+SQLSERVER_PASSWORD
+
+=== apicurio health/ports
+search=000
+

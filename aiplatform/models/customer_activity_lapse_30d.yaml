@@ -1,0 +1,21 @@
+# The pilot. Chosen over transaction anomaly deliberately: anomaly detection is
+# unsupervised and has NO label horizon, so it would never exercise the leakage boundary
+# ADR-054 makes mandatory. A forward-window label makes leakage possible, and therefore
+# makes the leakage tests meaningful.
+name: customer_activity_lapse_30d
+description: Binary label -- no transaction in the 30 days after the label event time.
+owner: risk-data
+algorithm: logistic_regression
+inference_mode: batch          # no always-on endpoint (ADR-053/060)
+seed: 42
+metrics: [auc_roc, auc_pr, precision_at_k]
+
+dataset:
+  name: lapse_30d_training
+  label_name: lapsed_30d
+  label_event_time_column: label_event_time
+  feature_groups: [customer_behavior]
+  train_start: "2026-01-01"
+  train_end: "2026-07-31"
+  label_horizon_days: 30       # forward-looking: features from this window are leakage
+  split: time_based            # a random split over time-series features leaks by construction

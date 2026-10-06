@@ -1,0 +1,1 @@
+APS1-EMR-SERVERLESS-ARM-vCPUHours                 0.0525850000 USD/vCPU-Hours   $0.052585 per ARM vCPU per hour in Asia Pacific (Singapore)

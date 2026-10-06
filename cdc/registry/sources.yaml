@@ -1,0 +1,363 @@
+# CDC capture registry — the single source of truth for which source tables are captured
+# and how (ADR-062, docs/CDC_TABLE_CONFIG_REFERENCE.md).
+#
+# PRECEDENCE:  defaults  <  sources[].defaults  <  sources[].tables[]
+#
+# Target table names are DERIVED from the canonical id, never spelled out, so the FULL_CDC,
+# REALTIME and EOD names for a table cannot drift apart. Override only to adopt a table that
+# already exists in the catalog under another name.
+
+version: 1
+
+# HOW Kafka reaches FULL_CDC. The PROFILE decides the default mode -- `production` runs a
+# resident Structured Streaming app, `lab_low_cost` drains what Kafka holds and exits -- so
+# paying for an always-on application is a decision recorded here rather than a consequence
+# of which entry point somebody submitted (ADR-073).
+#
+# `mode` is left unset on purpose: the profile supplies it. Set it only to override a
+# profile deliberately, and expect to justify that in review.
+ingestion:
+  profile: lab_low_cost
+  trigger_interval: "1 minute"
+
+defaults:
+  classification: internal
+  schema_evolution: additive_only
+
+  # DRP1 (ADR-087). Governance metadata is INHERITED from here, through the domain
+  # defaults in `governance/registry/domains.yaml`, through each source's block, down to
+  # the table. Most specific wins for scalars; `tags`, `glossary_terms` and `pii_fields`
+  # ACCUMULATE, so a domain-level control cannot be shed by a local edit.
+  #
+  # `freshness_slo_minutes` is the PUBLISHED promise. `dq.freshness_sla_minutes` below is
+  # the EXECUTABLE threshold a check evaluates at. They are different facts, and the
+  # compiler refuses the combination that is actually wrong -- an SLO tighter than the SLA
+  # it is measured by. DRP0 open question 4, resolved by giving them different jobs rather
+  # than picking a winner.
+  governance:
+    retention_class: long
+    criticality: tier_2
+    freshness_slo_minutes: 1440
+    contract_policy: cdc_source_contract
+    dq_policy: cdc_landing_dq
+    reconciliation_policy: full_cdc_to_eod_rowcount
+    certification_policy: certified_eod
+    tags: [cdc]
+  write:
+    format_version: 2
+    compression: zstd
+    target_file_size_mb: 128
+    distribution_mode: hash
+  partition_spec:
+    - {column: event_date, transform: identity}
+  realtime:
+    enabled: true
+    # SHAPE is the downstream CONTRACT: `event_window` keeps the events, so a reader
+    # wanting current state must collapse them itself; `latest_state` keeps one row per
+    # business key and may be read as current state directly. WRITE_STRATEGY is the
+    # mechanism, and changes cost and failure behaviour but never meaning.
+    #
+    # These two replace `refresh_mode`, which answered both questions with one word. The
+    # old spelling still compiles, with a deprecation warning (R2-B).
+    shape: event_window
+    write_strategy: overwrite_window
+    processing:
+      # How a run finds rows it has not handled. `window_scan` re-filters the whole window
+      # every run: idempotent and self-healing, and it re-reads everything. R2-C adds
+      # `iceberg_snapshot`, which the compiler REFUSES until the engine implements it.
+      source_progress: window_scan
+    window_hours: 72
+    late_grace_hours: 24
+    retention_hours: 168          # >= 72 + 24, enforced
+  eod:
+    enabled: true
+    cutoff_policy: source_commit_ts
+    business_timezone: UTC        # ADR-024
+    delete_policy: exclude_from_snapshot
+    retention_days: 365
+  dq:
+    event_date_null_tolerance: 0  # never a legitimate state; see ADR-062
+    freshness_sla_minutes: 60
+  maintenance:
+    compact_target_mb: 128
+    expire_snapshots_days: 7
+    remove_orphan_files_days: 3   # <= expire_snapshots_days, enforced
+
+sources:
+  - source_id: oracle
+    engine: oracle
+    connector: corebank-source
+    database: coredb
+    schema: corebank
+    topic_prefix: cdc.oracle
+    defaults:
+      domain: core_banking
+      owner: my-aws-profile
+      # `owner` above is the AWS principal this lab runs as. It is left untouched because
+      # it is live config, but it is a PERSON, not a rota -- recorded as a DRP1 finding in
+      # docs/GOVERNANCE_METADATA_CONTRACT.md §6 rather than silently rewritten here.
+      governance:
+        technical_owner: data-platform
+        business_owner: banking-product
+        subdomain: reference
+        tags: [source-oracle]
+    tables:
+      - table: account
+        primary_key: [ACCOUNT_ID]
+        # DRP1: raised from the `internal` global default. The table declares financial
+        # PII below, and the masking views and the AI deny list read CLASSIFICATION, not
+        # the PII list -- so `internal` here left the column marked and unprotected.
+        classification: confidential
+        governance:
+          subdomain: account
+          criticality: tier_1
+          description: >-
+            Current state of every customer account, including the ledger balance every
+            certified balance mart is built from.
+          glossary_terms: [account_balance, current_state]
+          pii_fields:
+            - {column: ACCOUNT_ID, category: financial}
+            - {column: BALANCE, category: financial}
+        dq: {not_null: [ACCOUNT_ID, CUSTOMER_ID]}
+        # LATEST_STATE (R2-D, ADR-082/081). A mutable entity: consumers want the
+        # CURRENT row per key, not every event that produced it. `soft_flag` deletes are
+        # REQUIRED and enforced at compile -- the tombstone is what the next run's guard
+        # compares against, and removing it lets a late out-of-order event resurrect a
+        # key the source deleted.
+        realtime:
+          shape: latest_state
+          write_strategy: guarded_merge
+          processing: {source_progress: iceberg_snapshot}
+          # When the EOD close for a business date CERTIFIES, the changes it now contains
+          # are removed from the overlay (R2-F, ADR-085). Without this the two would be
+          # composed and the same change counted twice.
+          rebase: {on_eod_certified: true}
+        eod: {delete_policy: soft_flag}
+      - table: customer
+        primary_key: [CUSTOMER_ID]
+        governance:
+          subdomain: customer
+          criticality: tier_1
+          description: Master customer record; the join key for every cross-source mart.
+          glossary_terms: [customer_360, current_state]
+          pii_fields:
+            - {column: FULL_NAME, category: direct_identifier}
+            - {column: DOB, category: direct_identifier}
+        classification: confidential      # holds names and dates of birth
+        dq: {not_null: [CUSTOMER_ID]}
+        # LATEST_STATE (R2-D, ADR-082/081). A mutable entity: consumers want the
+        # CURRENT row per key, not every event that produced it. `soft_flag` deletes are
+        # REQUIRED and enforced at compile -- the tombstone is what the next run's guard
+        # compares against, and removing it lets a late out-of-order event resurrect a
+        # key the source deleted.
+        realtime:
+          shape: latest_state
+          write_strategy: guarded_merge
+          processing: {source_progress: iceberg_snapshot}
+          # When the EOD close for a business date CERTIFIES, the changes it now contains
+          # are removed from the overlay (R2-F, ADR-085). Without this the two would be
+          # composed and the same change counted twice.
+          rebase: {on_eod_certified: true}
+        eod: {delete_policy: soft_flag}
+      - table: branch
+        primary_key: [BRANCH_ID]
+        governance:
+          subdomain: reference
+          criticality: tier_3
+          description: Branch reference data; a conformed dimension source.
+        # A small, near-static reference table: a 72h realtime window is noise for it.
+        realtime: {enabled: false}
+        # The MINIMUM DQ contract: the key. Found empty by cdc-table-provision's readiness
+        # check -- a registered-but-empty contract is not a contract, and an EOD close that
+        # cannot fail a DQ rule certifies whatever it happens to produce.
+        dq: {not_null: [BRANCH_ID]}
+      # PHASE 8 ACCEPTANCE: a genuinely new table, onboarded with this entry and nothing
+      # else. No Spark job, no DAG, no hand-written Iceberg SQL, no EOD code.
+      - table: loan
+        primary_key: [LOAN_ID]
+        governance:
+          subdomain: lending
+          criticality: tier_2
+          description: Loan accounts, onboarded through the config-driven path (Phase 8).
+        dq: {not_null: [LOAN_ID, CUSTOMER_ID]}
+        # The day fields under `recovery:` -- which is what they have always MEANT: how
+        # far back a run reads to REPAIR itself. Identical to declaring them at the top
+        # level; declaring the same field in both places is refused rather than resolved.
+        realtime:
+          shape: latest_state
+          write_strategy: guarded_merge
+          processing: {source_progress: iceberg_snapshot}
+          rebase: {on_eod_certified: true}
+          # Still a CALENDAR window -- but for latest_state these numbers are a RECOVERY
+          # HORIZON, not a prune. A loan that has not changed in a month keeps its row;
+          # deleting it because its last event is old would empty the table of exactly the
+          # entities that are most stable (ADR-082, `prunes_by_age`).
+          recovery: {lookback_days: 5, late_arrival_grace_days: 3,
+                     physical_retention_days: 14}
+        eod: {schedule: "30 2 * * *", delete_policy: soft_flag}
+        maintenance: {temperature: warm}
+      - table: transaction
+        primary_key: [TRANSACTION_ID]
+        # DRP1: financial PII declared below; see `account` for the reasoning.
+        classification: confidential
+        governance:
+          subdomain: transaction
+          criticality: tier_1
+          description: Posted financial transactions; the highest-volume Oracle table.
+          glossary_terms: [transaction_monitoring, event_window]
+          pii_fields:
+            - {column: AMOUNT, category: financial}
+            - {column: ACCOUNT_ID, category: financial}
+        # EVENT_WINDOW on the incremental cursor (R2-E, ADR-084). `append` + the cursor
+        # replaces re-reading 96 hours of FULL_CDC every ten minutes; `dv_event_id` is
+        # what makes a replayed range a no-op rather than a duplicate.
+        #
+        # `retention_hours: 96` is NOT a tightening: it makes the physical extent EQUAL the
+        # materialised window, which is what `overwrite_window` produced implicitly. Left at
+        # 168 the append path would keep a further three days the layer never promised, and
+        # a consumer counting rows would see the table change shape on the day this landed.
+        realtime:
+          shape: event_window
+          write_strategy: append
+          processing: {source_progress: iceberg_snapshot}
+          retention_hours: 96
+        # EVENT_WINDOW, and it is not a judgement call: a transaction is an immutable fact,
+        # not a mutable entity. Collapsing to one row per TRANSACTION_ID would keep the
+        # latest CDC event about each transaction, which is the same thing only while
+        # nothing is ever corrected -- and would silently stop being the same thing after
+        # the first amendment.
+        # The highest-volume Oracle table; a tighter freshness target and more aggressive
+        # compaction than the shared defaults.
+        dq: {not_null: [TRANSACTION_ID, ACCOUNT_ID], freshness_sla_minutes: 15}
+        maintenance: {compact_target_mb: 256}
+
+  - source_id: sqlserver
+    engine: sqlserver
+    connector: digital-source
+    database: digital
+    schema: dbo
+    topic_prefix: cdc.sqlserver
+    defaults:
+      domain: digital_channel
+      owner: my-aws-profile
+      governance:
+        technical_owner: data-platform
+        business_owner: digital-product
+        subdomain: reference
+        tags: [source-sqlserver]
+    tables:
+      - table: app_user
+        primary_key: [user_id]
+        governance:
+          subdomain: identity
+          criticality: tier_2
+          description: Digital app users; joins to Oracle CUSTOMER across the source boundary.
+          glossary_terms: [latest_state]
+          pii_fields:
+            - {column: user_id, category: pseudonymous}
+            - {column: device_type, category: behavioural}
+        classification: confidential
+        dq: {not_null: [user_id]}
+        # LATEST_STATE (R2-D, ADR-082/081). A mutable entity: consumers want the
+        # CURRENT row per key, not every event that produced it. `soft_flag` deletes are
+        # REQUIRED and enforced at compile -- the tombstone is what the next run's guard
+        # compares against, and removing it lets a late out-of-order event resurrect a
+        # key the source deleted.
+        realtime:
+          shape: latest_state
+          write_strategy: guarded_merge
+          processing: {source_progress: iceberg_snapshot}
+          # When the EOD close for a business date CERTIFIES, the changes it now contains
+          # are removed from the overlay (R2-F, ADR-085). Without this the two would be
+          # composed and the same change counted twice.
+          rebase: {on_eod_certified: true}
+        eod: {delete_policy: soft_flag}
+      - table: digital_event
+        primary_key: [event_id]
+        # DRP1: carries a pseudonymous user identifier; see `account` for the reasoning.
+        classification: confidential
+        governance:
+          subdomain: engagement
+          criticality: tier_2
+          description: Digital channel event stream; the REALTIME event window.
+          glossary_terms: [channel_engagement, event_window]
+          pii_fields:
+            - {column: user_id, category: pseudonymous}
+        # EVENT_WINDOW on the incremental cursor (R2-E, ADR-084). `append` + the cursor
+        # replaces re-reading 96 hours of FULL_CDC every ten minutes; `dv_event_id` is
+        # what makes a replayed range a no-op rather than a duplicate.
+        #
+        # `retention_hours: 96` is NOT a tightening: it makes the physical extent EQUAL the
+        # materialised window, which is what `overwrite_window` produced implicitly. Left at
+        # 168 the append path would keep a further three days the layer never promised, and
+        # a consumer counting rows would see the table change shape on the day this landed.
+        realtime:
+          shape: event_window
+          write_strategy: append
+          processing: {source_progress: iceberg_snapshot}
+          retention_hours: 96
+        # 3,000 rows/day against ACCOUNT's 320 -- the measured skew in the Phase 0 audit.
+        dq: {not_null: [event_id, user_id], freshness_sla_minutes: 15}
+        maintenance: {compact_target_mb: 256}
+      - table: channel
+        primary_key: [channel_code]
+        governance:
+          subdomain: reference
+          criticality: tier_3
+          description: Channel reference data. REALTIME is OFF; see ADR-086.
+        realtime: {enabled: false}
+        dq: {not_null: [channel_code]}
+      - table: merchant
+        primary_key: [merchant_id]
+        governance:
+          subdomain: reference
+          criticality: tier_3
+          description: Merchant reference data; a conformed dimension source.
+        realtime: {enabled: false}
+        dq: {not_null: [merchant_id]}
+      # PHASE 8 ACCEPTANCE, SECOND SOURCE TYPE. Everything above about COREBANK.LOAN
+      # applies here, on a different ENGINE: one entry, no new code. SQL Server is the
+      # engine that breaks Oracle-shaped assumptions -- a hex LSN where Oracle has a
+      # numeric SCN -- so proving the generic path on it is what makes the platform
+      # engine-agnostic rather than Oracle-with-a-SQL-Server-special-case.
+      #
+      # `payload.mode: typed` is exercised here and NOT on LOAN, deliberately: the two
+      # payload modes take different code paths through every layer (pk extraction,
+      # ordering, DQ, the EOD grain), and an acceptance that only ever ran the JSON path
+      # would leave the typed one unproven.
+      - table: payment_method
+        primary_key: [payment_method_id]
+        governance:
+          subdomain: payments
+          criticality: tier_2
+          description: Stored payment methods. Only the last four digits are held.
+          pii_fields:
+            - {column: masked_last4, category: financial}
+            - {column: user_id, category: pseudonymous}
+        classification: confidential      # payment instrument metadata
+        # EVENT_WINDOW on the incremental cursor (R2-E, ADR-084). `append` + the cursor
+        # replaces re-reading 96 hours of FULL_CDC every ten minutes; `dv_event_id` is
+        # what makes a replayed range a no-op rather than a duplicate.
+        #
+        # `retention_hours: 96` is NOT a tightening: it makes the physical extent EQUAL the
+        # materialised window, which is what `overwrite_window` produced implicitly. Left at
+        # 168 the append path would keep a further three days the layer never promised, and
+        # a consumer counting rows would see the table change shape on the day this landed.
+        realtime:
+          shape: event_window
+          write_strategy: append
+          processing: {source_progress: iceberg_snapshot}
+          retention_hours: 96
+        dq: {not_null: [payment_method_id, user_id]}
+        payload:
+          mode: typed
+          columns:
+          - {name: payment_method_id, type: "bigint", encoding: none}
+          - {name: user_id, type: "bigint", encoding: none}
+          - {name: method_type, type: "string", encoding: none}
+          - {name: masked_last4, type: "string", encoding: none}
+          - {name: is_default, type: "boolean", encoding: none}
+          # DATETIME2(6) -> Debezium io.debezium.time.MicroTimestamp -> int64 MICROSECONDS.
+          # Declared, never inferred: cast straight to timestamp this reads as year 57609
+          # and nothing raises.
+          - {name: created_at, type: "timestamp", encoding: micro_timestamp}

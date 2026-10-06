@@ -1,0 +1,280 @@
+{
+  "budget": 30.0,
+  "hours_per_month": 730.0,
+  "floor_baseline": {
+    "s3_lake_storage": 0.25,
+    "kms_cmks": 3.0,
+    "secretsmanager": 1.6,
+    "ssm_secure_params": 0.0,
+    "cloudwatch_alarms": 0.6000000000000001,
+    "cloudwatch_logs": 0.15,
+    "state_bucket": 2.5e-05,
+    "TOTAL": 5.600025
+  },
+  "floor_optimised": {
+    "s3_lake_storage": 0.25,
+    "kms_cmks": 2.0,
+    "secretsmanager": 0.0,
+    "ssm_secure_params": 0.0,
+    "cloudwatch_alarms": 0.0,
+    "cloudwatch_logs": 0.03,
+    "state_bucket": 2.5e-05,
+    "TOTAL": 2.2800249999999997
+  },
+  "full_stack_hourly_burn": 1.5322650410958902,
+  "kafka_share_of_burn": 0.5056977695871995,
+  "packages": {
+    "A  3 brokers, t3.xlarge source lab": {
+      "windows": [
+        {
+          "window": "W1",
+          "sessions": "03 + 04 + 05",
+          "hours": 4,
+          "parts": {
+            "msk_3x_m7g_large": 3.099452054794521,
+            "source_lab_xlarge": 0.8448,
+            "cdc_runtime": 0.4224,
+            "ebs_gp3": 0.052602739726027394
+          },
+          "total": 4.419254794520548
+        },
+        {
+          "window": "W2",
+          "sessions": "06 + 07",
+          "hours": 5,
+          "parts": {
+            "msk_3x_m7g_large": 3.874315068493151,
+            "source_lab_xlarge": 1.056,
+            "cdc_runtime": 0.528,
+            "ebs_gp3": 0.06575342465753424,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.065,
+            "athena": 0.03
+          },
+          "total": 6.525896493150686
+        },
+        {
+          "window": "W3",
+          "sessions": "09",
+          "hours": 4,
+          "parts": {
+            "msk_3x_m7g_large": 3.099452054794521,
+            "source_lab_xlarge": 0.8448,
+            "cdc_runtime": 0.4224,
+            "k3s_airflow": 0.4224,
+            "ebs_gp3": 0.0789041095890411,
+            "emr_serverless_nrt": 0.906828,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.052,
+            "athena": 0.03
+          },
+          "total": 6.159060164383561
+        },
+        {
+          "window": "W4",
+          "sessions": "08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)",
+          "hours": 8,
+          "parts": {
+            "k3s_airflow": 0.8448,
+            "ebs_gp3": 0.052602739726027394,
+            "emr_serverless_batch": 1.4509248,
+            "glue_interface_endpoint": 0.104,
+            "athena": 0.08
+          },
+          "total": 2.5323275397260274
+        },
+        {
+          "window": "W5",
+          "sessions": "12 + 15 + 17 + 19  (merged)",
+          "hours": 6,
+          "parts": {
+            "msk_3x_m7g_large": 4.649178082191781,
+            "source_lab_xlarge": 1.2671999999999999,
+            "cdc_runtime": 0.6335999999999999,
+            "k3s_airflow": 0.6335999999999999,
+            "ebs_gp3": 0.11835616438356164,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.078,
+            "athena": 0.05
+          },
+          "total": 8.336762246575343
+        }
+      ],
+      "windows_total": 27.973301238356164,
+      "floor": 2.2800249999999997,
+      "grand_total": 30.253326238356163
+    },
+    "A- 3 brokers, t3.large source lab": {
+      "windows": [
+        {
+          "window": "W1",
+          "sessions": "03 + 04 + 05",
+          "hours": 4,
+          "parts": {
+            "msk_3x_m7g_large": 3.099452054794521,
+            "source_lab_large": 0.4224,
+            "cdc_runtime": 0.4224,
+            "ebs_gp3": 0.052602739726027394
+          },
+          "total": 3.9968547945205484
+        },
+        {
+          "window": "W2",
+          "sessions": "06 + 07",
+          "hours": 5,
+          "parts": {
+            "msk_3x_m7g_large": 3.874315068493151,
+            "source_lab_large": 0.528,
+            "cdc_runtime": 0.528,
+            "ebs_gp3": 0.06575342465753424,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.065,
+            "athena": 0.03
+          },
+          "total": 5.9978964931506855
+        },
+        {
+          "window": "W3",
+          "sessions": "09",
+          "hours": 4,
+          "parts": {
+            "msk_3x_m7g_large": 3.099452054794521,
+            "source_lab_large": 0.4224,
+            "cdc_runtime": 0.4224,
+            "k3s_airflow": 0.4224,
+            "ebs_gp3": 0.0789041095890411,
+            "emr_serverless_nrt": 0.906828,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.052,
+            "athena": 0.03
+          },
+          "total": 5.736660164383562
+        },
+        {
+          "window": "W4",
+          "sessions": "08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)",
+          "hours": 8,
+          "parts": {
+            "k3s_airflow": 0.8448,
+            "ebs_gp3": 0.052602739726027394,
+            "emr_serverless_batch": 1.4509248,
+            "glue_interface_endpoint": 0.104,
+            "athena": 0.08
+          },
+          "total": 2.5323275397260274
+        },
+        {
+          "window": "W5",
+          "sessions": "12 + 15 + 17 + 19  (merged)",
+          "hours": 6,
+          "parts": {
+            "msk_3x_m7g_large": 4.649178082191781,
+            "source_lab_large": 0.6335999999999999,
+            "cdc_runtime": 0.6335999999999999,
+            "k3s_airflow": 0.6335999999999999,
+            "ebs_gp3": 0.11835616438356164,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.078,
+            "athena": 0.05
+          },
+          "total": 7.703162246575341
+        }
+      ],
+      "windows_total": 25.966901238356165,
+      "floor": 2.2800249999999997,
+      "grand_total": 28.246926238356163
+    },
+    "B  2 brokers, t3.large source lab": {
+      "windows": [
+        {
+          "window": "W1",
+          "sessions": "03 + 04 + 05",
+          "hours": 4,
+          "parts": {
+            "msk_2x_m7g_large": 2.0663013698630137,
+            "source_lab_large": 0.4224,
+            "cdc_runtime": 0.4224,
+            "ebs_gp3": 0.052602739726027394
+          },
+          "total": 2.9637041095890413
+        },
+        {
+          "window": "W2",
+          "sessions": "06 + 07",
+          "hours": 5,
+          "parts": {
+            "msk_2x_m7g_large": 2.5828767123287673,
+            "source_lab_large": 0.528,
+            "cdc_runtime": 0.528,
+            "ebs_gp3": 0.06575342465753424,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.065,
+            "athena": 0.03
+          },
+          "total": 4.706458136986302
+        },
+        {
+          "window": "W3",
+          "sessions": "09",
+          "hours": 4,
+          "parts": {
+            "msk_2x_m7g_large": 2.0663013698630137,
+            "source_lab_large": 0.4224,
+            "cdc_runtime": 0.4224,
+            "k3s_airflow": 0.4224,
+            "ebs_gp3": 0.0789041095890411,
+            "emr_serverless_nrt": 0.906828,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.052,
+            "athena": 0.03
+          },
+          "total": 4.703509479452055
+        },
+        {
+          "window": "W4",
+          "sessions": "08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)",
+          "hours": 8,
+          "parts": {
+            "k3s_airflow": 0.8448,
+            "ebs_gp3": 0.052602739726027394,
+            "emr_serverless_batch": 1.4509248,
+            "glue_interface_endpoint": 0.104,
+            "athena": 0.08
+          },
+          "total": 2.5323275397260274
+        },
+        {
+          "window": "W5",
+          "sessions": "12 + 15 + 17 + 19  (merged)",
+          "hours": 6,
+          "parts": {
+            "msk_2x_m7g_large": 3.0994520547945204,
+            "source_lab_large": 0.6335999999999999,
+            "cdc_runtime": 0.6335999999999999,
+            "k3s_airflow": 0.6335999999999999,
+            "ebs_gp3": 0.11835616438356164,
+            "emr_serverless_nrt": 0.604552,
+            "emr_serverless_batch": 0.302276,
+            "glue_interface_endpoint": 0.078,
+            "athena": 0.05
+          },
+          "total": 6.153436219178082
+        }
+      ],
+      "windows_total": 21.05943548493151,
+      "floor": 2.2800249999999997,
+      "grand_total": 23.339460484931507
+    }
+  },
+  "open_12_express": {
+    "kafka_m7g_large_hr": 0.255,
+    "express_m7g_large_hr": 0.51,
+    "express_premium_per_broker_hr": 0.255,
+    "storage_saved_per_broker_hr": 0.003287671232876712
+  }
+}

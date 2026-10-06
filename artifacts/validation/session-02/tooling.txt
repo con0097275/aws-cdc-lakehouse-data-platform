@@ -1,0 +1,11 @@
+Tool inventory recorded 2026-08-12T11:01:20Z
+Host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64
+
+terraform    Terraform v1.15.8
+python3      Python 3.10.8
+aws          aws-cli/1.36.20 Python/3.10.8 Linux/6.18.33.2-microsoft-standard-WSL2 botocore/1.35.79
+jq           jq-1.6
+git          git version 2.34.1
+checkov      checkov 3.3.10
+tflint       ABSENT
+shellcheck   ABSENT

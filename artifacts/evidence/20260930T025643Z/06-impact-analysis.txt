@@ -1,0 +1,30 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from cdc.impact import LineageImpactService
+from cdc.lineage_graph import build_static_graph
+from cdc.urns import UrnMinter, default_catalog
+from cdc.metadata_plane import load
+from cdc.assets import AssetId
+m = UrnMinter(load().environment, default_catalog()); g = build_static_graph(m)
+s = LineageImpactService(g, environment='dev', minter=m)
+r = s.downstream(m.dataset_urn(AssetId.parse('eod:oracle_coredb_corebank_account')))
+print('impacted:', len(r.nodes), '| executable:', len(r.executable))
+for k, v in r.by_class().items(): print(' ', k, len(v))
+for n in sorted(r.nodes, key=lambda x: (x.hops, x.urn))[:12]:
+    print(f'  hop {n.hops}  {m.parse_dataset(n.urn)[1][:56]}')
+
+
+impacted: 14 | executable: 14
+  EXECUTABLE_JOB 14
+  hop 1  kafka_dev_lab_dev_curated.banking_account
+  hop 2  kafka_dev_lab_dev_curated.dim_account
+  hop 2  kafka_dev_lab_dev_curated.fact_account_daily_snapshot
+  hop 3  kafka_dev_lab_dev_curated.fact_transaction
+  hop 3  kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot
+  hop 4  kafka_dev_lab_dev_mart.int_customer_daily_balance
+  hop 4  kafka_dev_lab_dev_mart.mart_account_balance_daily
+  hop 4  kafka_dev_lab_dev_mart.stg_fact_transaction
+  hop 5  kafka_dev_lab_dev_mart.int_customer_daily_txn
+  hop 5  kafka_dev_lab_dev_mart.mart_account_balance_monthly
+  hop 5  kafka_dev_lab_dev_mart.mart_account_risk_daily
+  hop 5  kafka_dev_lab_dev_mart.mart_channel_performance_daily

@@ -1,0 +1,32 @@
+# Session 17 — FinOps audit, live against the account
+# Captured: 2026-08-15T08:14:59Z
+# Account 111122223333 / ap-southeast-1 / profile my-aws-profile
+
+=== HEADLINE ===
+  THIS PROJECT     : $0.00/month — 0 resources tagged Project=kafka-dev-lab
+  THE ACCOUNT      : ~$0.35/month — 44 S3 buckets (13.67 GB) from PRIOR work
+  COMPUTE          : ZERO. No MSK, EC2, EMR, EKS, RDS, Redshift, NAT, EIP, EBS.
+
+=== TWO ALARMS I RAISED AND THEN CORRECTED BY CHECKING ===
+  1. '5 KMS keys = $5/mo' — WRONG. All five are AWS-MANAGED (alias/aws/*), which
+     are FREE. Only CUSTOMER-managed keys bill. Verified via KeyMetadata.KeyManager.
+  2. '44 buckets' — real, but NOT this project's. YouTube/Redfin/Snowflake/demo work.
+     The CDC lakehouse bucket vannk-dev-lake-* does not exist, confirming nothing
+     was ever applied.
+
+=== THE ONE REAL FINDING ===
+  3 CloudWatch log groups have retentionInDays = NULL (never expire):
+    /aws-glue/crawlers	95437
+    /aws/codebuild/airflow-dev-pipeline	638378
+    /aws/codebuild/airflow-staging-pipeline	800856
+  ~1.5 MB today, and they belong to OTHER projects. Not changed automatically —
+  altering another project's retention is the owner's call. Command in FINOPS.md 1.
+
+=== GUARDRAILS ALREADY IN PLACE ===
+    budget: My Monthly Cost Budget	30.0
+    budget: My Zero-Spend Budget	1.0
+    enable_athena=true  enable_redshift_serverless=false  enable_trino=false
+    0 NAT, 0 EKS, 0 RDS, 0 Redshift workgroups — all verified live
+
+=== NOTHING WAS DESTROYED OR STOPPED ===
+  There was nothing running to stop. No mutating command was executed.

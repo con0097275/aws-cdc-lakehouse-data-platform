@@ -1,0 +1,10 @@
+  oracle-corebank-source -> RUNNING ['RUNNING']
+  sqlserver-digital-source -> RUNNING ['RUNNING']
+--- offsets AFTER restart ---
+cdc.oracle.COREBANK.ACCOUNT:0:92
+cdc.oracle.COREBANK.ACCOUNT:1:125
+cdc.oracle.COREBANK.ACCOUNT:2:111
+cdc.oracle.COREBANK.CUSTOMER:0:67
+cdc.oracle.COREBANK.CUSTOMER:1:69
+cdc.oracle.COREBANK.CUSTOMER:2:70
+

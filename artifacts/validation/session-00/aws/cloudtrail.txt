@@ -1,0 +1,25 @@
+# CloudTrail corroboration of the repo A destroy (SOURCE_REPOSITORY_DECISION.md 3.3)
+# Captured: 2026-08-13T03:47:46Z
+
+$ aws cloudtrail lookup-events EventName=DeleteCluster --max-results 5
+[
+    {
+        "Time": 1785092986.0,
+        "User": "my-aws-profile",
+        "Name": "DeleteCluster"
+    }
+]
+
+$ aws cloudtrail lookup-events EventName=CreateCluster --max-results 5
+[
+    {
+        "Time": 1785071949.0,
+        "User": "my-aws-profile",
+        "Name": "CreateCluster"
+    },
+    {
+        "Time": 1785070874.0,
+        "User": "my-aws-profile",
+        "Name": "CreateCluster"
+    }
+]

@@ -1,0 +1,17 @@
+=== source-lab: docker ps -a
+source-sqlserver	Up 13 minutes (healthy)	mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
+
+=== source-lab: compose + disk
+/dev/nvme0n1p1   50G   17G   34G  34% /
+docker-compose.yml
+generators
+healthcheck.sh
+oracle
+sqlserver
+NAME               IMAGE                                                   COMMAND                  SERVICE     CREATED          STATUS                    PORTS
+source-sqlserver   mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04   "/opt/mssql/bin/perm…"   sqlserver   13 minutes ago   Up 13 minutes (healthy)   10.42.0.114:1433->1433/tcp
+
+=== source-lab: oracle logs tail
+Error response from daemon: No such container: source-oracle
+no container named source-oracle
+

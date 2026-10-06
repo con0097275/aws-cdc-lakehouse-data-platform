@@ -1,0 +1,118 @@
+# Session 13 — rendered mart-read policy (defect D13-1 fix)
+# The BI role was attached to lake_read, which grants s3:GetObject on the WHOLE
+# bucket. The comment beside it claimed 'Power BI reads marts, never L1/L2'.
+# Rendered with terraform apply against a standalone copy of the policy document:
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListLakeBucketForServing",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "arn:aws:s3:::lake",
+            "Condition": {
+                "StringLike": {
+                    "s3:prefix": [
+                        "warehouse/snapshot/*",
+                        "warehouse/curated/*",
+                        "warehouse/mart/*",
+                        "warehouse/ops/*",
+                        "athena-results/*"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "ReadServingObjects",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObjectVersion",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::lake/warehouse/snapshot/*",
+                "arn:aws:s3:::lake/warehouse/ops/*",
+                "arn:aws:s3:::lake/warehouse/mart/*",
+                "arn:aws:s3:::lake/warehouse/curated/*"
+            ]
+        },
+        {
+            "Sid": "ReadWriteQueryResults",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:AbortMultipartUpload"
+            ],
+            "Resource": "arn:aws:s3:::lake/athena-results/*"
+        },
+        {
+            "Sid": "DenyRawCdcLayers",
+            "Effect": "Deny",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObjectVersion",
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::lake/warehouse/stream/*",
+                "arn:aws:s3:::lake/warehouse/quarantine/*",
+                "arn:aws:s3:::lake/warehouse/full_cdc/*",
+                "arn:aws:s3:::lake/checkpoints/*"
+            ]
+        },
+        {
+            "Sid": "DecryptServingObjects",
+            "Effect": "Allow",
+            "Action": [
+                "kms:DescribeKey",
+                "kms:Decrypt"
+            ],
+            "Resource": "arn:aws:kms:ap-southeast-1:111122223333:key/abc"
+        },
+        {
+            "Sid": "ReadGlueServingCatalog",
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetTables",
+                "glue:GetTable",
+                "glue:GetPartitions",
+                "glue:GetPartition",
+                "glue:GetDatabases",
+                "glue:GetDatabase"
+            ],
+            "Resource": [
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_snapshot/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_ops/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_mart/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_curated/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_snapshot",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_ops",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_mart",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_curated",
+                "arn:aws:glue:ap-southeast-1:111122223333:catalog"
+            ]
+        },
+        {
+            "Sid": "DenyRawCdcCatalog",
+            "Effect": "Deny",
+            "Action": [
+                "glue:GetTables",
+                "glue:GetTable",
+                "glue:GetPartitions",
+                "glue:GetPartition"
+            ],
+            "Resource": [
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_stream/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:table/p_full_cdc/*",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_stream",
+                "arn:aws:glue:ap-southeast-1:111122223333:database/p_full_cdc"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,50 @@
+# Session 13 — validation transcript
+# Captured: 2026-08-14T17:08:31Z
+
+=== LIVE AWS STATE (nothing applied) ===
+  Athena workgroups (ours): 0
+  MSK clusters            : 0
+  Redshift Serverless     : 0
+  => unapplied. No Athena query was executed, so $0.00 was scanned.
+
+=== DEFECT D13-1 — the BI role could read L1/L2 ===
+  athena_bi was attached to lake_read:
+      actions   = [s3:GetObject, s3:GetObjectVersion]
+      resources = [${lake_bucket_arn}/*]        <- the WHOLE bucket
+  The attachment comment claimed 'Power BI reads marts, never L1/L2'.
+  The policy did not implement it. Fixed with a new mart_read policy:
+    - narrow Allow on warehouse/{snapshot,curated,mart,ops}/ + athena-results/
+    - scoped s3:prefix on ListBucket (a listing leaks table names and volumes)
+    - EXPLICIT DENY on warehouse/stream/*, full_cdc/*, quarantine/*, checkpoints/*
+    - EXPLICIT DENY on the Glue catalog for stream/full_cdc (schemas leak too)
+  Rendered policy: mart-read-policy.json
+
+=== TERRAFORM ===
+  fmt/validate  : Success
+  plan          : 117 create, 23 read, 0 destroy, 0 replace
+  Session 13    : + aws_iam_policy.mart_read
+                  + aws_athena_workgroup.this
+
+=== NO REDSHIFT / NO TRINO — precisely ===
+  Engine resources (namespace/workgroup/cluster) : NONE
+  aws_redshiftserverless_* / Trino compute       : NONE
+  IAM objects named for them                     : 7 (roles/profile/attachments)
+    These pre-date Session 13, come from modules/lake_iam, are FREE, and exist so the
+    engines can be enabled later without an IAM change. 'Zero Redshift/Trino
+    resources' would be imprecise; 'zero BILLABLE Redshift/Trino resources' is accurate.
+  Flags: enable_athena=true  enable_redshift_serverless=false  enable_trino=false
+
+=== COST ===
+  Athena workgroup       $0.00  (no idle cost)
+  Data scanned           $5.00/TB, capped at 10 GiB/query = ~$0.05 ceiling
+  Query results          7-day lifecycle
+  Session 13 incremental $0.00 until a query runs
+
+=== TESTS ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+26 passed, 4 warnings in 0.09s
+
+=== FULL SUITE ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+268 passed, 4 warnings in 115.76s (0:01:55)
+Closing down clientserver connection

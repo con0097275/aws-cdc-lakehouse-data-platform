@@ -1,0 +1,81 @@
+{
+  "artifact": {
+    "bias": 7.21036010403686e-06,
+    "feature_names": [
+      "closing_balance",
+      "txn_count",
+      "debit_amount",
+      "credit_amount"
+    ],
+    "iterations": 500,
+    "l2": 0.01,
+    "learning_rate": 0.1,
+    "mean": [
+      6349633.3384374995,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      3078957.419362359,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "seed": 42,
+    "weights": [
+      3.2199860491186527,
+      -0.006306244650145149,
+      0.004550578042829338,
+      0.005703386402989633
+    ]
+  },
+  "code_version": "baa348eae8658f4d48e49b7460167b8ca3dae1d9",
+  "created_at": "2026-08-26T14:15:26+00:00",
+  "dataset_version": "dataset:ecbe9eade4dc35a0",
+  "feature_versions": [
+    "feature_group:pilot-v1"
+  ],
+  "metrics": {
+    "test": {
+      "accuracy": 1.0,
+      "auc_roc": 1.0,
+      "confusion": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 160,
+        "tp": 160
+      },
+      "f1": 1.0,
+      "n": 320,
+      "positives": 160,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "train": {
+      "accuracy": 1.0,
+      "auc_roc": 1.0,
+      "confusion": {
+        "fn": 0,
+        "fp": 0,
+        "tn": 320,
+        "tp": 320
+      },
+      "f1": 1.0,
+      "n": 640,
+      "positives": 320,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "model_name": "account_balance_tier_next_day",
+  "model_version": "model:eb58e352986ba990",
+  "owner": "risk-data",
+  "parameters": {
+    "iterations": 500,
+    "l2": 0.01,
+    "learning_rate": 0.1,
+    "seed": 42
+  },
+  "synthetic_label": true
+}

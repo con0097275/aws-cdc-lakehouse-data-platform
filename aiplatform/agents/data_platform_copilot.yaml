@@ -1,0 +1,42 @@
+# V1 read-only copilot. Only tools the repository can actually back; a tool that returns a
+# plausible answer from nothing is worse than a missing tool.
+agent_name: data_platform_copilot
+description: Answers questions about the platform's architecture, data and pipelines.
+# CORRECTED by AI-P8, 2026-08-26. The previously pinned
+# anthropic.claude-haiku-4-5-20251001-v1:0 cannot be invoked by bare model id -- newer
+# Anthropic models on Bedrock require a cross-region INFERENCE PROFILE and reject the plain
+# id with ValidationException. Verified against the live account.
+model_id: anthropic.claude-3-5-sonnet-20240620-v1:0
+prompt_version: "prompt:v1"
+temperature: 0.0
+max_output_tokens: 800
+max_context_chars: 8000
+session_memory: false          # ADR-057: session state is where injection persists
+
+tools:
+  - tool_name: retrieve_knowledge
+    description: BM25 retrieval over the published corpus, with citations.
+    authorization_class: public_metadata
+    input_schema:  {type: object, properties: {question: {type: string}}, required: [question]}
+    output_schema: {type: object, properties: {chunks: {type: array}}}
+    timeout_seconds: 15
+  - tool_name: explain_dataset
+    description: Owner, grain, classification, PII, retention and SLA for one dataset.
+    authorization_class: public_metadata
+    input_schema:  {type: object, properties: {name: {type: string}}, required: [name]}
+    output_schema: {type: object, properties: {summary: {type: string}}}
+  - tool_name: query_athena
+    description: >
+      Read-only Athena query over MART/SERVING only. Guarded by an allow-list, single
+      statement, injected LIMIT re-validated after injection, and the workgroup's enforced
+      bytes cutoff.
+    authorization_class: governed_read
+    input_schema:  {type: object, properties: {sql: {type: string}}, required: [sql]}
+    output_schema: {type: object, properties: {rows: {type: array}, query_id: {type: string}}}
+    timeout_seconds: 60
+    max_rows: 500
+  - tool_name: get_pipeline_status
+    description: Execution status from the DynamoDB runtime state and the compiled plan.
+    authorization_class: ops_read
+    input_schema:  {type: object, properties: {job_id: {type: string}}, required: [job_id]}
+    output_schema: {type: object, properties: {status: {type: string}}}

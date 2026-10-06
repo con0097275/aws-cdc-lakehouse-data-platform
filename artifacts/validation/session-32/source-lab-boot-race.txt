@@ -1,0 +1,49 @@
+SOURCE LAB BOOT RACE — found and cleared 2026-08-20T04:35Z.
+
+SYMPTOM
+  Source lab (i-0108f96e91b11b717, t3a.xlarge) had been up 40 minutes with NO containers.
+  Oracle and SQL Server were never started, so there was no CDC source at all.
+
+EVIDENCE  /var/log/cloud-init-output.log
+  === source lab bootstrap 2026-08-20T03:57:10Z ===
+  fatal error: An error occurred (AccessDenied) when calling the ListObjectsV2 operation:
+    User: arn:aws:sts::111122223333:assumed-role/kafka-dev-lab-dev-source-lab/i-0108f96e91b11b717
+    is not authorized to perform: s3:ListBucket
+  2026-08-20 03:59:03 - cc_scripts_user.py[WARNING]: Failed to run module scripts-user
+
+  user-data.sh.tftpl:31   aws s3 sync "$BOOTSTRAP_URI" "$LAB_DIR" ...
+  There is no retry. One AccessDenied ends the bootstrap permanently.
+
+NOT A PERMISSIONS GAP — A RACE
+  The role HAS the right policy now, and the same call succeeds now:
+
+    $ aws s3 ls s3://kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/
+        PRE generators/   PRE oracle/   PRE sqlserver/
+        2026-08-20 03:56:45   3024  docker-compose.yml
+        2026-08-20 03:56:46   3248  healthcheck.sh
+
+  Timeline, and it is tight:
+    03:56:45-46   Terraform uploads the bootstrap objects (aws_s3_object)
+    03:56:49      the instance launches
+    03:57:10      user-data runs `aws s3 sync`  -> AccessDenied
+    03:59:03      cloud-init gives up
+
+  The instance assumed its role and called S3 roughly 20 seconds after the IAM attachment
+  and the objects were created. IAM is eventually consistent; the grant had not propagated.
+
+CLEARED BY
+  cloud-init single --name scripts-user --frequency always
+  -> source-sqlserver container Created/Starting/Started within ~2 minutes.
+
+THE REPO FIX (not applied here -- it changes user-data, which REPLACES the instance,
+and replacing the source lab mid-validation would discard the databases just brought up)
+  `depends_on` alone does not fix this: Terraform ordering cannot make an IAM grant
+  propagate. The bootstrap needs to RETRY:
+
+      for attempt in 1 2 3 4 5; do
+        aws s3 sync "$BOOTSTRAP_URI" "$LAB_DIR" --region "$REGION" --only-show-errors && break
+        echo "bootstrap sync attempt $attempt failed; IAM may still be propagating"
+        sleep $((attempt * 10))
+      done
+
+  Same pattern belongs in the CDC runtime user-data, which stages assets the same way.

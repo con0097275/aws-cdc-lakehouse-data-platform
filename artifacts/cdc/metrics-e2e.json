@@ -1,0 +1,102 @@
+{
+ "oracle.coredb.corebank.account": {
+  "avg_file_size_bytes": 64636.0,
+  "file_count": 1,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_account",
+  "manifest_count": 1,
+  "orphan_file_count": 0,
+  "small_file_count": 1,
+  "snapshot_count": 1,
+  "total_bytes": 64636
+ },
+ "oracle.coredb.corebank.branch": {
+  "avg_file_size_bytes": 9455.0,
+  "file_count": 1,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_branch",
+  "manifest_count": 1,
+  "orphan_file_count": 0,
+  "small_file_count": 1,
+  "snapshot_count": 1,
+  "total_bytes": 9455
+ },
+ "oracle.coredb.corebank.customer": {
+  "avg_file_size_bytes": 42025.0,
+  "file_count": 1,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_customer",
+  "manifest_count": 1,
+  "orphan_file_count": 0,
+  "small_file_count": 1,
+  "snapshot_count": 1,
+  "total_bytes": 42025
+ },
+ "oracle.coredb.corebank.loan": {
+  "avg_file_size_bytes": 16945.0,
+  "file_count": 1,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_loan",
+  "manifest_count": 1,
+  "orphan_file_count": 0,
+  "small_file_count": 1,
+  "snapshot_count": 1,
+  "total_bytes": 16945
+ },
+ "oracle.coredb.corebank.transaction": {
+  "avg_file_size_bytes": 343292.0,
+  "file_count": 1,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_transaction",
+  "manifest_count": 1,
+  "orphan_file_count": 0,
+  "small_file_count": 1,
+  "snapshot_count": 1,
+  "total_bytes": 343292
+ },
+ "sqlserver.digital.dbo.app_user": {
+  "avg_file_size_bytes": 0.0,
+  "file_count": 0,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_app_user",
+  "manifest_count": 0,
+  "orphan_file_count": 0,
+  "small_file_count": 0,
+  "snapshot_count": 0,
+  "total_bytes": 0
+ },
+ "sqlserver.digital.dbo.channel": {
+  "avg_file_size_bytes": 0.0,
+  "file_count": 0,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_channel",
+  "manifest_count": 0,
+  "orphan_file_count": 0,
+  "small_file_count": 0,
+  "snapshot_count": 0,
+  "total_bytes": 0
+ },
+ "sqlserver.digital.dbo.digital_event": {
+  "avg_file_size_bytes": 0.0,
+  "file_count": 0,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_digital_event",
+  "manifest_count": 0,
+  "orphan_file_count": 0,
+  "small_file_count": 0,
+  "snapshot_count": 0,
+  "total_bytes": 0
+ },
+ "sqlserver.digital.dbo.merchant": {
+  "avg_file_size_bytes": 0.0,
+  "file_count": 0,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_merchant",
+  "manifest_count": 0,
+  "orphan_file_count": 0,
+  "small_file_count": 0,
+  "snapshot_count": 0,
+  "total_bytes": 0
+ },
+ "sqlserver.digital.dbo.payment_method": {
+  "avg_file_size_bytes": 0.0,
+  "file_count": 0,
+  "identifier": "glue_catalog.kafka_dev_lab_dev_full_cdc.cdc_sqlserver_digital_dbo_payment_method",
+  "manifest_count": 0,
+  "orphan_file_count": 0,
+  "small_file_count": 0,
+  "snapshot_count": 0,
+  "total_bytes": 0
+ }
+}

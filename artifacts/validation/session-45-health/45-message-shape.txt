@@ -1,0 +1,8 @@
+=== sqlserver key config
+39:    "message.key.columns": "dbo.app_user:user_id;dbo.channel:channel_code;dbo.digital_event:event_id;dbo.merchant:merchant_id;dbo.payment_method:payment_method_id",
+50:    "key.converter": "io.apicurio.registry.utils.converter.AvroConverter",
+=== sample 3 messages: partition + key presence + value size
+Partition:2	[B@33a3c44a	[B@5fcfca62
+Partition:2	[B@499ef98e	[B@24934262
+Partition:2	[B@93f432e	[B@288214b1
+

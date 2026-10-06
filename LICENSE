@@ -1,0 +1,31 @@
+All Rights Reserved
+
+Copyright (c) 2026 con0097275
+
+This repository is published for one purpose: to let people evaluate the author's
+engineering work. It is a portfolio, not a library and not a product.
+
+NO LICENCE IS GRANTED.
+
+You may:
+  - read this repository;
+  - clone or fork it for the sole purpose of reading it;
+  - quote short excerpts when discussing or reviewing the work, with attribution.
+
+You may NOT, without the author's prior written permission:
+  - use this material, in whole or in part, in any product, service or internal system,
+    whether commercial or not;
+  - copy, modify, merge, publish, redistribute, sublicense or sell it;
+  - use it as training data for a machine-learning model;
+  - re-publish it, in whole or in substantial part, under your own name or any licence.
+
+The architectural ideas and the engineering reasoning documented here are the point of
+the repository and are offered freely for discussion. The implementation is not.
+
+Requests for permission: open an issue on this repository.
+
+THE MATERIAL IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE MATERIAL OR
+ITS USE.

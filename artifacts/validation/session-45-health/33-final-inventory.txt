@@ -1,0 +1,25 @@
+### 2026-09-20T09:44:04Z CONSOLIDATED RESOURCE CHECK
+== MSK
+kafka-dev-lab-dev	ACTIVE
+== EC2
+kafka-dev-lab-dev-airflow	running	t3.large
+kafka-dev-lab-dev-cdc-runtime	running	t3.large
+kafka-dev-lab-dev-source-lab	running	t3a.xlarge
+kafka-dev-lab-dev-toolbox	running	t3.small
+== EMR
+kafka-dev-lab-dev-spark	00g8tlee3db1gu25	CREATED
+== Glue tables per db
+   kafka_dev_lab_dev_full_cdc         0
+   kafka_dev_lab_dev_stream           0
+   kafka_dev_lab_dev_snapshot         0
+   kafka_dev_lab_dev_ops              0
+   kafka_dev_lab_dev_curated          0
+   kafka_dev_lab_dev_mart             0
+   kafka_dev_lab_dev_serving          0
+   kafka_dev_lab_dev_quarantine       0
+== KMS pending deletion
+   cd7c3d82-932b-479f-9f25-577311cec8a7  PendingDeletion	1790270915.486	KMS key for kafka-dev-lab-dev MSK lab
+== Budget
+51.686	95.579
+== Airflow UI credentials location
+/kafka-dev-lab/dev/airflow/admin-password	SecureString

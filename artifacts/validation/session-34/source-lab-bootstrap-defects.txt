@@ -1,0 +1,93 @@
+Source-lab bootstrap defects found and fixed — 2026-08-21
+Account 111122223333 / ap-southeast-1 / instance i-087d247ae3fb4ac14
+
+REPORTED SYMPTOM
+  "missing password in 'digital' database (not correct to connect)"
+
+WHAT IT ACTUALLY WAS
+  The sa password was CORRECT the whole time. Proof: a sqlcmd as sa authenticated and
+  returned the database list successfully. What that list showed was the real problem:
+
+      master, tempdb, model, msdb        <- 'digital' ABSENT
+
+  Every later command uses `-d digital`, and connecting to a database that does not
+  exist reports as a login failure. The password was never the issue.
+
+--------------------------------------------------------------------------------
+DEFECT 1 — SQL Server schema was never created
+--------------------------------------------------------------------------------
+  docker/source-lab/healthcheck.sh ran, for SQL Server:
+      --enable-cdc  ->  02-enable-cdc.sql
+      --seed        ->  03-seed.sql
+  and NEVER 01-init.sql, the script that does CREATE DATABASE digital.
+
+  Root cause: the files are mounted at /docker-entrypoint-initdb.d/, which is a
+  PostgreSQL auto-run convention. The mssql image has no equivalent and runs nothing.
+  The Oracle image DOES auto-run /opt/oracle/scripts/startup, so Oracle came up with a
+  schema and SQL Server did not -- an asymmetry that hid the missing call.
+
+  FIX: sqlserver_init_if_missing() in healthcheck.sh, called from --init, --enable-cdc
+  and --seed. Guarded on a COUNT over sys.databases, so it is idempotent.
+  VERIFIED: digital created; channel/merchant/app_user/digital_event present.
+
+--------------------------------------------------------------------------------
+DEFECT 2 — snapshot isolation was never enabled
+--------------------------------------------------------------------------------
+  grep for ALLOW_SNAPSHOT_ISOLATION across docker/source-lab/ returned NOTHING.
+  The Debezium SQL Server connector needs it for its snapshot; without it the connector
+  registers as RUNNING and then fails at snapshot time -- healthy-looking, captures zero.
+
+  FIX: idempotent ALTER DATABASE ... SET ALLOW_SNAPSHOT_ISOLATION ON in
+  sqlserver/02-enable-cdc.sql, guarded on snapshot_isolation_state = 0, placed before
+  CDC enablement so it runs while the database is empty and cannot block on open txns.
+  VERIFIED: snapshot_isolation_state = 1.
+
+--------------------------------------------------------------------------------
+DEFECT 3 — Oracle corebank password was unknowable
+--------------------------------------------------------------------------------
+  oracle/01-init.sql: CREATE USER corebank IDENTIFIED BY "&1"
+  &1 is a SQL*Plus positional substitution variable. The Oracle image auto-runs startup
+  scripts with NO arguments, so &1 was never bound and corebank got an unintended
+  password. Schema and seed both load as SYSTEM, so every health check passed; the
+  breakage surfaces only later as ORA-01017 from `sqlplus corebank/...`, which is what
+  scripts/source-lab.sh cmd_workload uses for all 6 workload scenarios.
+
+  FIX: oracle_reconcile_corebank_password() in healthcheck.sh -- an idempotent
+  ALTER USER run as SYSTEM, making "corebank's password IS $ORACLE_PASSWORD" true
+  regardless of how 01-init was invoked.
+  VERIFIED: corebank login now succeeds; SELECT COUNT(*) FROM transaction = 2000.
+
+--------------------------------------------------------------------------------
+DEFECT 4 — create-topics.sh emitted names Debezium never writes to
+--------------------------------------------------------------------------------
+  Debezium's TopicNamingStrategy uses identifiers AS THE DATABASE STORES THEM.
+      was: cdc.oracle.corebank.<t>          is: cdc.oracle.COREBANK.<T>   (Oracle folds
+                                                 unquoted identifiers to uppercase)
+      was: cdc.sqlserver.digital.<t>        is: cdc.sqlserver.digital.dbo.<t>
+                                                 (SQL Server topics include the schema)
+  and six internal topics were missing entirely: the schema-change topics named exactly
+  after topic.prefix (cdc.oracle, cdc.sqlserver), both schema-history topics, and both
+  heartbeats (<heartbeat.topics.prefix>.<topic.prefix>, so the prefix appears twice).
+
+  With auto.create.topics.enable=false this fails SILENTLY: connectors report RUNNING
+  and eight topics sit at offset 0.
+
+  schema-history is cleanup.policy=DELETE with retention.ms=-1, NOT compact. Debezium
+  replays it from the beginning to rebuild the DDL timeline; compaction would drop
+  intermediate DDL and break schema reconstruction at older offsets.
+
+  FIX: all names corrected, 6 internal topics added, retention documented in-line.
+  VERIFIED: 22 topics present with the exact names above.
+
+--------------------------------------------------------------------------------
+STATE AFTER THESE FIXES
+--------------------------------------------------------------------------------
+  healthcheck.sh: ALL CHECKS PASSED - safe to deploy connectors
+    Oracle    ARCHIVELOG + supplemental logging MIN
+    SQLServer Agent Running, CDC enabled, 4 tables tracked
+  Seed parity: Oracle branch 4 / customer 200 / account 320 / transaction 2000
+               SQLServer channel 4 / merchant 50 / app_user 150 / digital_event 3000
+  Kafka Connect REST is UP and reached MSK (kafka_cluster_id Ve-wolD7QsKwKRRh9DXTDA)
+
+  NOT DONE: connector registration. scripts/register-connectors.sh refuses to
+  self-approve ("a human must type the confirmation phrase", docs/APPROVAL_GATES.md).

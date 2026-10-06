@@ -1,0 +1,11 @@
+=== connector + task state (traces if any)
+-- oracle-corebank-source
+   connector: RUNNING
+   task 0 RUNNING 
+-- sqlserver-digital-source
+   connector: RUNNING
+   task 0 RUNNING 
+
+
+=== topic config: partitions / replication / retention / cleanup
+

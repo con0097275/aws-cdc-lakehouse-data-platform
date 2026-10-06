@@ -1,0 +1,22 @@
+=== docker journal mentions of source-oracle
+
+=== any shell history / scripts that ran compose
+-rw-r--r--.  1 root   root            402669 Sep 20 09:01 source-lab-bootstrap.log
+
+=== ssm command history on this node (last 10)
+----------------------------------------------------------------
+|                    ListCommandInvocations                    |
++---------+----------------------+----------+------------------+
+| Comment |         Doc          | Status   |      Time        |
++---------+----------------------+----------+------------------+
+|         |  AWS-RunShellScript  |  Success |  1789894935.899  |
+|         |  AWS-RunShellScript  |  Success |  1789894932.363  |
+|         |  AWS-RunShellScript  |  Success |  1789894909.924  |
+|         |  AWS-RunShellScript  |  Success |  1789894907.208  |
+|         |  AWS-RunShellScript  |  Success |  1789894904.366  |
+|         |  AWS-RunShellScript  |  Success |  1789894901.304  |
+|         |  AWS-RunShellScript  |  Success |  1789894877.128  |
+|         |  AWS-RunShellScript  |  Success |  1789894874.195  |
+|         |  AWS-RunShellScript  |  Success |  1789894871.54   |
+|         |  AWS-RunShellScript  |  Success |  1789894857.921  |
++---------+----------------------+----------+------------------+

@@ -1,0 +1,99 @@
+PHASE 12 — FINAL PRE-APPLY VERIFICATION.  2026-08-20.
+RESULT: STOPPED BEFORE APPLY.  Nothing was applied.  Spend $0.00.
+
+================================================================================
+CONTEXT — all verified, all correct
+================================================================================
+  identity     arn:aws:iam::111122223333:user/my-aws-profile
+  account      111122223333            matches EXPECT_ACCOUNT
+  region       ap-southeast-1          matches
+  workspace    default
+  state        s3://aws-cdc-lakehouse-tfstate-111122223333/aws-cdc-lakehouse/dev/
+               serial 14, 3 resources: caller_identity, budget, lake bucket
+  budget       kafka-dev-lab-dev-monthly, 30.0 USD, MONTHLY, TagKeyValue-filtered  LIVE
+               (plus two account-level budgets: My Monthly Cost 30.0, My Zero-Spend 1.0)
+
+================================================================================
+STOP 1 — THE REPOSITORY'S SAVED PLAN IS NOT THE APPROVED PLAN
+================================================================================
+`scripts/tf.sh apply --execute` applies terraform/envs/dev/tfplan and nothing else.
+That file contains:
+
+  actions                 130 create, 25 update, 7 no-op
+  aws_msk_cluster         CREATE x1      <-- always-on Kafka, ~$0.7650/hr
+  aws_emrserverless_app   CREATE x1
+  aws_instance            CREATE x3
+  aws_dynamodb_table      CREATE x0      <-- the approved plan's entire purpose
+  reporting_ops           NONE
+
+Four of the listed STOP conditions fire at once: a new expensive always-on Kafka
+resource, a new large EMR resource, and a plan that does not match what was approved.
+
+================================================================================
+STOP 2 — THAT PLAN IS ALSO STRUCTURALLY STALE
+================================================================================
+  plan file mtime          2026-08-16 16:02
+  config mtime             2026-08-20 09:47  (main.tf, variables.tf, outputs.tf)
+  plan's PRIOR STATE       46 resources
+  actual current state      3 resources
+
+The 25 `update` actions are computed against 43 resources that no longer exist -- they
+were destroyed on 2026-08-16 between 10:57 and 11:03. A saved plan is applied AS-IS and
+is not re-checked against the configuration, so applying it would ignore
+modules/reporting_ops entirely and act on a world that is four days gone.
+
+================================================================================
+STOP 3 — THE APPROVED PLAN CANNOT BE APPLIED AS IT STANDS EITHER
+================================================================================
+Plan B (reporting-only) is correct on every axis checked:
+
+  actions        42 create, 0 change, 0 DESTROY
+  network        NONE          no VPC, subnet, SG, NAT gateway, endpoint, EIP
+  MSK            0
+  EMR            0
+  Airflow        0
+  DynamoDB       4             PAY_PER_REQUEST, SSE-CMK, PITR off, TTL only on execution
+  IAM            1 role, 2 policies, 2 attachments -- no Scan, no DeleteItem, no wildcard
+  S3             16 prefix markers + 6 bucket-level configs, 1 KMS CMK
+  cost           $0.0000/hr, 6h window $0.00, monthly floor $1.00 (the lake CMK)
+
+But it must not be applied yet:
+
+  a) auto_destroy_after = 2026-08-16T18:00:00Z -- FOUR DAYS IN THE PAST.  The value is
+     baked into every resource's tags in that plan, so every resource would be created
+     already-expired to any cleanup sweep (ADR-027, OPEN-34).
+  b) ADR-036 is marked "requires operator sign-off before terraform apply".  No sign-off
+     is recorded anywhere in the repository.
+  c) OPEN-32 (EMR unreachable without MSK) and OPEN-33 (ADR-036 vs implementation) are
+     both open.  Applying the state store before deciding OPEN-32 creates tables that
+     nothing can yet run against.
+  d) It was generated with -lock=false for read-only analysis and lives in a scratchpad,
+     not at the path the wrapper applies.
+
+================================================================================
+STOP 4 — THE GATE CANNOT BE SELF-APPROVED, BY DESIGN
+================================================================================
+scripts/tf.sh cmd_apply calls confirm_destructive, which does:
+
+    if [[ ! -t 0 ]]; then die "refusing to run non-interactively; a human must type
+                              the confirmation phrase"
+
+APPROVAL_GATES.md: "No gate may be self-approved by an agent."  An agent has no terminal,
+so the wrapper refuses.  Running bare `terraform apply` to get around that is precisely
+what the control exists to prevent, and was not done.
+
+================================================================================
+WHAT AN OPERATOR RUNS, IN ORDER
+================================================================================
+  1. Decide OPEN-32 (docs/REPORTING_INFRA_GAP_ANALYSIS.md section 5) and record it.
+  2. Sign off ADR-036; amend it for the two divergences (OPEN-33).
+  3. Set auto_destroy_after in terraform/envs/dev/terraform.tfvars to a REAL future
+     window end, e.g. window start + 6h.
+  4. Set enable_reporting_framework = true (and the other flags to the tier you intend).
+  5. bash scripts/tf.sh plan          # regenerates terraform/envs/dev/tfplan, controlled
+  6. bash scripts/tf.sh show          # READ IT.  Confirm: 0 destroy, 0 MSK, 4 DynamoDB.
+  7. bash scripts/tf.sh cost          # confirm $0.0000/hr before the confirmation phrase
+  8. bash scripts/tf.sh apply --execute
+
+Step 5 replaces the stale tfplan.  Until then that file is a loaded gun: it is the newest
+plan on disk, it is what the wrapper applies, and it creates MSK.

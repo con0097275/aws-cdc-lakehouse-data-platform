@@ -1,0 +1,5 @@
+$ bash -c python3 --version; java -version 2>&1 | head -1; terraform --version | head -1
+
+Python 3.10.8
+openjdk version "17.0.20.1" 2026-08-18
+Terraform v1.15.8

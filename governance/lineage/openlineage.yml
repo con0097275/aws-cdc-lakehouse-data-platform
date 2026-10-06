@@ -1,0 +1,127 @@
+# OpenLineage configuration. Open-source, no SaaS (session constraint).
+#
+# WHAT THIS ADDS THAT dbt DOES NOT
+# --------------------------------
+# dbt already emits complete lineage for the models it owns (Session 11: manifest.json,
+# 53 nodes, 7 sources, 2 exposures). Rebuilding that here would be a second lineage system
+# restating the first — the S11-3 objection.
+#
+# What dbt CANNOT see is everything upstream of the marts: Debezium -> Kafka -> L1 -> L2 ->
+# L3 -> Kimball are Spark jobs and connectors, invisible to a SQL compiler. That gap is
+# what OpenLineage covers here, and the two are joined at the marts.
+#
+# ---------------------------------------------------------------------------------------
+# SUPERSEDED (2026-09-30, DRP6) -- and CORRECTED.
+#
+# This file is the Session-14 DECLARED graph. The DRP0 audit found two things wrong with it:
+#
+#   1. It marked the Spark hops `evidence: observed` while NOTHING in the repository
+#      injected `spark.extraListeners`. That claimed telemetry that had never been produced.
+#      Those markers are now `declared`, which is what they actually are (blocker B10).
+#   2. Every dataset identifier in it is from the pre-config-driven naming generation --
+#      `stream.oracle_corebank_customer` where the platform has
+#      `stream.rt_oracle_coredb_corebank_customer`. Two of eleven resolve to a live table.
+#
+# The live graph is now built by `cdc/lineage_graph.py::build_static_graph` from the CDC
+# registry, `reporting/curated/entities.yaml`, `governance/registry/lineage_declared.yaml`
+# and the dbt manifest: 81 nodes, 80 edges, 0 cycles, 0 audit findings, and it was published
+# to DataHub on 2026-09-30 (18-asset multi-hop traversal confirmed in GMS).
+#
+# This file is KEPT, not deleted, because `ai/tools.py` and `ai/knowledge/sources.py` still
+# read it at runtime. Repointing them is blocker B4 and its own gate. Do not treat the
+# identifiers below as current.
+# ---------------------------------------------------------------------------------------
+
+# TRANSPORT: an Iceberg table, not an HTTP endpoint.
+# Marquez is the usual OpenLineage backend, but it is a service that must run 24/7 to
+# receive events. `ops.lineage_event` is queryable from Athena, costs storage only, and
+# needs nothing running. Marquez stays a feature flag (CLAUDE.md §4.10), default OFF.
+
+version: 1
+
+transport:
+  type: iceberg_table            # ops.lineage_event
+  table: glue_catalog.ops.lineage_event
+  # Emitting must never fail the job it is observing. A lineage backend outage that takes
+  # down the pipeline has inverted the priority: lineage is metadata about the work, not
+  # the work.
+  fail_on_error: false
+
+namespace: cdc-lakehouse-dev
+
+# The chain being tracked, end to end.
+lineage_graph:
+  - job: debezium.oracle_corebank
+    type: CONNECTOR
+    inputs:  [oracle://corebank/CUSTOMER, oracle://corebank/ACCOUNT, oracle://corebank/TRANSACTION]
+    outputs: [kafka://cdc.oracle.corebank.CUSTOMER, kafka://cdc.oracle.corebank.ACCOUNT]
+    # Debezium does not emit OpenLineage. This edge is DECLARED from the connector config
+    # rather than observed — recorded as declared so nobody mistakes it for telemetry.
+    evidence: declared
+
+  - job: debezium.sqlserver_digital
+    type: CONNECTOR
+    inputs:  [sqlserver://digital/APP_USER, sqlserver://digital/DIGITAL_EVENT]
+    outputs: [kafka://cdc.sqlserver.digital.APP_USER]
+    evidence: declared
+
+  - job: spark.l1_stream
+    type: SPARK_STREAMING
+    inputs:  [kafka://cdc.oracle.corebank.CUSTOMER, kafka://cdc.sqlserver.digital.APP_USER]
+    outputs: [stream.oracle_corebank_customer, stream.sqlserver_digital_event]
+    evidence: declared          # CORRECTED (B10) -- see the header
+
+  - job: spark.eod_l1_to_l2
+    type: SPARK_BATCH
+    inputs:  [stream.oracle_corebank_customer]
+    outputs: [full_cdc.oracle_corebank_customer]
+    evidence: declared          # CORRECTED (B10)
+
+  - job: spark.build_snapshot
+    type: SPARK_BATCH
+    inputs:  [full_cdc.oracle_corebank_customer]
+    outputs: [snapshot.banking_customer]
+    evidence: declared          # CORRECTED (B10)
+
+  - job: spark.build_kimball
+    type: SPARK_BATCH
+    inputs:  [snapshot.banking_customer, snapshot.banking_account]
+    outputs: [mart.dim_customer, mart.dim_account, mart.fact_account_daily_snapshot]
+    evidence: declared          # CORRECTED (B10)
+
+  - job: dbt.marts
+    type: DBT
+    inputs:  [mart.fact_transaction, mart.fact_account_daily_snapshot]
+    outputs: [mart.mart_customer_360_daily, mart.mart_channel_performance_daily]
+    # Already emitted by dbt itself; recorded here only to JOIN the two graphs at the marts.
+    evidence: dbt_manifest
+
+  - job: athena.serving
+    type: QUERY
+    inputs:  [mart.mart_customer_360_daily]
+    outputs: [powerbi://customer-360]
+    evidence: declared
+
+spark:
+  # Injected by spark-submit; the listener emits START/COMPLETE/FAIL per job.
+  conf:
+    spark.extraListeners: io.openlineage.spark.agent.OpenLineageSparkListener
+    spark.openlineage.namespace: cdc-lakehouse-dev
+    spark.openlineage.parentJobName: "${AIRFLOW_DAG_ID}.${AIRFLOW_TASK_ID}"
+    spark.openlineage.parentRunId: "${AIRFLOW_RUN_ID}"
+
+airflow:
+  # Airflow 3 emits OpenLineage natively via the provider; no separate agent.
+  provider: apache-airflow-providers-openlineage
+  emit_on: [START, SUCCESS, FAILURE]
+
+optional_backends:
+  marquez:
+    enabled: false              # a 24/7 service; ops.lineage_event needs nothing running
+    reason: "cost — CLAUDE.md §4.10 keeps it a flag; the Iceberg transport is free"
+  glue_data_quality:
+    enabled: false
+    reason: "managed DQ is per-DPU; dq_engine.py covers the same checks on existing Spark"
+  lake_formation:
+    enabled: false
+    reason: "IAM-only baseline is functional (S13-1); LF adds fine-grained control we do not need yet"

@@ -1,0 +1,5 @@
+heartbeat sample 1:
+__debezium-heartbeat.cdc.oracle:0:46
+heartbeat sample 2 (after 45s):
+__debezium-heartbeat.cdc.oracle:0:48
+

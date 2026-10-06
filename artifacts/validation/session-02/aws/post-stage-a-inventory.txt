@@ -1,0 +1,14 @@
+# Account emptiness re-verified after Session 02 Stage A - 2026-08-12T11:12:26Z
+# All calls read-only. Stage A executed no AWS write.
+
+MSK clusters          : 0
+EC2 non-terminated    : []
+EBS volumes           : []
+VPC endpoints         : []
+NAT gateways          : []
+EMR Serverless apps   : []
+Redshift workgroups   : []
+Redshift namespaces   : []
+S3 buckets            : ["acb-operator-code","aws-athena-query-results-us-east-1-111122223333","aws-glue-assets-111122223333-us-east-1","aws-logs-111122223333-ap-southeast-1","aws-logs-111122223333-us-east-1","cf-templates-gmukjsi8hego-us-east-1","cleaned-data-zone-csv-bucket-operator","copy-of-raw-json-bucket-operator","de-youtube-analytics-useast1-dev-operator","de-youtube-cleaned-useast1-dev-operator","de-youtube-raw-useast1-dev-operator","de-youtube-raw-useast1-operator-athena-job","demo-cloudfront-operator-v4","demo-other-origin-operator","demo-s3-access-logs-operator-2023","demo-operator-athena-us-east-1","demo-operator-mfa-delete","demo-operator-v3-event-notifications","demo-operator-vpc-flow-logs-v2","elasticbeanstalk-us-east-1-111122223333","emr-studio-bucket-yml-operator","endtoendyoutube-ym-bucket-operator","redfin-data-project-yml-operator","redfin-transform-zone-yml-operator","s3-access-logs-operator-v3","s3-storage-classes-demo5446-2023","s3-operator-bucket-origin-v2","s3-operator-bucket-replica-v2","store-raw-data-yml-operator","taskjapfa-operator","test-task-snowlake-japfa","testing-ymlo-operator","testsnowflake-operator","vanguyen-demo-bucket-encription","operator-bucket-test","operator-demo-s3","operator-test-bucket123","vannk-dev-airflow-dev-codepipeline-artifacts","vannk-dev-airflow-staging-codepipeline-artifacts","vannk-dev-oracle-fusion-erp","vannk-terraform-series-bucket","vannk-terraform-series-s3-backend","vannk-test-cognito-idp","weatherapiairflowbucket-yml-operator"]
+KMS aliases (lab)     : []
+Budgets               : 2

@@ -1,0 +1,13 @@
+=== SQL Server login + data (correct env name)
+name                                                                                                                             is_cdc_enabled
+-------------------------------------------------------------------------------------------------------------------------------- --------------
+
+=== Oracle login + data
+SP2-0158: unknown SET option ";"
+Help: https://docs.oracle.com/error-help/db/sp2-0158/
+Usage: SET FEEDBACK {n | ON | OFF | ONLY} [SQL_ID]
+
+=== apicurio inspect
+{}
+in-container=000
+

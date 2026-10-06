@@ -1,0 +1,197 @@
+# The dataset registry. ONE place, referenced by ADR-028 and docs/DATA_CONTRACTS.md §2.
+#
+# This file was NAMED by ADR-028 and referenced twice by DATA_CONTRACTS.md before it
+# existed — a dangling contract for six sessions. Created here at the path those documents
+# already point at, rather than inventing a new one.
+#
+# WHY ONE FILE
+# ------------
+# Ownership, classification, PII columns, retention and the freshness SLA are all derived
+# from this registry: the masking views, the DQ rules, the access matrix and the retention
+# policy. A second list of PII columns somewhere else is exactly how masking and policy
+# drift apart while both look maintained (the S09-2 / S11-4 reasoning, applied to metadata).
+#
+# CLASSIFICATION (reference/SECURITY_MODEL.md)
+#   restricted   raw PII — L1/L2. BI is DENIED (S13-1).
+#   confidential curated with controlled PII — L3, dimensions.
+#   internal     aggregates with no direct identifiers — marts.
+#   operational  pipeline telemetry — ops.*.
+
+version: 1
+updated: 2026-08-15
+
+defaults:
+  owner: data-platform
+  steward: data-governance
+  # Retention is the DEFAULT, not the rule: anything holding PII overrides it below.
+  retention_days: 365
+  freshness_sla_minutes: 1440
+
+domains:
+  banking:
+    description: Core banking — customers, accounts, transactions (Oracle source)
+    owner: banking-data
+    source_system: oracle_corebank
+  digital:
+    description: Digital channel — app users, events (SQL Server source)
+    owner: digital-data
+    source_system: sqlserver_digital
+  ops:
+    description: Pipeline telemetry, DQ results, certification and lineage
+    owner: data-platform
+    source_system: internal
+
+datasets:
+
+  # ------------------------------------------------------------------ L1 STREAM
+  - name: stream.oracle_corebank_customer
+    layer: L1
+    domain: banking
+    grain: one row per CDC event
+    primary_key: [event_id]
+    classification: restricted
+    pii_columns: [before, after]        # raw payloads — unmasked source values
+    retention_days: 90
+    freshness_sla_minutes: 15
+    # L1 is the replay source for L2 (CLAUDE.md §5.3). Deleting it before L2 is validated
+    # removes the only way to rebuild — which is why retention here is a correctness
+    # setting, not a storage one.
+    deletion_blocked_until: l2_validated
+    bi_access: denied
+
+  - name: stream.sqlserver_digital_event
+    layer: L1
+    domain: digital
+    grain: one row per CDC event
+    primary_key: [event_id]
+    classification: restricted
+    pii_columns: [before, after]
+    retention_days: 90
+    freshness_sla_minutes: 15
+    deletion_blocked_until: l2_validated
+    bi_access: denied
+
+  # ------------------------------------------------------------------ L2 FULL CDC
+  - name: full_cdc.oracle_corebank_customer
+    layer: L2
+    domain: banking
+    grain: one row per CDC event, full history
+    primary_key: [event_id]
+    classification: restricted
+    pii_columns: [before, after]
+    retention_days: 2555               # 7 years — the audit history (§7 below)
+    freshness_sla_minutes: 1440
+    bi_access: denied
+
+  - name: full_cdc.oracle_corebank_transaction
+    layer: L2
+    domain: banking
+    grain: one row per CDC event, full history
+    primary_key: [event_id]
+    classification: restricted
+    pii_columns: [before, after]
+    retention_days: 2555
+    freshness_sla_minutes: 1440
+    bi_access: denied
+
+  # ------------------------------------------------------------------ L3 SNAPSHOT
+  - name: snapshot.banking_customer
+    layer: L3
+    domain: banking
+    grain: one active row per customer_id as-of snapshot_date
+    primary_key: [primary_key, snapshot_date]
+    classification: confidential
+    pii_columns: [full_name, dob]
+    retention_days: 1095
+    freshness_sla_minutes: 1440
+    # DATA_CONTRACTS §7.2 — the _history variant is opt-in per table BECAUSE retaining
+    # deleted records conflicts with erasure obligations. This flag is that opt-in.
+    enable_snapshot_history: false
+    # DENIED, not read (defect D14-1). This table holds unmasked full_name and dob, and it
+    # sits under warehouse/snapshot/* which the BI policy otherwise allows in full. BI gets
+    # the masked mart instead; reconciliation against L3 runs as the governance role.
+    bi_access: denied
+
+  - name: snapshot.banking_account
+    layer: L3
+    domain: banking
+    grain: one active row per account_id as-of snapshot_date
+    primary_key: [primary_key, snapshot_date]
+    classification: confidential
+    pii_columns: []
+    retention_days: 1095
+    enable_snapshot_history: true
+    bi_access: read
+
+  # ------------------------------------------------------------------ Kimball
+  - name: mart.dim_customer
+    layer: KIMBALL
+    domain: banking
+    grain: one row per customer_id per validity interval (SCD2)
+    primary_key: [customer_sk]
+    classification: confidential
+    pii_columns: [full_name, dob]
+    # MATERIALIZED, not a view. An Athena view requires read access to the underlying
+    # table, so a view over a table BI can read masks nothing (D14-1). The Kimball build
+    # writes this copy with the PII already tokenised, and BI is denied the base table.
+    masked_table: mart.dim_customer_bi
+    retention_days: 2555
+    freshness_sla_minutes: 1440
+    bi_access: denied
+
+  - name: mart.fact_transaction
+    layer: KIMBALL
+    domain: banking
+    grain: one row per transaction_id
+    primary_key: [transaction_id]
+    classification: internal
+    pii_columns: []
+    retention_days: 2555
+    freshness_sla_minutes: 60
+    bi_access: read
+
+  - name: mart.fact_account_daily_snapshot
+    layer: KIMBALL
+    domain: banking
+    grain: one row per account_sk per business_date
+    primary_key: [account_sk, business_date]
+    classification: internal
+    pii_columns: []
+    retention_days: 2555
+    freshness_sla_minutes: 1440
+    bi_access: read
+
+  # ------------------------------------------------------------------ Marts
+  - name: mart.dim_customer_bi
+    layer: KIMBALL
+    domain: banking
+    grain: one row per customer_id per validity interval, PII tokenised
+    primary_key: [customer_sk]
+    classification: internal          # no direct identifiers survive tokenisation
+    pii_columns: []
+    retention_days: 2555
+    freshness_sla_minutes: 1440
+    bi_access: read
+    derived_from: mart.dim_customer
+
+  - name: mart.mart_customer_360_daily
+    layer: MART
+    domain: banking
+    grain: one row per customer_sk per business_date
+    primary_key: [customer_sk, business_date]
+    classification: internal
+    pii_columns: []
+    retention_days: 1095
+    freshness_sla_minutes: 1440
+    bi_access: read
+
+  # ------------------------------------------------------------------ ops
+  - name: ops.dq_result
+    layer: OPS
+    domain: ops
+    grain: one row per check per dataset per run
+    primary_key: [run_id, dataset, check_name]
+    classification: operational
+    pii_columns: []
+    retention_days: 365
+    bi_access: read

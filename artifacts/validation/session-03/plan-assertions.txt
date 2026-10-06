@@ -1,0 +1,37 @@
+# Session 03 plan assertions — checked against the plan JSON, not the config
+
+TOTAL: 138 create, 0 change, 0 destroy
+
+=== BY MODULE ===
+    42  module.kafka_platform[0]
+    39  module.lake_iam[0]
+    23  module.source_lab[0]
+    22  module.data_lake
+     7  module.glue_catalog
+     2  module.vpc_endpoints[0]
+     1  root
+     1  module.athena[0]
+     1  module.budget_guardrails
+
+=== SOURCE LAB: 23 resources ===
+    13  aws_s3_object
+     4  aws_ssm_parameter
+     4  random_password
+     1  aws_instance
+     1  aws_security_group
+
+=== ASSERTIONS ===
+  [PASS] RDS instances (ADR-032 rejects)          expected   0  got   0
+  [PASS] EC2 instances (toolbox + source lab)     expected   2  got   2
+  [PASS] SSM SecureString params (source lab)     expected   4  got   4
+  [PASS] Secrets Manager secrets (ADR-031)        expected   0  got   0
+  [PASS] Open DB ports (no CDC runtime yet)       expected   0  got   0
+  [PASS] NAT gateways (CLAUDE.md 4.2)             expected   0  got   0
+  [PASS] EKS resources                            expected   0  got   0
+  [INFO] Bootstrap objects staged in S3                          got  13
+  [PASS] SSH key pairs (CLAUDE.md 3.4)            expected   0  got   0
+  [PASS] Plaintext password in user-data          expected none  got none
+  [PASS] user-data under EC2 16 KB limit          expected <16384  got     4
+  [PASS] 0.0.0.0/0 INGRESS (CLAUDE.md 3.3)        expected   0  got   0
+
+  OVERALL: ALL ASSERTIONS PASS

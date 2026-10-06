@@ -1,0 +1,5 @@
+spark-sql-kafka-0-10_2.12-3.5.1.jar                  432340 2746e5f4
+spark-token-provider-kafka-0-10_2.12-3.5.1.jar        56810 2746e5f4
+kafka-clients-3.4.1.jar                             5050443 2746e5f4
+commons-pool2-2.11.1.jar                             145516 2746e5f4
+aws-msk-iam-auth.jar                               13109114 2746e5f4

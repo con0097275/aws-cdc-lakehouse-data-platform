@@ -1,0 +1,116 @@
+terraform scan results:
+
+Passed checks: 355, Failed checks: 23, Skipped checks: 0
+
+Check: CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+	FAILED for resource: module.data_lake.aws_iam_policy_document.lake_key
+	File: /modules/data_lake/main.tf:21-62
+	Calling File: /envs/dev/main.tf:151-163
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-iam-policies-do-not-allow-permissions-management-resource-exposure-without-constraint
+Check: CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+	FAILED for resource: module.data_lake.aws_iam_policy_document.lake_key
+	File: /modules/data_lake/main.tf:21-62
+	Calling File: /envs/dev/main.tf:151-163
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-356
+Check: CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+	FAILED for resource: module.data_lake.aws_iam_policy_document.lake_key
+	File: /modules/data_lake/main.tf:21-62
+	Calling File: /envs/dev/main.tf:151-163
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-iam-policies-do-not-allow-write-access-without-constraint
+Check: CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+	FAILED for resource: module.kafka_platform[0].aws_iam_policy_document.kms
+	File: /modules/kafka_platform/kms.tf:1-39
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-iam-policies-do-not-allow-permissions-management-resource-exposure-without-constraint
+Check: CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+	FAILED for resource: module.kafka_platform[0].aws_iam_policy_document.kms
+	File: /modules/kafka_platform/kms.tf:1-39
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-356
+Check: CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+	FAILED for resource: module.kafka_platform[0].aws_iam_policy_document.kms
+	File: /modules/kafka_platform/kms.tf:1-39
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-iam-policies-do-not-allow-write-access-without-constraint
+Check: CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year"
+	FAILED for resource: module.kafka_platform[0].aws_cloudwatch_log_group.msk
+	File: /modules/kafka_platform/msk.tf:1-5
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-338
+Check: CKV_AWS_130: "Ensure VPC subnets do not assign public IP by default"
+	FAILED for resource: module.kafka_platform[0].aws_subnet.public[0]
+	File: /modules/kafka_platform/network.tf:19-35
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-vpc-subnets-do-not-assign-public-ip-by-default
+Check: CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+	FAILED for resource: module.kafka_platform[0].aws_security_group.toolbox
+	File: /modules/kafka_platform/network.tf:88-111
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/bc-aws-382
+Check: CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+	FAILED for resource: module.kafka_platform[0].aws_security_group.msk
+	File: /modules/kafka_platform/network.tf:113-168
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/bc-aws-382
+Check: CKV_AWS_130: "Ensure VPC subnets do not assign public IP by default"
+	FAILED for resource: module.kafka_platform[0].aws_subnet.public[1]
+	File: /modules/kafka_platform/network.tf:19-35
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-vpc-subnets-do-not-assign-public-ip-by-default
+Check: CKV_AWS_130: "Ensure VPC subnets do not assign public IP by default"
+	FAILED for resource: module.kafka_platform[0].aws_subnet.public[2]
+	File: /modules/kafka_platform/network.tf:19-35
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-vpc-subnets-do-not-assign-public-ip-by-default
+Check: CKV_AWS_88: "EC2 instance should not have public IP."
+	FAILED for resource: module.kafka_platform[0].aws_instance.toolbox
+	File: /modules/kafka_platform/toolbox.tf:5-58
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/public-policies/public-12
+Check: CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+	FAILED for resource: module.kafka_platform[0].aws_instance.toolbox
+	File: /modules/kafka_platform/toolbox.tf:5-58
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-ec2-is-ebs-optimized
+Check: CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances"
+	FAILED for resource: module.kafka_platform[0].aws_instance.toolbox
+	File: /modules/kafka_platform/toolbox.tf:5-58
+	Calling File: /envs/dev/main.tf:118-145
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/ensure-that-detailed-monitoring-is-enabled-for-ec2-instances
+Check: CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+	FAILED for resource: module.source_lab.aws_security_group.source_lab
+	File: /modules/source_lab_ec2/main.tf:136-153
+	Calling File: /envs/dev/main.tf:240-268
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/bc-aws-382
+Check: CKV_AWS_88: "EC2 instance should not have public IP."
+	FAILED for resource: module.source_lab.aws_instance.source_lab
+	File: /modules/source_lab_ec2/main.tf:183-228
+	Calling File: /envs/dev/main.tf:240-268
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/public-policies/public-12
+Check: CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+	FAILED for resource: module.source_lab.aws_instance.source_lab
+	File: /modules/source_lab_ec2/main.tf:183-228
+	Calling File: /envs/dev/main.tf:240-268
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-ec2-is-ebs-optimized
+Check: CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances"
+	FAILED for resource: module.source_lab.aws_instance.source_lab
+	File: /modules/source_lab_ec2/main.tf:183-228
+	Calling File: /envs/dev/main.tf:240-268
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/ensure-that-detailed-monitoring-is-enabled-for-ec2-instances
+Check: CKV2_AWS_11: "Ensure VPC flow logging is enabled in all VPCs"
+	FAILED for resource: module.kafka_platform[0].aws_vpc.this
+	File: /modules/kafka_platform/network.tf:1-9
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/logging-9-enable-vpc-flow-logging
+Check: CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
+	FAILED for resource: module.data_lake.aws_s3_bucket.lake
+	File: /modules/data_lake/main.tf:82-91
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/s3-policies/s3-13-enable-logging
+Check: CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+	FAILED for resource: module.data_lake.aws_s3_bucket.lake
+	File: /modules/data_lake/main.tf:82-91
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-2-62
+Check: CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
+	FAILED for resource: module.data_lake.aws_s3_bucket.lake
+	File: /modules/data_lake/main.tf:82-91
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-s3-bucket-has-cross-region-replication-enabled
+

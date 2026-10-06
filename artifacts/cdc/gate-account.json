@@ -1,0 +1,87 @@
+{
+ "cob_date": "2026-08-22",
+ "detail": {
+  "consumer": {
+   "legacy": [
+    [
+     "r",
+     "640"
+    ],
+    [
+     "u",
+     "1"
+    ]
+   ],
+   "per_table": [
+    [
+     "r",
+     "640"
+    ],
+    [
+     "u",
+     "1"
+    ]
+   ]
+  },
+  "counts": {
+   "legacy_identities": 641,
+   "legacy_rows": 961,
+   "legacy_rows_without_identity": 320,
+   "per_table_identities": 641,
+   "per_table_rows": 641
+  },
+  "dq": {
+   "ACCOUNT_ID": 0,
+   "CUSTOMER_ID": 0,
+   "event_date_is_null": 0
+  },
+  "eod": {
+   "legacy": [
+    "641",
+    "320"
+   ],
+   "per_table": [
+    "641",
+    "320"
+   ]
+  },
+  "identity": {
+   "in_both": 641,
+   "only_in_legacy": 0,
+   "only_in_per_table": 0
+  },
+  "latency": {
+   "legacy_ms": 1662.0,
+   "per_table_ms": 690.0
+  },
+  "realtime": {
+   "legacy": 641,
+   "per_table": 641
+  },
+  "schema": {
+   "legacy_only_breaking": [],
+   "legacy_only_ingest_artifacts": {
+    "loaded_at": "written by the old staging job; no consumer reads it"
+   },
+   "per_table_extra": [
+    "dv_pk_hash",
+    "ingest_job",
+    "ingest_run_id",
+    "schema_global_id",
+    "source_database"
+   ]
+  }
+ },
+ "observed": {
+  "benchmark_measured": true,
+  "consumer_test": true,
+  "dq": true,
+  "eod_equivalence": true,
+  "event_identity_completeness": true,
+  "full_cdc_equivalence": true,
+  "latency": true,
+  "realtime_window_equivalence": true,
+  "schema_comparison": true
+ },
+ "table_id": "oracle.coredb.corebank.account"
+}

@@ -1,0 +1,39 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from datetime import date
+from cdc.dq_catalog import evaluate_publish
+from cdc.quality import DqResult, DataInterval, ResultStatus
+from cdc.contracts import CheckType, Severity
+def dq(sev, st=ResultStatus.FAIL):
+    return DqResult(dq_run_id='d', run_id='r', dataset_id='eod:x', check_id='one_row_per_key',
+                    check_type=CheckType.UNIQUENESS, severity=sev,
+                    interval=DataInterval(cob_date=date(2026,9,28)), status=st,
+                    expected_rule='one active row per key', engine='spark',
+                    config_version='v', rows_examined=670, failed_count=0 if st is ResultStatus.PASS else 1)
+from cdc.quality import ReconResult
+def recon(st=ResultStatus.PASS):
+    return ReconResult(recon_run_id='rc', run_id='r', source_dataset='full_cdc:x',
+                       target_dataset='eod:x', interval=DataInterval(cob_date=date(2026,9,28)),
+                       metric='row_count', status=st, config_version='v',
+                       source_value=670.0, target_value=670.0, severity=Severity.ERROR)
+cases = [
+    ('BLOCKER DQ          ', [dq(Severity.BLOCKER)],              [recon()]),
+    ('ERROR DQ            ', [dq(Severity.ERROR)],                [recon()]),
+    ('clean DQ, no recon  ', [dq(Severity.ERROR, ResultStatus.PASS)], []),
+    ('clean DQ + recon    ', [dq(Severity.ERROR, ResultStatus.PASS)], [recon()]),
+    ('no DQ at all        ', [],                                  [recon()]),
+]
+print(f{case:22s} {outcome:24s} {watermark:10s} {certify:8s} invalid)
+for label, d_, r_ in cases:
+    d = evaluate_publish(committed=True, dq_results=d_, recon_results=r_)
+    print(f'{label} {d.outcome.value:24s} {str(d.advance_watermark):10s} '
+          f'{str(d.certify):8s} {d.mark_snapshot_invalid}')
+print()
+print('Only the fourth row certifies. An absent reconciliation is NOT a passed one, and an')
+print('empty DQ suite is not a clean one -- no check failed is not the data was checked.')
+
+
+  File "<string>", line 26
+    print(f{case:22s}
+                  ^
+SyntaxError: invalid decimal literal

@@ -1,0 +1,32 @@
+=== SSM MANAGED INSTANCES
+-----------------------------------------------------------------------------------
+|                           DescribeInstanceInformation                           |
++------------+-----------------------+-----------------+---------+----------------+
+|    Agent   |          Id           |    LastPing     |  Ping   |   Platform     |
++------------+-----------------------+-----------------+---------+----------------+
+|  3.3.4624.0|  i-0c04da52f6408a8f8  |  1789894536.559 |  Online |  Amazon Linux  |
+|  3.3.4624.0|  i-02c84774a112aa02f  |  1789894514.191 |  Online |  Amazon Linux  |
+|  3.3.4624.0|  i-0fd5ef5515782f595  |  1789894545.497 |  Online |  Amazon Linux  |
+|  3.3.4624.0|  i-0f117e9b1443c1029  |  1789894672.058 |  Online |  Amazon Linux  |
++------------+-----------------------+-----------------+---------+----------------+
+=== MSK BOOTSTRAP
+{
+    "IAM": "b-2.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098,b-1.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098,b-3.kafkadevlabdev.x6q6em.c6.kafka.ap-southeast-1.amazonaws.com:9098",
+    "TLS": null
+}
+=== KMS ALIASES
+--------------------------------------------------------------------------
+|                               ListAliases                              |
++-------------------------------+----------------------------------------+
+|             Alias             |                  Key                   |
++-------------------------------+----------------------------------------+
+|  alias/kafka-dev-lab-dev      |  3cdedee2-7f5a-422d-9d47-01837e9a4c5a  |
+|  alias/kafka-dev-lab-dev-lake |  0b5b383b-5628-4e2f-a130-9be8b7345ae8  |
++-------------------------------+----------------------------------------+
+=== ATHENA WORKGROUP
+{
+    "State": "ENABLED",
+    "Output": "s3://kafka-dev-lab-dev-lake-111122223333/query-results/athena/",
+    "BytesCutoff": 10737418240,
+    "Enforce": true
+}

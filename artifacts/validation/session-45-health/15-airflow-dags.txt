@@ -1,0 +1,44 @@
+=== DAGs known to Airflow
+2026-09-20T09:04:00.704752Z [warning  ] The dag_dir_list_interval option in [scheduler] has been moved to the refresh_interval option in [dag_processor] - the old setting has been used, but please update your config. [py.warnings] category=DeprecationWarning filename=/home/airflow/.local/lib/python3.13/site-packages/airflow/dag_processing/bundles/base.py lineno=261
+2026-09-20T09:04:02.198566Z [info     ] setup plugin alembic.autogenerate.schemas [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:02.199166Z [info     ] setup plugin alembic.autogenerate.tables [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:02.199571Z [info     ] setup plugin alembic.autogenerate.types [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:02.199932Z [info     ] setup plugin alembic.autogenerate.constraints [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:02.200272Z [info     ] setup plugin alembic.autogenerate.defaults [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:02.200616Z [info     ] setup plugin alembic.autogenerate.comments [alembic.runtime.plugins] loc=plugins.py:37
+dag_id                         | fileloc                                           | owners        | is_paused | bundle_name | bundle_version
+===============================+===================================================+===============+===========+=============+===============
+business_ai_insights           | /opt/airflow/dags/business_insights.py            | my-aws-profile   | True      | dags-folder | None          
+cdc_eod                        | /opt/airflow/dags/cdc_table_platform.py           | my-aws-profile   | True      | dags-folder | None          
+cdc_health_check               | /opt/airflow/dags/dag_cdc_health.py               | data-platform | True      | dags-folder | None          
+cdc_maintenance                | /opt/airflow/dags/cdc_table_platform.py           | my-aws-profile   | True      | dags-folder | None          
+cdc_realtime                   | /opt/airflow/dags/cdc_table_platform.py           | my-aws-profile   | True      | dags-folder | None          
+datamart_auto_correct          | /opt/airflow/dags/datamart_auto_correct.py        | data-platform | True      | dags-folder | None          
+datamart_eod                   | /opt/airflow/dags/datamart_eod.py                 | data-platform | True      | dags-folder | None          
+datamart_fulfill               | /opt/airflow/dags/datamart_fulfill.py             | data-platform | True      | dags-folder | None          
+datamart_stream_batch          | /opt/airflow/dags/datamart_stream_batch.py        | data-platform | True      | dags-folder | None          
+eod_certified_pipeline         | /opt/airflow/dags/dag_eod_pipeline.py             | data-platform | True      | dags-folder | None          
+flow_auto_correct              | /opt/airflow/dags/dag_intraday_flows.py           | data-platform | True      | dags-folder | None          
+flow_nrt_mart                  | /opt/airflow/dags/dag_intraday_flows.py           | data-platform | True      | dags-folder | None          
+full_cdc_streaming_monitor     | /opt/airflow/dags/full_cdc_streaming_lifecycle.py | my-aws-profile   | True      | dags-folder | None          
+full_cdc_streaming_start       | /opt/airflow/dags/full_cdc_streaming_lifecycle.py | my-aws-profile   | True      | dags-folder | None          
+full_cdc_streaming_stop        | /opt/airflow/dags/full_cdc_streaming_lifecycle.py | my-aws-profile   | True      | dags-folder | None          
+l1_stream_supervisor           | /opt/airflow/dags/dag_l1_stream.py                | data-platform | True      | dags-folder | None          
+recovery_quarantine_replay     | /opt/airflow/dags/dag_recovery.py                 | data-platform | True      | dags-folder | None          
+recovery_rebuild_business_date | /opt/airflow/dags/dag_recovery.py                 | data-platform | True      | dags-folder | None          
+recovery_replay_l1_to_l2       | /opt/airflow/dags/dag_recovery.py                 | data-platform | True      | dags-folder | None          
+streaming_rt_monitor           | /opt/airflow/dags/streaming_rt_lifecycle.py       | airflow       | True      | dags-folder | None          
+streaming_rt_start             | /opt/airflow/dags/streaming_rt_lifecycle.py       | airflow       | True      | dags-folder | None          
+
+=== DAG files on the node
+
+=== import errors
+2026-09-20T09:04:17.540185Z [warning  ] The dag_dir_list_interval option in [scheduler] has been moved to the refresh_interval option in [dag_processor] - the old setting has been used, but please update your config. [py.warnings] category=DeprecationWarning filename=/home/airflow/.local/lib/python3.13/site-packages/airflow/dag_processing/bundles/base.py lineno=261
+2026-09-20T09:04:18.908689Z [info     ] setup plugin alembic.autogenerate.schemas [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:18.909295Z [info     ] setup plugin alembic.autogenerate.tables [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:18.909680Z [info     ] setup plugin alembic.autogenerate.types [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:18.910040Z [info     ] setup plugin alembic.autogenerate.constraints [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:18.910389Z [info     ] setup plugin alembic.autogenerate.defaults [alembic.runtime.plugins] loc=plugins.py:37
+2026-09-20T09:04:18.910591Z [info     ] setup plugin alembic.autogenerate.comments [alembic.runtime.plugins] loc=plugins.py:37
+No data found
+

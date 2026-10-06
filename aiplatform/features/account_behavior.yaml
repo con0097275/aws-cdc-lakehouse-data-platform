@@ -1,0 +1,113 @@
+# Business feature group for the BAI-P5 pilots.
+#
+# GROUNDED IN WHAT THE MART ACTUALLY HAS. mart_account_balance_daily carries exactly:
+#   account_sk, customer_sk, business_date, closing_balance, debit_amount,
+#   credit_amount, txn_count, processing_status
+#
+# So `failed_txn_ratio_7d` and every digital-engagement feature from the BAI-P5 candidate
+# list are ABSENT here rather than approximated. There is no per-transaction status in the
+# mart and mart_channel_engagement_daily has never been materialised; a feature computed
+# from a field that does not exist is a column of plausible nulls that trains a model to
+# predict nothing.
+#
+# `requires_days` is enforced at materialisation. With four business dates present, every
+# 7d/30d window below is UNAVAILABLE and is reported as such rather than computed from
+# whatever days happen to exist -- a "7-day volatility" over 3 days is a number with the
+# wrong name.
+
+name: account_behavior
+entity_keys: [account_sk]
+event_time_column: feature_event_time
+owner: risk-data
+domain: retail_banking
+classification: internal
+version: 1
+description: >
+  Daily behavioural features per account, derived only from mart_account_balance_daily.
+  Grain: account_sk + feature_event_time (the business date the features describe).
+
+source_relation: mart.mart_account_balance_daily
+partition_by: [feature_event_time]
+
+batch:        {enabled: true}
+streaming:    {enabled: false}    # ADR-053: no streaming features
+online_store: {enabled: false}    # no sub-100ms consumer exists (ADR-053)
+
+features:
+  - name: balance_close
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.closing_balance"]
+    requires_days: 1
+    description: "Closing balance on the feature date."
+  - name: txn_count_1d
+    type: bigint
+    source_lineage: ["mart.mart_account_balance_daily.txn_count"]
+    requires_days: 1
+    description: "Transactions on the feature date."
+  - name: debit_amount_1d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.debit_amount"]
+    requires_days: 1
+    description: Debit amount on the feature date.
+  - name: credit_amount_1d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.credit_amount"]
+    requires_days: 1
+    description: Credit amount on the feature date.
+  - name: net_flow_1d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.credit_amount"]
+    requires_days: 1
+    description: "credit_amount - debit_amount on the feature date."
+  - name: avg_txn_value_1d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.txn_count"]
+    requires_days: 1
+    description: >
+      (debit + credit) / txn_count. NULL when txn_count is 0 -- never 0, which would read
+      as a real average of zero-value transactions.
+  - name: balance_change_1d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.closing_balance"]
+    requires_days: 2
+    description: "closing_balance minus the previous available day's."
+  - name: balance_change_7d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.closing_balance"]
+    requires_days: 7
+    description: Closing balance minus its value 7 days earlier.
+  - name: txn_count_7d
+    type: bigint
+    source_lineage: ["mart.mart_account_balance_daily.txn_count"]
+    requires_days: 7
+    description: Transactions summed over the trailing 7 days.
+  - name: balance_volatility_7d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.closing_balance"]
+    requires_days: 7
+    description: "Sample stddev of closing_balance over the trailing 7 days."
+  - name: balance_volatility_30d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.closing_balance"]
+    requires_days: 30
+    description: Sample stddev of closing_balance over the trailing 30 days.
+  - name: avg_txn_amount_30d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.debit_amount"]
+    requires_days: 30
+    description: Mean value per transaction over the trailing 30 days.
+  - name: days_since_last_activity
+    type: bigint
+    source_lineage: ["mart.mart_account_balance_daily.txn_count"]
+    requires_days: 2
+    description: "Days since the account last had txn_count > 0."
+  - name: activity_frequency_7d
+    type: double
+    source_lineage: ["mart.mart_account_balance_daily.txn_count"]
+    requires_days: 7
+    description: "Fraction of the trailing 7 days with txn_count > 0."
+
+# DELIBERATELY ABSENT — the data does not exist:
+#   failed_txn_ratio_7d      no per-transaction status in the mart
+#   digital_session_count    mart_channel_engagement_daily was never materialised
+#   channel_mix              same

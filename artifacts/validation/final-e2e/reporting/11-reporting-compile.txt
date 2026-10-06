@@ -1,0 +1,26 @@
+config_version : cfg-418d7158728c925c
+plan_hash      : 418d7158728c925cd8ec6fa58342112449ba7ff988d5bbf04a0f68eca1584cd4
+source_sha256  : 261afff2619b0496...
+jobs           : 3
+flow configs   : 15
+dependencies   : 3
+profiles       : 5
+enabled modes  : EOD=3, AUTO_CORRECT=3, FULFILL=3, STREAM_BATCH=3
+
+ALL:
+  TURN 1: mart_account_balance_daily, mart_channel_engagement_daily
+  TURN 2: mart_account_balance_monthly
+AUTO_CORRECT:
+  TURN 1: mart_account_balance_daily, mart_channel_engagement_daily
+  TURN 2: mart_account_balance_monthly
+EOD:
+  TURN 1: mart_account_balance_daily, mart_channel_engagement_daily
+  TURN 2: mart_account_balance_monthly
+FULFILL:
+  TURN 1: mart_account_balance_daily, mart_channel_engagement_daily
+  TURN 2: mart_account_balance_monthly
+STREAM_BATCH:
+  TURN 1: mart_account_balance_daily, mart_channel_engagement_daily
+  TURN 2: mart_account_balance_monthly
+
+wrote target/reporting/plan.json

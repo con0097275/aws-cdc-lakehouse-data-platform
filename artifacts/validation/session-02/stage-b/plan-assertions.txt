@@ -1,0 +1,19 @@
+# Plan assertions — checked against the saved plan JSON, not the config
+# Captured: 2026-08-13T04:42:40Z
+
+  [PASS] 0.0.0.0/0 INGRESS rules          expected   0  got   0
+  [PASS] NAT gateways                     expected   0  got   0
+  [PASS] Secrets Manager secrets          expected   0  got   0
+  [PASS] EKS resources                    expected   0  got   0
+  [PASS] RDS resources                    expected   0  got   0
+  [PASS] Redshift resources               expected   0  got   0
+  [PASS] Glue databases                   expected   7  got   7
+  [PASS] KMS keys                         expected   2  got   2
+  [PASS] MSK clusters                     expected   1  got   1
+  [PASS] S3 buckets                       expected   1  got   1
+  [PASS] VPC gateway endpoints (free)     expected   2  got   2
+  [PASS] IAM roles                        expected   8  got   8
+
+  Total: 113 create, 0 change, 0 destroy
+
+  OVERALL: ALL ASSERTIONS PASS

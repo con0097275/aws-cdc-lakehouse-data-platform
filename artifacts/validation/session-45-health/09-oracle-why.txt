@@ -1,0 +1,51 @@
+=== images
+container-registry.oracle.com/database/free:23.5.0.0	9.45GB
+mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04	1.59GB
+
+=== oracle service in compose
+  oracle:
+    image: ${ORACLE_IMAGE}
+    container_name: source-oracle
+    restart: unless-stopped
+    # Bind to the PRIVATE IP only. Publishing on 0.0.0.0 would expose 1521 on the public
+    # interface regardless of the security group — defence in depth (CLAUDE.md 3.3).
+    ports:
+      - "${PRIVATE_IP}:1521:1521"
+    environment:
+      ORACLE_PWD: ${ORACLE_PASSWORD}
+      ORACLE_CHARACTERSET: AL32UTF8
+      # Oracle Free is capped at 2 GB by licence; asking for more is silently ignored.
+      INIT_SGA_SIZE: "1536"
+
+=== cloud-init tail (oracle/pull errors)
+ 6bb22823d4ee Pulling fs layer 
+ c6905a973195 Pull complete 
+ 52be51345d28 Pull complete 
+ 3776f5972314 Pull complete 
+ ecb4fe8cffd3 Pull complete 
+ bd48d3f50dd7 Pull complete 
+ 30950d539508 Pull complete 
+ b65c5eddd16b Pull complete 
+ a46ca36d2998 Pull complete 
+ 28c76d32849a Pull complete 
+ af2c542e5953 Pull complete 
+ 85b3ebaf2b57 Pull complete 
+ 60ae4f7af338 Pull complete 
+ 887e445c4c06 Pull complete 
+ c4cee0c7a6c2 Pull complete 
+ c248d1418feb Pull complete 
+ 644079d386d8 Pull complete 
+ df8f4eb20bb1 Pull complete 
+ 9ec103b6e275 Pull complete 
+ f6a8af0be82f Pull complete 
+ 92f086a2c5c6 Pull complete 
+ 6bb22823d4ee Pull complete 
+ oracle Pulled 
+ Volume "source-lab_oracle-data"  Creating
+ Volume "source-lab_oracle-data"  Created
+ Container source-oracle  Creating
+ Container source-oracle  Created
+ Container source-oracle  Starting
+ Container source-oracle  Started
+CDC is NOT enabled automatically: Oracle needs a restart into ARCHIVELOG mode.
+

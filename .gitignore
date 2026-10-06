@@ -1,0 +1,87 @@
+# Terraform state is sensitive (CLAUDE.md section 3.8). Never commit it.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.tfstate.lock.info
+crash.log
+crash.*.log
+
+# Saved plans contain resource IDs, ARNs and sometimes secret material.
+tfplan
+tfplan.*
+tfplan-*
+*.tfplan
+plan.out
+plan.json
+
+# Variable files may carry account-specific values. Only *.example is tracked.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!*.tfvars.json.example
+
+# Backend config carries the state bucket name.
+backend.hcl
+!backend.hcl.example
+
+# Credentials and keys must never reach Git (CLAUDE.md section 3.1).
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+credentials
+*_rsa
+*_ed25519
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+# A trailing comment is NOT valid here -- gitignore takes the whole line as the
+# pattern, so `.venv*/  # note` silently matches nothing.
+.venv*/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+profiles.yml
+!profiles.yml.example
+
+# Spark / build
+spark/**/target/
+
+# Compiled reporting plan. DERIVED from reporting/*.yaml (ADR-034) and reproducible
+# with `make reporting-compile`; the authored YAML is the source of truth, not this.
+target/reporting/
+*.jar
+!connectors/**/*.jar.sha256
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Validation artifacts: keep the directory and committed evidence, drop scratch.
+artifacts/**/*.tmp
+artifacts/**/*.err
+
+# Built RAG corpora. Regenerable and deterministic from the tree; the VERSION is what
+# matters and it lives in the manifest recorded by ops.ai_knowledge_sync.
+ai/knowledge/corpus_*/
+
+# Built by scripts/build-agent-package.sh; reproducible, so not tracked.
+terraform/modules/ai_runtime/package/copilot.zip
+
+# Claude Code session artifacts — local tooling, not part of the project.
+.claude/

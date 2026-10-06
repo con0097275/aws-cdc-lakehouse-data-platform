@@ -1,0 +1,98 @@
+PHASE 14 — PROGRESS AND BLOCKERS.  2026-08-20T06:30Z.  MSK up 2.5h, ~$2.85 spent.
+
+================================================================================
+PROVEN WORKING — with evidence, not inference
+================================================================================
+EMR Serverless -> Spark -> Iceberg -> Glue -> S3 -> KMS
+  job run 00g84kussh41e827   state SUCCESS
+  Glue table  kafka_dev_lab_dev_ops.emr_smoke   Parameters.table_type = ICEBERG
+  data        warehouse/ops/emr_smoke/data/00000-0-01ebb7ac-....parquet   654 B
+              warehouse/ops/emr_smoke/data/00001-1-01ebb7ac-....parquet   676 B
+  metadata    00001-41937568-394f-45d8-bc19-5ef66cbea3b4.metadata.json
+
+  This is the first time anything in this project has executed on real compute.
+
+Source databases
+  source-oracle      Up (healthy)
+  source-sqlserver   Up (healthy)
+
+Staged to S3 (SSE-KMS with the lake CMK)
+  ops/config/plan.json                    config_version cfg-9277073c543012d8
+  artifacts/code/reporting-framework.zip  62 files
+  artifacts/dbt/dbt-project.zip           35 files
+
+Reporting runtime state store
+  4 DynamoDB tables live, 12 module.reporting_ops resources in state
+
+================================================================================
+DEFECTS FOUND AND FIXED TODAY
+================================================================================
+1. SOURCE LAB NEVER BOOTED  (fixed, running)
+   user-data `aws s3 sync` hit AccessDenied 20s after the IAM grant was created and had
+   no retry, so cloud-init gave up and no database ever started. IAM propagation race, not
+   a permissions gap -- the same call succeeds now. Cleared with
+   `cloud-init single --name scripts-user --frequency always`.
+   REPO FIX NEEDED: retry loop in user-data.sh.tftpl (drafted, not applied -- editing
+   user-data REPLACES the instance and would discard the databases just brought up).
+
+2. EMR SERVERLESS COULD NOT REACH S3  (fixed live + in Terraform)
+   modules/emr_serverless SG egress allowed only the VPC CIDR. S3 and DynamoDB are GATEWAY
+   endpoints: they route to the service's PUBLIC prefix list, which is outside the VPC
+   CIDR, so every S3 call hung and the job died after 9 minutes without reading its own
+   entry-point .py. This is risk R4 -- "lean endpoint set unproven; failure mode is a hang,
+   not an error" -- now proven.
+   FIXED: prefix-list egress (pl-6fa54006 S3, pl-67a5400e DynamoDB) added live AND to
+   modules/emr_serverless/main.tf, matching, so the next plan shows no drift.
+
+3. LAKE BUCKET POLICY REJECTS COMPLIANT CLIENTS  (worked around; TF fixed, live NOT applied)
+   `DenyUnencryptedObjectUploads` denies any PutObject without an explicit
+   `x-amz-server-side-encryption: aws:kms` HEADER. The bucket has DEFAULT encryption with
+   the lake CMK, so header-less writes are already encrypted correctly -- the rule tests
+   the request, not the result. EMR's log pusher does not send the header:
+     AccessDenied ... logs/emr-serverless/.../job-metadata.log ... explicit deny
+   WORKED AROUND without touching the policy, which is the better outcome: the JOB now
+   sends the header --
+     --conf spark.hadoop.fs.s3a.server-side-encryption-algorithm=SSE-KMS
+     --conf spark.hadoop.fs.s3a.server-side-encryption.key=<lake CMK>
+     --conf spark.sql.catalog.glue_catalog.s3.sse.type=kms
+     --conf spark.sql.catalog.glue_catalog.s3.sse.key=<lake CMK>
+   and EMR-managed logging replaces the S3 log push.
+   modules/data_lake/main.tf now carries the `Null` narrowing for the day someone wants
+   header-less clients to work; it is NOT applied live and is not required.
+
+================================================================================
+OPEN BLOCKER — KAFKA CONNECT WILL NOT STAY UP
+================================================================================
+  restarts=96 before intervention, exit code 0, OOMKilled=false, 4.7 GB host memory free.
+
+  CAUSE (partly fixed): plugin.path was
+      /usr/share/java,/usr/share/confluent-hub-components,/opt/connect-plugins
+  `/usr/share/java` is the WHOLE Confluent image, including confluent-control-center. The
+  scan took ~15s per directory and the log always ended inside it. The connectors this
+  project needs are 71 MB in /opt/connect-plugins (debezium-oracle, debezium-sqlserver,
+  libs/{apicurio-serde,aws-msk-iam-auth,ojdbc11,jmx_prometheus_javaagent}.jar).
+
+  APPLIED: plugin.path=/opt/connect-plugins, and CLASSPATH=/opt/connect-plugins/libs/*
+  so the worker's own MSK IAM auth stays on the system classloader.
+  RESULT: ServiceLoaderScanner now takes 1449 ms instead of minutes -- but the process
+  still exits 0 during the SECOND (reflection) scan, and restarts continue.
+
+  NEXT STEP, NOT YET RUN: raise the container memory limit from 3G to 6G and restart.
+  The host has 8 GB with 4.7 GB free, and 3G is the only obvious constraint left.
+
+================================================================================
+WHY I STOPPED
+================================================================================
+  1. The Claude Code permission classifier blocked the remaining infrastructure
+     mutations -- `aws s3api put-bucket-policy` and the SSM command that edits
+     docker-compose.yml and restarts Connect. Both are legitimate; I am not going to
+     route around a deliberate control.
+
+  2. Four CDC steps are gated on a typed confirmation phrase that refuses non-interactive
+     callers, by design (APPROVAL_GATES.md: no gate may be self-approved by an agent):
+       bash scripts/source-lab.sh enable-cdc --execute      # ENABLE CDC
+       bash scripts/source-lab.sh seed --execute            # SEED SOURCE LAB
+       bash scripts/cdc-runtime.sh create-topics --execute  # CREATE TOPICS
+       bash scripts/register-connectors.sh --execute        # REGISTER CONNECTORS
+
+  No Phase 14 scenario has been executed. Nothing is claimed as PASS.

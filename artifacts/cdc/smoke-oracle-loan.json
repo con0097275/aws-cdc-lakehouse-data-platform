@@ -1,0 +1,10 @@
+{
+  "connector_running": {"observed": "RUNNING", "note": "oracle-corebank-source, task 0 RUNNING"},
+  "snapshot_complete": {"observed": true, "note": "changes_only: history starts at capture. 3 pre-existing rows are deliberately absent; a backfill is a separate act"},
+  "topic_has_events": {"observed": 5, "note": "cdc.oracle.COREBANK.LOAN end-offsets, incl. tombstone"},
+  "full_cdc_rows": {"observed": 4, "note": "c=2 u=1 d=1; tombstone correctly not a row"},
+  "lag_within_sla": {"observed": true, "note": "ingested within minutes of the source change; SLA 60m"},
+  "realtime_rows": {"observed": 4, "note": "calendar_day window, lower bound midnight 2026-09-06"},
+  "eod_status": {"observed": "CERTIFIED", "note": "COB 2026-09-10, ops.eod_run, dq PASS recon PASS"},
+  "reconciliation": {"observed": true, "note": "independent Athena count below cutoff_utc: 2 keys - 1 delete = 1 row; EOD wrote 1"}
+}

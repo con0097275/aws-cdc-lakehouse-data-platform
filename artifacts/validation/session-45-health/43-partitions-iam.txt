@@ -1,0 +1,28 @@
+=== per-partition end offsets (topic:partition:offset)
+-- cdc.oracle.COREBANK.ACCOUNT
+cdc.oracle.COREBANK.ACCOUNT:0:92
+cdc.oracle.COREBANK.ACCOUNT:1:121
+cdc.oracle.COREBANK.ACCOUNT:2:107
+-- cdc.sqlserver.digital.dbo.payment_method
+cdc.sqlserver.digital.dbo.payment_method:0:13
+cdc.sqlserver.digital.dbo.payment_method:1:16
+cdc.sqlserver.digital.dbo.payment_method:2:21
+-- cdc.dlq.oracle
+cdc.dlq.oracle:0:0
+cdc.dlq.oracle:1:0
+cdc.dlq.oracle:2:0
+-- cdc.dlq.sqlserver
+cdc.dlq.sqlserver:0:0
+cdc.dlq.sqlserver:1:0
+cdc.dlq.sqlserver:2:0
+-- __debezium-heartbeat.cdc.oracle
+__debezium-heartbeat.cdc.oracle:0:45
+-- __debezium-heartbeat.cdc.sqlserver
+__debezium-heartbeat.cdc.sqlserver:0:1
+-- cdc.oracle.schema-history
+cdc.oracle.schema-history:0:5
+-- cdc.sqlserver.schema-history
+cdc.sqlserver.schema-history:0:5
+
+=== kafka-cluster actions granted to the cdc-runtime role
+   inline policies: 

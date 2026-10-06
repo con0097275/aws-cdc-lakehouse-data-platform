@@ -1,0 +1,13 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from cdc.lineage_graph import build_static_graph, audit
+from cdc.urns import UrnMinter, default_catalog
+from cdc.metadata_plane import load
+g = build_static_graph(UrnMinter(load().environment, default_catalog()))
+print('nodes', len(g.nodes), '| edges', len(g.edges), '| column edges', len(g._columns))
+print('cycles', len(g.cycles()), '| audit findings', len(audit(g)))
+for f in audit(g): print('   ', f)
+
+
+nodes 81 | edges 80 | column edges 67
+cycles 0 | audit findings 0

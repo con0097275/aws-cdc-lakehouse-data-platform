@@ -1,0 +1,171 @@
+{
+  "config_version": "cfg-77a0ec78dbbf7bfc",
+  "flow_config": {
+    "flow_mode": "STREAMING_RT",
+    "is_enabled": false,
+    "source_layer_policy": "FULL_CDC_APPEND",
+    "stream_trigger_interval": "30 seconds",
+    "checkpoint_location": "s3://kafka-dev-lab-dev-lake/checkpoints/reporting/dev/mart_account_balance_daily/STREAMING_RT/",
+    "execution_timeout_seconds": 43200
+  },
+  "source_decision": {
+    "policy": "FULL_CDC_APPEND",
+    "approved_default": true,
+    "describes_as": "FULL_CDC_APPEND: an incremental read of the canonical Iceberg layer, so the lakehouse stays the single read path",
+    "kafka_direct_selected": false
+  },
+  "steps": [
+    {
+      "step": "initial_start",
+      "note": "an empty checkpoint, reported not assumed",
+      "outcome": "STARTED",
+      "status": "STARTING",
+      "restart_count": 0,
+      "last_batch_id": null,
+      "rows_written_total": 0,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": null,
+      "application_name": "rt_dev_mart_account_balance_daily",
+      "deployment_id": "rt_dep-20260820T010000Z-git-demo"
+    },
+    {
+      "step": "steady_batches",
+      "note": "a duplicate inside batch 2 collapsed to one row",
+      "outcome": "RUNNING",
+      "status": "RUNNING",
+      "restart_count": 0,
+      "last_batch_id": 2,
+      "rows_written_total": 4,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": null,
+      "distinct_keys_in_target": 2
+    },
+    {
+      "step": "sink_failure",
+      "note": "RAISED so Spark does not commit the offsets; the rows stay in the source",
+      "outcome": "RAISED",
+      "status": "DEGRADED",
+      "restart_count": 0,
+      "last_batch_id": 2,
+      "rows_written_total": 4,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "batch 3 write failed: MERGE INTO the target failed for batch 3. Nothing was committed.",
+      "batch_3_committed": false
+    },
+    {
+      "step": "retry_after_failure",
+      "note": "Spark retried the same batch; it was written",
+      "outcome": "WRITTEN",
+      "status": "RUNNING",
+      "restart_count": 0,
+      "last_batch_id": 3,
+      "rows_written_total": 5,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "batch 3 write failed: MERGE INTO the target failed for batch 3. Nothing was committed.",
+      "batch_3_committed": true
+    },
+    {
+      "step": "crash_restart",
+      "note": "same deployment, same checkpoint, restart_count + 1",
+      "outcome": "RESTARTED",
+      "status": "STARTING",
+      "restart_count": 1,
+      "last_batch_id": 3,
+      "rows_written_total": 5,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "driver lost: container killed",
+      "checkpoint_unchanged": true
+    },
+    {
+      "step": "checkpoint_recovery",
+      "note": "the committed batch was re-delivered and written NOTHING twice",
+      "outcome": "REPLAY_NO_OP",
+      "status": "RUNNING",
+      "restart_count": 1,
+      "last_batch_id": 3,
+      "rows_written_total": 5,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "driver lost: container killed",
+      "replayed": true,
+      "rows_written": 0,
+      "checkpoint_reported": "RESUMING_FROM_BATCH_3",
+      "checkpoint_deleted_by_recovery": false
+    },
+    {
+      "step": "compatible_schema_change",
+      "note": "a new nullable column: ordinary upstream evolution, not an outage",
+      "outcome": "ACCEPTED",
+      "status": "RUNNING",
+      "restart_count": 1,
+      "last_batch_id": 4,
+      "rows_written_total": 6,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "driver lost: container killed",
+      "added_columns": [
+        "channel"
+      ]
+    },
+    {
+      "step": "invalid_schema_change",
+      "note": "a dropped column would have written NULL over every row in the window",
+      "outcome": "REFUSED",
+      "status": "FAILED",
+      "restart_count": 1,
+      "last_batch_id": 4,
+      "rows_written_total": 6,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "incompatible schema at batch 5: column(s) removed upstream: closing_balance. The target still has them, so writing this batch would silently fill them with NULL for every row in the window.",
+      "batch_5_committed": false
+    },
+    {
+      "step": "liveness",
+      "note": "a stalled stream throws no exception; only time shows it",
+      "outcome": "DETECTED",
+      "healthy_after_30s": false,
+      "healthy_after_1h": false,
+      "stalled_status": "FAILED",
+      "seconds_since_progress": null
+    },
+    {
+      "step": "controlled_stop",
+      "note": "the checkpoint stays; the next start resumes from it",
+      "outcome": "STOPPED",
+      "status": "STOPPED",
+      "restart_count": 1,
+      "last_batch_id": 4,
+      "rows_written_total": 6,
+      "checkpoint_state_at_start": "EMPTY",
+      "error_msg": "scheduled window close",
+      "checkpoint_retained": true
+    }
+  ],
+  "target_state": {
+    "active_keys": [
+      "k1",
+      "k2",
+      "k3",
+      "k4"
+    ],
+    "tombstoned_keys": [],
+    "committed_batches": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "invariants": {
+    "a_failed_batch_raised_rather_than_committing_offsets": true,
+    "a_failed_batch_did_not_inflate_restart_count": true,
+    "a_restart_incremented_restart_count": true,
+    "a_replayed_batch_wrote_nothing_twice": true,
+    "recovery_never_deleted_the_checkpoint": true,
+    "a_compatible_schema_change_did_not_stop_the_stream": true,
+    "an_invalid_schema_change_wrote_nothing": true,
+    "a_stall_was_detected_by_elapsed_time": true,
+    "the_stop_retained_the_checkpoint": true,
+    "the_source_is_the_approved_full_cdc_append": true,
+    "the_checkpoint_is_outside_the_warehouse": true,
+    "the_application_ships_disabled": true
+  }
+}

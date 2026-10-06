@@ -1,0 +1,150 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+Oracle CDC verification
+-------------------------------------------------------------------------------
+  command id 3a7e775c-bcad-4b1f-a03e-990f1cabacbe — waiting
+===== 1. ARCHIVELOG mode (must be ARCHIVELOG) =====
+
+LOG_MODE
+------------
+ARCHIVELOG
+===== 2. Database supplemental logging (MIN must be YES) =====
+
+MIN_SUPP ALL
+-------- ---
+YES	 NO
+===== 3. Per-table supplemental logging (one row per captured table, ALL COLUMNS) =====
+
+OWNER
+--------------------------------------------------------------------------------------------------------------------------------
+TABLE_NAME															 LOG_GROUP_TYPE
+-------------------------------------------------------------------------------------------------------------------------------- -------------------
+COREBANK
+ACCOUNT 															 ALL COLUMN LOGGING
+
+COREBANK
+BRANCH																 ALL COLUMN LOGGING
+
+COREBANK
+CUSTOMER															 ALL COLUMN LOGGING
+
+COREBANK
+LOAN																 ALL COLUMN LOGGING
+
+COREBANK
+TRANSACTION															 ALL COLUMN LOGGING
+
+===== 4. Capture user privileges (LOGMINING must be present) =====
+
+GRANTED_ROLE
+--------------------------------------------------------------------------------------------------------------------------------
+SELECT_CATALOG_ROLE
+EXECUTE_CATALOG_ROLE
+LOGMINING
+===== 5. Archive destination healthy (must be VALID) =====
+
+DEST_NAME
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STATUS
+---------
+LOG_ARCHIVE_DEST_1
+VALID
+
+===== 6. Row counts =====
+
+TBL		     N
+----------- ----------
+branch		     4
+customer	   200
+account 	   320
+loan		    50
+transaction	  2000
+
+-------------------------------------------------------------------------------
+SQL Server CDC verification
+-------------------------------------------------------------------------------
+  command id 67174578-3d01-4d1d-bcae-ba3f39327768 — waiting
+Changed database context to 'digital'.
+===== 1. SQL Server Agent (must be Running) =====
+servicename                                                                                                                                                                                                                                                      status_desc                                                                                                                                                                                                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL Server Agent (MSSQLSERVER)                                                                                                                                                                                                                                   Running                                                                                                                                                                                                                                                         
+
+(1 rows affected)
+===== 2. Database CDC enabled (is_cdc_enabled must be 1) =====
+name                                                                                                                             is_cdc_enabled
+-------------------------------------------------------------------------------------------------------------------------------- --------------
+digital                                                                                                                                       1
+
+(1 rows affected)
+===== 3. Table CDC enabled (one row per registered table, is_tracked_by_cdc = 1) =====
+schema_name                                                                                                                      table_name                                                                                                                       is_tracked_by_cdc
+-------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------- -----------------
+dbo                                                                                                                              app_user                                                                                                                                         1
+dbo                                                                                                                              channel                                                                                                                                          1
+dbo                                                                                                                              digital_event                                                                                                                                    1
+dbo                                                                                                                              merchant                                                                                                                                         1
+dbo                                                                                                                              payment_method                                                                                                                                   1
+
+(5 rows affected)
+===== 4. Capture instances and change tables =====
+capture_instance                                                                                                                 source_schema                                                                                                                    source_table                                                                                                                     supports_net_changes
+-------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------- --------------------
+dbo_app_user                                                                                                                     dbo                                                                                                                              app_user                                                                                                                                            0
+dbo_channel                                                                                                                      dbo                                                                                                                              channel                                                                                                                                             0
+dbo_digital_event                                                                                                                dbo                                                                                                                              digital_event                                                                                                                                       0
+dbo_merchant                                                                                                                     dbo                                                                                                                              merchant                                                                                                                                            0
+dbo_payment_method                                                                                                               dbo                                                                                                                              payment_method                                                                                                                                      0
+
+(5 rows affected)
+===== 5. CDC jobs (capture + cleanup must both exist) =====
+job_type             retention            maxtrans    maxscans    pollinginterval     
+-------------------- -------------------- ----------- ----------- --------------------
+capture                                 0         500          10                    5
+cleanup                             10080           0           0                    0
+
+(2 rows affected)
+===== 6. Agent jobs actually enabled =====
+name                                                                                                                             enabled
+-------------------------------------------------------------------------------------------------------------------------------- -------
+cdc.digital_cleanup                                                                                                                    1
+cdc.digital_capture                                                                                                                    1
+
+(2 rows affected)
+===== 7. Capture is producing rows (0 before any DML is expected) =====
+tbl            change_rows
+-------------- -----------
+app_user               150
+digital_event         3000
+channel                  4
+merchant                50
+payment_method          50
+
+(5 rows affected)
+===== 8. Source row counts =====
+tbl            row_count  
+-------------- -----------
+channel                  4
+merchant                50
+app_user               150
+digital_event         3000
+payment_method          50
+
+(5 rows affected)
+

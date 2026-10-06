@@ -1,0 +1,162 @@
+# The governance VOCABULARY — domains, subdomains, glossary and policy names.
+#
+# THIS FILE DOES NOT LIST DATASETS, AND THAT IS THE POINT.
+#
+# `governance/catalog/domains.yml` listed datasets by hand. The DRP0 audit measured the
+# result: 12 declared, 1 live, while 72 of 73 real tables carried no governance at all. A
+# hand-maintained list of datasets drifts because the platform underneath it is
+# config-driven and the list is not.
+#
+# So this file holds only the CLOSED SETS that a governance reference is checked against.
+# The dataset list is derived — from `cdc/registry/sources.yaml` for the CDC layers and from
+# `reporting/jobs/*.yaml` plus the dbt manifest for the layers above. An overlay in
+# `governance/registry/derived_assets.yaml` may add metadata to a derived asset but cannot
+# invent one: naming an asset that the platform does not produce is a compile error.
+#
+# The domain NAMES here are the ones the platform already uses -- `core_banking` and
+# `digital_channel`, as declared in `cdc/registry/sources.yaml` -- not tidier ones invented
+# for this file. Renaming a domain in the vocabulary while the registry kept the old spelling
+# would have created drift on day one of the phase built to end it.
+#
+# ADR-087, decision 1.
+
+version: 1
+updated: 2026-09-30
+
+domains:
+
+  core_banking:
+    description: Core banking — customers, accounts, transactions, branches, loans (Oracle)
+    subdomains: [customer, account, transaction, lending, reference]
+    defaults:
+      owner: banking-data
+      technical_owner: data-platform
+      business_owner: banking-product
+      classification: confidential
+      retention_class: long
+      criticality: tier_2
+      tags: [source-oracle, regulated]
+
+  digital_channel:
+    description: Digital channel — app users, events, merchants, payment methods (SQL Server)
+    subdomains: [identity, engagement, payments, reference]
+    defaults:
+      owner: digital-data
+      technical_owner: data-platform
+      business_owner: digital-product
+      classification: confidential
+      retention_class: standard
+      criticality: tier_2
+      tags: [source-sqlserver]
+
+  # Conformed dimensions shared by both business domains. They have their own domain
+  # because "who owns dim_date" has a different answer from either source system, and
+  # attaching it to one of them makes the other a second-class consumer of its own
+  # dimension.
+  shared:
+    description: Conformed dimensions and calendars used across business domains
+    subdomains: [conformed_dimension, calendar, reference]
+    defaults:
+      owner: data-platform
+      technical_owner: data-platform
+      business_owner: data-governance
+      classification: internal
+      retention_class: long
+      criticality: tier_2
+      tags: [conformed]
+
+  ops:
+    description: Pipeline telemetry, run ledgers, DQ, reconciliation, certification, incidents
+    subdomains: [run_ledger, quality, lineage, incident]
+    defaults:
+      owner: data-platform
+      technical_owner: data-platform
+      business_owner: data-platform
+      classification: internal
+      retention_class: standard
+      criticality: tier_3
+      tags: [telemetry]
+
+glossary:
+
+  cob_date:
+    definition: >-
+      Close of business date. The business day a certified figure describes. Distinct from
+      the wall-clock date a job ran: closing COB D on day D+1 is normal, and a figure's COB
+      never moves because the job was late.
+
+  certified_number:
+    definition: >-
+      A figure produced by the EOD flow from a closed, cutoff-bounded read, that has passed
+      its DQ and reconciliation gates. Spark exiting 0 is not certification.
+
+  event_window:
+    definition: >-
+      The REALTIME contract in which a table holds every event within a bounded rolling
+      window. Reading it as current state requires re-ranking by event order.
+
+  latest_state:
+    definition: >-
+      The REALTIME contract in which a table holds one row per business key, deletes kept
+      as tombstones. Directly readable as "now", within the window's extent.
+
+  current_state:
+    definition: >-
+      Certified EOD baseline plus the REALTIME overlay of changes after its cutoff. The one
+      governed way to answer "what is true now".
+
+  blast_radius:
+    definition: >-
+      The set of assets downstream of a defect, through the lineage graph. Bounds what a
+      recovery may touch; a plan whose radius exceeds the configured limit requires approval.
+
+  freshness_slo:
+    definition: >-
+      The lag a consumer may rely on. Distinct from the freshness SLA a check evaluates at:
+      the SLA is what is measured, the SLO is what is promised, and the SLO may never be
+      tighter than the SLA.
+
+  account_balance:
+    definition: Ledger balance of an account as of a stated point in time or COB.
+
+  channel_engagement:
+    definition: Counts and rates of digital events per channel, per customer, per day.
+
+  customer_360:
+    definition: One row per customer per COB joining banking and digital measures.
+
+  transaction_monitoring:
+    definition: Near-real-time transaction aggregates used for surveillance, never certified.
+
+# Policy NAMES only. The rules themselves live with the thing they govern — the contract in
+# `cdc/contracts.py`, the checks in the registry's `dq:` block, the ladder in
+# `cdc/certification.py`. Naming them here makes a typo a compile error instead of a
+# silently unenforced policy.
+policies:
+
+  contract:
+    - cdc_source_contract          # a captured source table: schema, PK, evolution
+    - curated_conformed_contract   # a conformed dimension or fact
+    - mart_serving_contract        # a mart read by BI
+    - telemetry_contract           # ops ledgers
+
+  dq:
+    - cdc_landing_dq               # uniqueness on event id, not-null keys, event_date
+    - eod_snapshot_dq              # one active row per PK, cutoff bounded
+    - realtime_overlay_dq          # window extent and tombstone sanity
+    - mart_certified_dq            # the blocking suite behind a certified publish
+    - telemetry_dq                 # light; ops tables are evidence, not product
+
+  reconciliation:
+    - full_cdc_to_eod_rowcount
+    - full_cdc_to_realtime_keyset
+    - eod_to_mart_measure
+    - none                         # explicit: this asset reconciles against nothing
+
+  certification:
+    - certified_eod                # may reach CERTIFIED
+    - reconciled_fulfill           # may reach RECONCILED
+    - provisional_correct          # may reach PROVISIONAL_CORRECTED
+    - provisional_nrt              # may reach PROVISIONAL_NRT
+    - realtime_overlay             # may reach REALTIME only
+    - uncertified                  # never carries a certification tier

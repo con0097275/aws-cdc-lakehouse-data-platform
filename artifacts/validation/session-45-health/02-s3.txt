@@ -1,0 +1,58 @@
+=== S3 BUCKETS
+2026-08-15 18:58:27 aws-cdc-lakehouse-tfstate-111122223333
+2026-09-20 15:17:12 kafka-dev-lab-dev-lake-111122223333
+2026-04-24 06:47:30 test-task-snowlake-japfa
+2026-04-24 05:36:26 testsnowflake-operator
+=== LAKE TOP-LEVEL
+bucket=kafka-dev-lab-dev-lake-111122223333
+                           PRE ai/
+                           PRE artifacts/
+                           PRE bootstrap/
+                           PRE checkpoints/
+                           PRE dq-results/
+                           PRE features/
+                           PRE logs/
+                           PRE models/
+                           PRE ops/
+                           PRE quarantine-payloads/
+                           PRE query-results/
+                           PRE warehouse/
+=== warehouse/
+                           PRE curated/
+                           PRE full_cdc/
+                           PRE mart/
+                           PRE ops/
+                           PRE quarantine/
+                           PRE snapshot/
+                           PRE stream/
+=== checkpoints/
+2026-09-20 15:17:13          0 checkpoints/
+2026-09-10 11:18:02         29 checkpoints/full_cdc/stream_w20260906/commits/0
+2026-09-06 15:09:28          0 checkpoints/full_cdc/stream_w20260906/commits_$folder$
+2026-09-10 11:18:02         45 checkpoints/full_cdc/stream_w20260906/metadata
+2026-09-10 11:18:02        871 checkpoints/full_cdc/stream_w20260906/offsets/0
+=== artifacts/
+2026-09-10 17:58:01        631 artifacts/cdc/metrics.json
+2026-09-17 22:56:44      31252 artifacts/cdc/table-plan.json
+2026-09-10 11:18:02      12002 artifacts/code/.superseded-2026-09-03/eod_job.py
+2026-09-10 11:18:02      15676 artifacts/code/.superseded-2026-09-03/full_cdc_job.py
+2026-09-10 11:18:02       5030 artifacts/code/.superseded-2026-09-03/realtime_job.py
+2026-09-10 11:18:02      23996 artifacts/code/.superseded-2026-09-06/schemas.legacy.json
+2026-09-10 11:18:02   13109114 artifacts/code/aws-msk-iam-auth.jar
+2026-09-17 22:56:37      12958 artifacts/code/backfill.py
+2026-09-17 22:56:32     113452 artifacts/code/cdc-framework.zip
+2026-09-17 22:56:43       6980 artifacts/code/cdc_maintenance_job.py
+2026-09-10 11:18:02     145516 artifacts/code/commons-pool2-2.11.1.jar
+2026-09-10 11:18:02       1382 artifacts/code/emr_smoke.py
+2026-09-17 22:56:41      29111 artifacts/code/eod_engine.py
+2026-09-10 11:18:02      12002 artifacts/code/eod_job.py
+2026-09-10 11:18:02     151493 artifacts/code/framework-flat.zip
+2026-09-17 22:56:33      45270 artifacts/code/full_cdc_job.py
+2026-09-17 22:56:34      15110 artifacts/code/full_cdc_stream_job.py
+2026-09-10 11:18:02    5050443 artifacts/code/kafka-clients-3.4.1.jar
+2026-09-10 11:18:02        791 artifacts/code/l1_cleanup.py
+2026-09-10 11:18:02       8222 artifacts/code/l1_load.py
+=== object count
+
+Total Objects: 4385
+   Total Size: 302403764

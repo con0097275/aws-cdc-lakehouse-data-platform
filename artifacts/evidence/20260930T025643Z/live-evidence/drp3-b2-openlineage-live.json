@@ -1,0 +1,62 @@
+{
+  "artifact": "io.openlineage:openlineage-spark_2.12:1.53.0",
+  "blocker": "B2 \u2014 a real OpenLineage event from a real Spark run",
+  "by_event_type": {
+    "COMPLETE": 3,
+    "RUNNING": 5,
+    "START": 4
+  },
+  "captured_at": "2026-09-29T23:02:05.172127+00:00",
+  "does_not_prove": [
+    "emission from EMR Serverless against Iceberg/Glue tables",
+    "delivery to the DataHub OpenLineage endpoint",
+    "the canonical datahub_urn facet on an Iceberg dataset (the listener names local paths here; ADR-090's carried identity is applied by the platform's own emitter, not by the listener)"
+  ],
+  "events_emitted": 12,
+  "events_with_io": 10,
+  "how": "local Spark 3.5.0, listener attached via the conf DERIVED from cdc/lineage_runtime.py",
+  "listener": "io.openlineage.spark.agent.OpenLineageSparkListener",
+  "namespace": "cdc-lakehouse-dev",
+  "producer": "https://github.com/OpenLineage/OpenLineage/tree/1.53.0/integration/spark",
+  "proves": [
+    "the pinned artifact is correct for Spark 3.5 / Scala 2.12",
+    "the conf derived by cdc/lineage_runtime.py actually attaches the listener",
+    "START / RUNNING / COMPLETE lifecycle is emitted",
+    "input and output datasets are captured on real read/write"
+  ],
+  "sample_event": {
+    "eventType": "START",
+    "inputs": [
+      "/tmp/ol-out/src"
+    ],
+    "job": {
+      "facets": {
+        "jobType": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/tree/1.53.0/integration/spark",
+          "_schemaURL": "https://openlineage.io/spec/facets/2-0-4/JobTypeJobFacet.json#/$defs/JobTypeJobFacet",
+          "integration": "SPARK",
+          "jobType": "SQL_JOB",
+          "processingType": "BATCH"
+        }
+      },
+      "name": "drp3_b2_openlineage_proof.adaptive_spark_plan.ol-out_agg",
+      "namespace": "cdc-lakehouse-dev"
+    },
+    "job_facet_keys": [
+      "jobType"
+    ],
+    "outputs": [
+      "/tmp/ol-out/agg"
+    ],
+    "run_facet_keys": [
+      "environment-properties",
+      "parent",
+      "processing_engine",
+      "spark_applicationDetails",
+      "spark_properties"
+    ],
+    "run_id": "01a0ef67-0144-722f-946a-5a61efa60eb3"
+  },
+  "schema_url": "https://openlineage.io/spec/2-0-2/OpenLineage.json#/$defs/RunEvent",
+  "spark_version": "3.5.0"
+}

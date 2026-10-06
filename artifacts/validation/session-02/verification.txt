@@ -1,0 +1,41 @@
+# Session 02 Stage A verification - 2026-08-12T11:12:06Z
+
+## make identity
+profile=my-aws-profile region=ap-southeast-1 environment=dev
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+account guard OK
+
+## make lint-shell
+  ok   scripts/bootstrap-state-backend.sh
+  ok   scripts/collect-pricing.sh
+  ok   scripts/install-tools.sh
+  ok   scripts/lib.sh
+  ok   scripts/probe-msk-instance-type.sh
+  shellcheck ABSENT - skipped (OPEN-06)
+
+## checkov
+3.3.10
+
+## make validate-docs
+validate-docs.py — repo root: /path/to/aws-cdc-lakehouse
+==============================================================================
+[PASS] Session 01 and 02-Stage-A deliverables exist                            
+[PASS] D4: L3 build SQL references only defined columns                        
+[PASS] D2/D3: no rejected column aliases outside a rejection section           
+[PASS] enable_* flags agree between COST.md and the flag matrix                
+[PASS] every ADR file is indexed and every indexed ADR exists                  
+[PASS] every ADR has the required sections                                     
+[PASS] D8/ADR-024: no local-time cutoff sneaks back in                         
+[PASS] mermaid blocks are structurally valid (structural parse, not mmdc)      
+[PASS] CLAUDE.md 9.4: no runnable placeholders                                 
+[PASS] CLAUDE.md 3.1: no static credentials                                    
+[PASS] CLAUDE.md 4: COST.md prices trace to PRICE_REFERENCE.md                 
+[PASS] CLAUDE.md 7: KubernetesCeleryExecutor only appears as a known-wrong name
+[PASS] Sessions 00-19 all graphed; all 5 approval gate classes covered         
+[PASS] APPROVAL_GATES: AWS-mutating scripts default to dry-run                 
+==============================================================================
+14 passed, 0 failed, 0 skipped

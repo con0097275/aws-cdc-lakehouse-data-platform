@@ -1,0 +1,26 @@
+{
+  "job_id": "mart_account_balance_daily",
+  "flow_mode": "AUTO_CORRECT",
+  "coordinator_run_id": "p14s34-s3-1787379269",
+  "execution_id": "p14s34-s3-1787379269:AUTO_CORRECT:mart_account_balance_daily:2026-08-22:1",
+  "turn": 1,
+  "attempt_number": 1,
+  "dependencies": [],
+  "config_version": "cfg-20237926f3c07ed2",
+  "business_date": "2026-08-22",
+  "watermark_before": {
+    "last_success_date_of_data": "2026-08-21",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14s34-s3land-1787308169:AUTO_CORRECT:mart_account_balance_daily:2026-08-21:1"
+  },
+  "watermark_after": {
+    "last_success_date_of_data": "2026-08-22",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14s34-s3-1787379269:AUTO_CORRECT:mart_account_balance_daily:2026-08-22:1"
+  },
+  "spark_app_id": null,
+  "tracking_url": null,
+  "status": "SUCCEEDED",
+  "detail": "0 date(s), 0 key(s), path=DERIVED; 3 date(s) ESCALATED (already certified; AUTO_CORRECT cannot overwrite CERTIFIED)",
+  "finished_at": "2026-08-22T06:14:33.957053+00:00"
+}

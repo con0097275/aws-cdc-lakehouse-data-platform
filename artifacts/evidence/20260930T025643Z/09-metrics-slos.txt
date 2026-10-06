@@ -1,0 +1,18 @@
+$ python3 -c 
+import sys, json; sys.path.insert(0,'.')
+from cdc.reliability_metrics import payload
+p = payload()
+print('metrics', len(p['metrics']), '| SLOs', len(p['slos']),
+      '(enforceable', p['enforceable_slos'], ', proposed', p['proposed_slos'], ')',
+      '| alerts', len(p['alerts']))
+for s in p['slos']: print(f"  {s['basis']:10s} {s['metric']:32s} {s['target'][:60]}")
+
+
+metrics 18 | SLOs 7 (enforceable 3 , proposed 4 ) | alerts 6
+  measured   certification_age_seconds        a COB certifies by 06:00 UTC on D+1
+  inherited  freshness_violations             per-table, the SLA in cdc/registry/sources.yaml (60m default
+  measured   metadata_publish_degraded_total  a degraded publish never fails a data flow; worst case 31.5 
+  proposed   metadata_ingestion_age_seconds   catalogue no more than 24 h stale
+  proposed   impact_plan_latency_seconds      a plan in under 60 s
+  proposed   mttd_seconds                     a blocking defect detected within one close cycle
+  proposed   mttr_seconds                     a bounded recovery re-certifies within one COB

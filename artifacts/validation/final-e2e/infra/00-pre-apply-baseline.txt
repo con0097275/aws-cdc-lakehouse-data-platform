@@ -1,0 +1,42 @@
+PRE-APPLY BASELINE — 2026-09-03T08:36:29Z
+Bring-up was REQUESTED and did NOT proceed. This file records the verified
+pre-apply state so the gate can be re-entered without re-deriving it.
+======================================================================
+
+--- GATE RE-VERIFICATION ---
+AWS_PROFILE                        my-aws-profile  (required my-aws-profile)  PASS
+AWS_REGION                         ap-southeast-1  (required ap-southeast-1)  PASS
+account                            111122223333  PASS
+workspace                          default  PASS
+backend profile pin                present  PASS
+provider version                   6.56.0 exact  PASS
+
+--- STATE (unchanged since the plan) ---
+data.aws_caller_identity.current
+module.budget_guardrails.aws_budgets_budget.project_monthly
+module.data_lake.aws_s3_bucket.lake
+
+--- SAVED PLAN FRESHNESS ---
+plan saved      : 2026-09-03 15:24:44.025357410 +0700
+plan sha256     : c70ba8a77770b76dfa955ac019fa476257bc2e0d4188ea43a4af1afde8e1b561
+inputs changed since plan: NONE
+  (only docs/E2E_LIVE_TEST_PLAN.md and dbt/logs/dbt.log changed; neither is a
+   plan input. The 90 aws_s3_object sources are airflow/dags/*.py, unmodified.)
+plan verdict    : 248 create / 0 change / 0 destroy / 0 replace  STILL VALID
+
+--- LIVE BILLABLE (nothing running) ---
+EC2 instances   : 0
+MSK clusters    : 0
+NAT gateways    : 0
+EMR Serverless  : 0
+DynamoDB tables : 0
+Glue databases  : 2  (default + another project)
+Athena WGs      : 1  (primary only)
+MTD spend       : $0.3121803918
+hourly burn     : $0.0000/hr
+
+--- BLOCKERS (why apply did not run) ---
+B1  auto_destroy_after = 2026-08-25T00:00:00Z  -- EXPIRED 9 days. UNMET.
+B2  monthly_budget_usd = 100  -- check assertion <= 50 FAILS. UNMET.
+B3  scripts/tf.sh apply --execute calls confirm_destructive(), which dies at
+    lib.sh:161-163 when stdin is not a TTY. No agent can satisfy it. BY DESIGN.

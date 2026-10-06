@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-09-30T02:32:30Z",
+  "phase": "DRP3 / DRP12 gate — Airflow runtime lineage",
+  "verdict": "LIVE PASS",
+  "host": "i-0fb5f608a7bc37002 (kafka-dev-lab-dev-airflow, k3s), reached via SSM Session Manager",
+  "method": "isolated pod from the DEPLOYED image apache/airflow:3.2.2 with an ephemeral sqlite metadata DB. The resident scheduler was NOT touched: all 8 production pods stayed Running throughout.",
+  "versions": {
+    "airflow": "3.2.2",
+    "provider": "apache-airflow-providers-openlineage==2.20.2",
+    "openlineage_python": "1.53.0",
+    "chart": "airflow-1.22.0"
+  },
+  "defect_found": {
+    "summary": "AIRFLOW__OPENLINEAGE__TRANSPORT was the bare string `console`; the provider parses that key as JSON",
+    "error": "AirflowConfigException: Unable to parse [openlineage] 'transport' as valid json",
+    "why_it_was_silent": "the exception is raised while the PLUGIN IS BEING IMPORTED, so Airflow skips the plugin, registers no listener, and every task still succeeds. The probe DAG ran green with REGISTERED_LISTENERS = [] and emitted nothing.",
+    "why_the_tests_missed_it": "the existing test asserted only that airflow/helm/values.yaml matched cdc/lineage_runtime.py::airflow_env(). Both carried the bare string, so they agreed — and agreement between two things I wrote is not evidence about the third thing that has to consume them.",
+    "fix": "airflow_env() now emits json.dumps({'type': ...}); values.yaml carries '{\"type\":\"console\"}'; three tests added that parse the value the way the provider does",
+    "note": "this is NOT the Spark shape — the Spark listener takes a flat spark.openlineage.transport.type=console string"
+  },
+  "before_fix": {"registered_listeners": [], "events_emitted": 0, "dag_run_state": "success"},
+  "after_fix": {
+    "registered_listeners": ["airflow.providers.openlineage.plugins.listener"],
+    "plugin": "OpenLineageProviderPlugin",
+    "events_emitted": 7,
+    "breakdown": "3 tasks x START/COMPLETE = 6, plus 1 DAG-level COMPLETE",
+    "namespace": "cdc-lakehouse-dev",
+    "namespace_matches_derived_config": true,
+    "job_names": ["drp3_probe", "drp3_probe.readiness_gate", "drp3_probe.submit_eod_build", "drp3_probe.close_and_certify"],
+    "dag_run_id": "01a0e54f-b000-79ed-8bc0-152e6c149174",
+    "producer": "https://github.com/apache/airflow/tree/providers-openlineage/2.20.2",
+    "run_facets_observed": ["airflow", "airflowDagRun", "airflowState", "nominalTime", "parent", "processing_engine", "tags", "unknownSourceAttribute"],
+    "parent_run_facet": {
+      "present": true,
+      "significance": "this is the hole the docs recorded: every task run now carries parent.run.runId pointing at the DAG run, and root pointing at the same, so an Airflow-submitted Spark job is no longer an orphan in the graph",
+      "parent_job": "drp3_probe",
+      "parent_namespace": "cdc-lakehouse-dev"
+    },
+    "processing_engine_facet": {"name": "Airflow", "version": "3.2.2", "openlineageAdapterVersion": "2.20.2"}
+  },
+  "proves": [
+    "provider 2.20.2 loads on the deployed Airflow 3.2.2 — the DRP0 open constraint about the provider major is closed with a real load, not a version-compatibility claim",
+    "the listener registers and emits real RunEvents for real task executions",
+    "the namespace the provider stamps equals the one cdc/lineage_runtime.py derives",
+    "the parent/root run facets link task runs to their DAG run"
+  ],
+  "does_not_prove": [
+    "that the RESIDENT scheduler emits. The provider is not in the image, and chart 1.22.0 removed `extraPipPackages`, so making this permanent needs a custom Airflow image — see the command list in docs/validation/DATA_RELIABILITY_E2E.md",
+    "dataset-level input/output lineage from Airflow: PythonOperator has no extractor, so inputs/outputs are empty. Dataset lineage comes from the Spark listener, which has 12 real events."
+  ],
+  "cost": "$0 — one short-lived pod on an already-running instance"
+}

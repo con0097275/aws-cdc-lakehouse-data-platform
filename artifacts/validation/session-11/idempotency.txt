@@ -1,0 +1,8 @@
+:: loading settings :: url = jar:file:~/.local/lib/python3.10/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+  mart_customer_360_daily                rows=2
+  mart_channel_performance_daily         rows=2
+  mart_transaction_monitoring_10m        rows=2
+  mart_account_balance_daily             rows=2
+--- customer_360 detail ---
+  cust=100 txn=150.00 bal=500.00 status=CERTIFIED
+  cust=101 txn=25.00 bal=250.00 status=PROVISIONAL_NRT

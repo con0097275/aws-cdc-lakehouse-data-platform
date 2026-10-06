@@ -1,0 +1,93 @@
+CDC E2E — FULL_CDC / REALTIME / EOD / RECONCILIATION EVIDENCE
+Captured 2026-09-03T10:04-10:28Z.  EMR Serverless app 00g8g05ud5dj2u25 (ARM64, emr-7.2.0).
+==============================================================================
+
+EMR SUBMISSION RECIPE (not previously recorded anywhere in the repo)
+  The first submission FAILED: "Failed to find data source: kafka".
+  EMR Serverless ships the connector jars but NOT on the default classpath. Proven by a
+  read-only probe job (run 00g8g1j59h239027) which listed the image:
+      /usr/lib/spark/connector/lib/spark-sql-kafka-0-10.jar
+      /usr/lib/spark/connector/lib/spark-token-provider-kafka-0-10.jar
+      /usr/lib/spark/connector/lib/spark-avro.jar          <- required by from_avro
+      /usr/share/aws/iceberg/lib/iceberg-spark3-runtime.jar
+      spark-core_2.12-3.5.1-amzn-0                          <- Spark 3.5.1
+  No jar had to be downloaded. Working sparkSubmitParameters:
+      --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+      --conf spark.sql.session.timeZone=UTC
+      --conf spark.jars=<the four image jars>,s3://<lake>/artifacts/code/aws-msk-iam-auth.jar,
+             s3://<lake>/artifacts/code/kafka-clients-3.4.1.jar,
+             s3://<lake>/artifacts/code/commons-pool2-2.11.1.jar
+
+FULL_CDC  (run 00g8g1kai53eq027, two test topics)
+  cdc.oracle.COREBANK.CUSTOMER          rows=205  tombstones=1
+  cdc.sqlserver.digital.dbo.app_user    rows=155  tombstones=1
+  FULL_CDC_INGESTED 360     FULL_CDC_COUNT 360    L1_SNAPSHOT 3736550349532109830
+  205 = 200 snapshot + 5 DML ; 155 = 150 snapshot + 5 DML.
+  Kafka moved +6 per topic (5 events + 1 tombstone); the job decoded 5 and counted the
+  tombstone separately. The two numbers agree exactly.
+  Schema evolution on first write: added dv_event_id, dv_src_event_id, loaded_at.
+
+FULL_CDC replay (run 00g8g1lknour1027, identical arguments)
+  FULL_CDC_INGESTED 360   -- re-read every source row
+  FULL_CDC_COUNT    360   -- table UNCHANGED
+  New snapshot 2711299981402775360 committed with ZERO added-records.
+  MERGE on dv_event_id is idempotent: a rerun is a no-op (CLAUDE.md 5.3).
+
+FULL_CDC all 8 topics (run 00g8g1n939q2hg27)
+  CUSTOMER 205  ACCOUNT 320  TRANSACTION 2000  BRANCH 4
+  app_user 155  channel 4    digital_event 3000 merchant 50
+  FULL_CDC_INGESTED 5738 = 5728 seeded + 10 controlled events.  COUNT 5738.
+  After the ACCOUNT scenarios (run 00g8g1rtk7sc4027): ACCOUNT rows=326 tombstones=2,
+  FULL_CDC_COUNT 5744 (= 5738 + 6 change events).
+
+ROW-LEVEL, Oracle CUSTOMER PK 990001 (Athena b8e8be23):
+  op  position_primary  position_secondary  part  offset  dv_event_id  dv_src_event_id  full_name            status    segment
+  c   3087592           3087591             2     64      7ed71575ed   f0c177cef9       E2E Alpha            ACTIVE    RETAIL
+  u   3087599           3087598             2     65      7544c5c4f8   3d01e88c98       E2E Alpha RENAMED    ACTIVE    RETAIL
+  u   3087606           3087605             2     66      b989928149   40f6cdf54a       E2E Alpha RENAMED    DORMANT   RETAIL
+  d   3087613           3087612             2     67      65a735223c   3660277959       E2E Alpha RENAMED    DORMANT   RETAIL
+  c   3087620           3087619             2     69      f1a0bb069f   5d2fc13fd1       E2E Alpha REBORN     ACTIVE    PRIORITY
+  * every I/U/D preserved, no dedup (5.2)   * position_primary strictly increasing
+  * the DELETE carries its before-image     * offset 68 (the tombstone) is ABSENT -- excluded from decode, counted
+  * dv_event_id and dv_src_event_id distinct on every row  * one partition throughout
+
+REALTIME (run 00g8g1oi05t11g27)
+  REALTIME_WINDOW hours=72 cutoff=2026-08-31 10:13:06 (UTC session zone pinned)
+  REALTIME_SOURCE_ROWS full_cdc=5738 in_window=5738     REALTIME_ROWS 5738
+  REALTIME_SNAPSHOT 7340210906418940945
+  Athena: rt_rows 5738, newest 2026-09-03 09:49:32, oldest 2026-09-03 09:28:03.
+  Full-refresh createOrReplace -> rerunning yields the same table (rebuildable).
+  It holds 5738 while FULL_CDC now holds 5744 because it ran BEFORE the ACCOUNT
+  scenarios: correct point-in-time behaviour for a materialised window, not a defect.
+
+EOD (runs 00g8g1pii7rtug27, 00g8g1stvh6gn027, 00g8g1ut99adpg27)
+  first build          EOD_ROWS 320   tag EOD_2026-09-03 -> 635798503432170794
+  after ACCOUNT DML    EOD_ROWS 322   <- WRONG, see finding E1
+  after the FIX        EOD_ROWS 321   tag EOD_2026-09-03 -> 5452782707029562418
+  EOD_LAYER_CLOSED written to ops.eod_watermark AND the Iceberg tag created on every run
+  -- the day is DECLARED closed, not merely populated (the gate needs both).
+
+  one state per PK : rows 321 = distinct account_sk 321
+  account 990001 (insert -> update 2500.55 -> DELETE)      ABSENT from EOD   correct
+  account 990002 (insert -> delete -> recreate REOPENED)   PRESENT 777.77    correct
+
+RECONCILIATION (approved semantic rule, computed independently in Athena)
+  latest event per PK by CAST(position_primary AS DECIMAL(38,0)) DESC, kafka_offset DESC,
+  deletes excluded, scoped to business_date 2026-09-03:
+      expected_from_full_cdc = 321
+      eod_rows               = 321      MATCH
+
+ICEBERG HISTORY
+  full_cdc.cdc_events -- 14 snapshots, e.g.
+     2131182114289262510 append added=205 total=205
+     3736550349532109830 append added=155 total=360
+     2711299981402775360 append added=(none) total=360   <- the REPLAY, zero rows added
+     4615494865886623398 append added=320 total=680
+     5521915788101352950 append added=50  total=5738
+     6867411053458223431 append added=6   total=5744
+  curated.fact_account_daily_snapshot
+     635798503432170794  overwrite total=320
+     5364965301189601843 overwrite total=322   <- the defect, preserved in history
+     3008184016200846125 delete    total=0     <- partition cleared to rebuild cleanly
+     5452782707029562418 overwrite total=321   <- after the fix
+  No snapshot was expired; all evidence remains queryable.

@@ -1,0 +1,14 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from cdc.lineage_graph import build_static_graph
+from cdc.urns import UrnMinter, default_catalog
+from cdc.metadata_plane import load
+from cdc.assets import AssetId
+m = UrnMinter(load().environment, default_catalog()); g = build_static_graph(m)
+for col in ('balance', 'customer_id'):
+    for c in g.column_upstreams(m.dataset_urn(AssetId.parse('curated:banking_account')), col):
+        print(f'  {c.upstream_column} -> {c.downstream_column} | {c.evidence.value} | {c.source}')
+
+
+  BALANCE -> balance | derived | curated/entities.yaml
+  CUSTOMER_ID -> customer_id | derived | curated/entities.yaml

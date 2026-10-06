@@ -1,0 +1,60 @@
+{
+  "captured_at": "2026-09-30T00:39:47.917178+00:00",
+  "incident_state": {
+    "automatic_recovery_allowed": "true",
+    "incident_id": "inc-b3-proof",
+    "recovery_plan_id": "rp1:45b21f325ca10ec5",
+    "status": "PLANNED"
+  },
+  "ledger_row_counts": {
+    "data_incident": 1,
+    "dq_result_v2": 151,
+    "reconciliation_run": 1,
+    "recovery_execution": 1,
+    "recovery_plan": 1
+  },
+  "phase": "DRP11 scenarios 3 (to plan), 4, 9, 10 \u2014 LIVE against AWS",
+  "scenario_10_column_lineage": {
+    "evidence": "derived",
+    "source": "reporting/curated/entities.yaml",
+    "trace": "eod\u2026account.BALANCE -> curated.banking_account.balance",
+    "verdict": "LIVE PASS to the curated layer; BI hop absent (no Power BI workspace)"
+  },
+  "scenario_3_eod_dq_failure": {
+    "dq": "BLOCKER FAIL persisted in ops.dq_result_v2",
+    "execution": "PENDING \u2014 persisted; the repair itself needs an EMR submission",
+    "incident": "opened, then advanced to PLANNED",
+    "plan": {
+      "approval": "AUTOMATIC",
+      "radius": 14,
+      "turns": [
+        1,
+        1,
+        2,
+        2,
+        5,
+        3
+      ],
+      "weakest_evidence": "derived"
+    },
+    "verdict": "LIVE PASS to the plan stage; repair and re-certify remain (B8)"
+  },
+  "scenario_4_unrelated_branch_excluded": {
+    "digital_branch_assets_included": 0,
+    "impacted": 14,
+    "root": "eod:oracle_coredb_corebank_account",
+    "verdict": "LIVE PASS \u2014 the blast radius is a radius, not the warehouse"
+  },
+  "scenario_9_large_blast_radius": {
+    "actual_radius": 14,
+    "approval": "REQUIRES_APPROVAL",
+    "policy_max_blast_radius": 2,
+    "reason": "blast radius 14 exceeds the limit 2",
+    "verdict": "LIVE PASS"
+  },
+  "still_open": [
+    "the repair + re-certify half of scenario 3 (needs EMR)",
+    "scenarios 1, 2, 5, 6 (need a pipeline run)",
+    "B9 k3s sizing measurement"
+  ]
+}

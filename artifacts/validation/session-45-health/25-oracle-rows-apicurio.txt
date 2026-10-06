@@ -1,0 +1,23 @@
+=== Oracle row counts
+BRANCH=
+CUSTOMER=
+ACCOUNT=
+TRANSACTION=
+LOAN=
+SUPP_LOG_TABLES=5
+
+=== host listeners on cdc-runtime
+LISTEN 0      50                        *:8083             *:*    users:(("java",pid=47903,fd=309))    
+LISTEN 0      4096   [::ffff:10.42.0.121]:8080             *:*    users:(("java",pid=47504,fd=354))    
+
+=== apicurio healthcheck + last logs
+{"Test":["CMD-SHELL","curl -sf http://10.42.0.121:8080/health/ready >/dev/null || exit 1"],"Interval":20000000000,"Timeout":10000000000,"StartPeriod":60000000000,"Retries":20}
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.kafkasql.upgrade.KafkaSqlUpgraderManager] (KSQL Kafka Consumer Thread) Lock acquired (UUID = 2e7557ec-4216-4497-aa25-5e2d29d84f46) to perform upgrade from version 1 to version 2.
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.kafkasql.upgrade.KafkaSqlUpgraderManager] (executor-thread-2) Performing an upgrade with (in order): KafkaSqlReferencesCanonicalHashUpgrader_ClientProxy, KafkaSqlReferencesContentHashUpgrader_ClientProxy .
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.sql.upgrader.AbstractReferencesCanonicalHashUpgrader] (executor-thread-2) Successfully updated 0 canonical content hashes.
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.sql.upgrader.AbstractReferencesContentHashUpgrader] (executor-thread-2) Successfully updated 0 content hashes.
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.kafkasql.upgrade.KafkaSqlUpgraderManager] (executor-thread-2) Upgrade finished successfully!
+2026-09-20 08:49:31 INFO <> [io.apicurio.registry.storage.impl.kafkasql.KafkaSqlRegistryStorage] (KSQL Kafka Consumer Thread) KafkaSQL storage bootstrapped in 4190 ms.
+2026-09-20 08:58:27 INFO <> [org.apache.kafka.clients.NetworkClient] (kafka-producer-network-thread | apicurio-registry-producer) [Producer clientId=apicurio-registry-producer] Node -1 disconnected.
+2026-09-20 08:58:27 INFO <> [org.apache.kafka.clients.NetworkClient] (KSQL Kafka Consumer Thread) [Consumer clientId=consumer-apicurio-registry-1777125b-418c-4e00-8151-f184796463cd-1, groupId=apicurio-registry-1777125b-418c-4e00-8151-f184796463cd] Node -1 disconnected.
+

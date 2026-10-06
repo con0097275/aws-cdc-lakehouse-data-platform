@@ -1,0 +1,13 @@
+=== bootstrap log: lines mentioning oracle container lifecycle
+4248: Container source-oracle  Creating
+4249: Container source-oracle  Created
+4250: Container source-oracle  Starting
+4251: Container source-oracle  Started
+
+=== systemd units managing compose
+(none)
+
+=== current docker ps -a (recheck)
+source-oracle | Up About a minute (healthy) | 2026-09-20 09:00:15 +0000 UTC
+source-sqlserver | Up 15 minutes (healthy) | 2026-09-20 08:46:55 +0000 UTC
+

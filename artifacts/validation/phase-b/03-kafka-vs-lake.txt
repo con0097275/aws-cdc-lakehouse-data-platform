@@ -1,0 +1,18 @@
+═══ 16:33:25Z  vòng 1 ═══
+  ── KAFKA (nguồn → topic)
+     cdc.oracle.COREBANK.ACCOUNT                       737
+     cdc.oracle.COREBANK.BRANCH                          4
+     cdc.oracle.COREBANK.CUSTOMER                      200
+     cdc.oracle.COREBANK.LOAN                         1668
+     cdc.oracle.COREBANK.TRANSACTION                  2000
+     cdc.sqlserver.digital.dbo.app_user                150
+     cdc.sqlserver.digital.dbo.channel                   4
+     cdc.sqlserver.digital.dbo.digital_event          3000
+     cdc.sqlserver.digital.dbo.merchant                 50
+     cdc.sqlserver.digital.dbo.payment_method         1676
+  ── ICEBERG trên S3 (Kafka → lake)
+     FULL_CDC/loan                                      65
+     FULL_CDC/payment                                   74
+     FULL_CDC/account                                  339
+     monolith                                         5886
+     OPS/event_index                                  5886

@@ -1,0 +1,3 @@
+SUBMITTED e2e-realtime-account run=00g8tu5j4jnd9827
+STATE e2e-realtime-account 00g8tu5j4jnd9827 SUCCESS
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8tu5j4jnd9827/SPARK_DRIVER/stdout.gz

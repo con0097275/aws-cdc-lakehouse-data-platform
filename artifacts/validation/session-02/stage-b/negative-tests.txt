@@ -1,0 +1,43 @@
+# Negative tests — every guard PROVEN to fire, not asserted
+# Captured: 2026-08-13T04:42:16Z
+
+--- T1 ADR-026: both optional engines, override false -> MUST FAIL ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[31m│[0m [0m[1m[31mError: [0m[0m[1mResource precondition failed[0m
+
+--- T2 OPEN-03: kafka.t3.small -> MUST FAIL ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid value for variable[0m
+
+--- T3 CLAUDE.md 4.2: NAT gateway -> MUST FAIL ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[31m│[0m [0m[1m[31mError: [0m[0m[1mResource precondition failed[0m
+
+--- T4 ADR-027: auto_destroy_after=manual -> MUST FAIL ---
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid value for variable[0m
+
+--- T5 OPEN-05: empty budget_email -> MUST FAIL ---
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid value for variable[0m
+[31m│[0m [0mbudget_email must be a valid address. Empty would silently disable the only
+
+--- T6 CLAUDE.md 2: az_count=2 -> MUST FAIL ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid value for variable[0m
+
+--- T7 CLAUDE.md 2: wrong account -> MUST FAIL ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[31m│[0m [0m[1m[31mError: [0m[0m[1mResource precondition failed[0m
+
+--- T8 risk R12: broker_ebs_gib=100 -> MUST WARN (check block, plan continues) ---
+      [32m+[0m[0m description  = "Kimball facts and dimensions. The ONLY layer Power BI reads (CLAUDE.md §8)"
+      [32m+[0m[0m description  = "Poison records with error class, stack hash and source coordinates (CLAUDE.md §5.10)"
+[33m│[0m [0mbroker_ebs_gib > 20: MSK storage is a ONE-WAY RATCHET and cannot be reduced
+
+--- T9 dependency flags: cdc_runtime without source_lab -> MUST FAIL ---
+[31m│[0m [0m[1m[31mError: [0m[0m[1mResource precondition failed[0m
+[31m│[0m [0menable_cdc_runtime requires enable_source_lab: Debezium has nothing to

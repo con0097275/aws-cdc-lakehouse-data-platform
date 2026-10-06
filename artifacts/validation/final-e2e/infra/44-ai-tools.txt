@@ -1,0 +1,20 @@
+  V1 TOOL CATALOG (all read_only=True)
+    diagnose_metric            governed_read     timeout=45.0s  max_rows=1000
+    forecast_metric            governed_read     timeout=45.0s  max_rows=1000
+    get_data_lineage           public_metadata   timeout=15.0s  max_rows=1000
+    get_dq_results             ops_read          timeout=10.0s  max_rows=1000
+    get_feature_definition     public_metadata   timeout=10.0s  max_rows=1000
+    get_model_status           ops_read          timeout=10.0s  max_rows=1000
+    get_pipeline_status        ops_read          timeout=20.0s  max_rows=25
+    get_table_schema           public_metadata   timeout=10.0s  max_rows=1000
+    governance_review          ops_read          timeout=45.0s  max_rows=1000
+    list_metrics               public_metadata   timeout=5.0s  max_rows=1000
+    query_athena               governed_read     timeout=60.0s  max_rows=1000
+    retrieve_knowledge         public_metadata   timeout=15.0s  max_rows=20
+
+  DELIBERATELY NOT IMPLEMENTED (a tool that answers from nothing is worse than none)
+    get_feature_value          feature_offline is not materialised yet
+    get_reconciliation_status  ops.metric_variance / ops.data_certification are empty
+    run_model_inference        the only model has a synthetic label and no predictive meaning
+
+  WRITE_TOOLS: {}   (asserted empty by test — ADR-057)

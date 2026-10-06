@@ -1,0 +1,35 @@
+COST/SAFETY GATE EVIDENCE — generated 2026-09-03T08:26:39Z
+================================================================
+
+--- ENVIRONMENT ---
+AWS_PROFILE=my-aws-profile
+AWS_REGION=ap-southeast-1
+ENVIRONMENT=dev
+DEPLOYMENT_PROFILE=lab_low_cost
+
+--- STS IDENTITY ---
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+--- TERRAFORM ---
+Terraform v1.15.8
+on linux_amd64
++ provider registry.terraform.io/hashicorp/aws v6.56.0
+workspace: default
+backend bucket: aws-cdc-lakehouse-tfstate-111122223333
+backend key   : aws-cdc-lakehouse/dev/terraform.tfstate
+backend profile pinned: 1
+provider pinned:       version = "6.56.0" # exact, no ~> — CLAUDE.md §3.9
+
+--- STATE BEFORE APPLY ---
+data.aws_caller_identity.current
+module.budget_guardrails.aws_budgets_budget.project_monthly
+module.data_lake.aws_s3_bucket.lake
+
+--- fmt / validate ---
+terraform fmt -check -recursive : CLEAN (exit 0)
+Success! The configuration is valid.
+

@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+what is billable RIGHT NOW (read-only)
+-------------------------------------------------------------------------------
+  MSK clusters    : 0
+  EC2 (running)   : 0
+  EBS volumes     : 0
+  NAT gateways    : 0   <- must be 0
+  VPC endpoints   : 0
+  KMS aliases     : 
+
+  Month-to-date spend:
+    $0.3121803918

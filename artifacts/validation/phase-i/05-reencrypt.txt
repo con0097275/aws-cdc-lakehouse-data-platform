@@ -1,0 +1,5 @@
+re-encrypted spark-sql-kafka-0-10_2.12-3.5.1.jar              -> 0b5b383b
+re-encrypted spark-token-provider-kafka-0-10_2.12-3.5.1.jar   -> 0b5b383b
+re-encrypted kafka-clients-3.4.1.jar                          -> 0b5b383b
+re-encrypted commons-pool2-2.11.1.jar                         -> 0b5b383b
+re-encrypted aws-msk-iam-auth.jar                             -> 0b5b383b

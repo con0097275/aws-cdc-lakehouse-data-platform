@@ -1,0 +1,15 @@
+STATE e2e-eod-account 00g8ttsc72ut7g27 FAILED
+Job failed, please check complete logs in configured logging destination. ExitCode: 1. Last few exceptions: software.amazon.awssdk.services.emrserverlessresourcemanager.model.ApplicationMaxCapacityExceededException: Worker could not be allocated as the application has exceeded maximumCapacity settings: [disk: 100 GB] (Service: EmrServerlessResourceManager, Status Code: 402, Request ID: 1c855119-03a2-46f0-b1f6-ae914038821c)
+26/09/20 16:10:19 WARN DefaultEmrServerlessRMClient: Encountered exception when requesting SPARK_EXECUTOR containers. Future container launch rate will be slowed down until recovered. Next call will be allowed after 2000ms....
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttsc72ut7g27/SPARK_DRIVER/stdout.gz
+26/09/20 16:15:59 WARN DefaultEmrServerlessRMClient: Encountered exception when requesting SPARK_EXECUTOR containers. Future container launch rate will be slowed down until recovered. Next call will be allowed after 3000ms.
+software.amazon.awssdk.services.emrserverlessresourcemanager.model.ApplicationMaxCapacityExceededException: Worker could not be allocated as the application has exceeded maximumCapacity settings: [disk: 100 GB] (Service: EmrServerlessResourceManager, Status Code: 402, Request ID: fc5f8304-ba67-4818-a0c6-63a1acb46fa8)
+26/09/20 16:15:56 WARN DefaultEmrServerlessRMClient: Encountered exception when requesting SPARK_EXECUTOR containers. Future container launch rate will be slowed down until recovered. Next call will be allowed after 2000ms....
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttv9ksp0v027/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-eod-account-3 run=00g8tu16hiuje027
+STATE e2e-eod-account-3 00g8tu16hiuje027 FAILED
+Job failed, please check complete logs in configured logging destination. ExitCode: 1.
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8tu16hiuje027/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-eod-account-4 run=00g8tu3lrktbl827
+STATE e2e-eod-account-4 00g8tu3lrktbl827 SUCCESS
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8tu3lrktbl827/SPARK_DRIVER/stdout.gz

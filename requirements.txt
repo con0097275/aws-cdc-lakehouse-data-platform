@@ -1,0 +1,27 @@
+# Pinned Python dependencies. CLAUDE.md 3.9 requires pinning and forbids `latest`.
+#
+# Before AI-P1 this repository had NO dependency manifest of any kind -- no
+# requirements.txt, no pyproject.toml, no constraints file -- while 3.9 mandates one. That
+# gap blocks AI-P8: LangGraph brings a large, fast-moving transitive tree, and installing it
+# without a manifest breaches 3.9 on the first `pip install`.
+#
+# These are the versions ALREADY INSTALLED AND IN USE, recorded from docs/VERSIONS.md.
+# Nothing new is introduced here; AI-P1 records what is, it does not upgrade.
+PyYAML==6.0.1
+jsonschema==4.23.0
+networkx==2.6.3
+boto3==1.35.49
+
+# AI-P6: the ML pilot. Already installed and in use; recorded here per 3.9.
+# scikit-learn is deliberately NOT added — a large ML stack pinned to train 960
+# rows is a dependency decision taken to avoid writing thirty lines of numpy.
+numpy==2.0.0
+pandas==2.2.2
+
+# AI-P8: LangGraph for agent orchestration (ADR-055). LangChain is NOT adopted as an
+# abstraction layer -- langchain-core arrives only as a langgraph dependency and no
+# business logic imports it. Tier 1 keeps working with all of this uninstalled, and a test
+# asserts that.
+langgraph==0.2.60
+langchain-core==0.3.86
+langgraph-checkpoint==2.1.2

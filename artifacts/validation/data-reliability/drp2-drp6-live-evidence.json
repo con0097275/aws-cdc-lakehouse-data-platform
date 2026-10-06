@@ -1,0 +1,159 @@
+{
+  "captured_at": "2026-09-29T21:52:01.930639+00:00",
+  "datahub": {
+    "cli_pin": "1.7.0.13",
+    "gms": "http://localhost:8080",
+    "health": {
+      "detail": "HTTP 200",
+      "mode": "local",
+      "reachable": true
+    },
+    "mode": "local",
+    "running_images": [
+      "acryldata/datahub-actions:v1.7.0.1-slim",
+      "acryldata/datahub-frontend-react:v1.7.0.1",
+      "acryldata/datahub-gms:v1.7.0.1",
+      "confluentinc/cp-kafka:8.2.2",
+      "mysql:8.2",
+      "opensearchproject/opensearch:2.19.3"
+    ],
+    "server_image_tag": "v1.7.0.1"
+  },
+  "defects_found_by_the_live_run": [
+    {
+      "fixed": true,
+      "id": "L1",
+      "symptom": "HTTP 422 naming none of nine proposals",
+      "what": "RestTransport discarded the HTTP error body"
+    },
+    {
+      "fixed": true,
+      "id": "L2",
+      "symptom": "/auditStamp :: field is required but not found and has no default value",
+      "what": "glossaryTerms missing the required auditStamp"
+    },
+    {
+      "fixed": true,
+      "id": "L3",
+      "symptom": "/type :: union type is not backed by a DataMap or null",
+      "what": "dataJobInfo.type sent as a string, not a union"
+    },
+    {
+      "fixed": false,
+      "id": "L4",
+      "note": "documented as an operational rule -- a traversal run too early UNDER-reports a blast radius, which is the dangerous direction",
+      "symptom": "traversal seconds after publish reached 3 assets; minutes later, 18",
+      "what": "DataHub's graph index is eventually consistent"
+    }
+  ],
+  "environment": {
+    "fabric": "DEV",
+    "name": "dev",
+    "namespace": "cdc-lakehouse-dev"
+  },
+  "governance_published": {
+    "aspects": 373,
+    "assets": 84,
+    "config_version": "gv1:3d3914603e0fd5a4",
+    "result": "373/373 on attempt 1"
+  },
+  "lineage_published": {
+    "connector_aspects": 20,
+    "graph_aspects": 67,
+    "result": "all published on attempt 1"
+  },
+  "multi_hop_traversal": {
+    "assets_found": 18,
+    "mart_account_balance_daily_hop": 7,
+    "path": [
+      {
+        "hop": 1,
+        "name": "cdc.oracle.COREBANK.ACCOUNT"
+      },
+      {
+        "hop": 2,
+        "name": "kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_account"
+      },
+      {
+        "hop": 3,
+        "name": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account"
+      },
+      {
+        "hop": 3,
+        "name": "kafka_dev_lab_dev_stream.rt_oracle_coredb_corebank_account"
+      },
+      {
+        "hop": 4,
+        "name": "kafka_dev_lab_dev_curated.banking_account"
+      },
+      {
+        "hop": 5,
+        "name": "kafka_dev_lab_dev_curated.dim_account"
+      },
+      {
+        "hop": 5,
+        "name": "kafka_dev_lab_dev_curated.fact_account_daily_snapshot"
+      },
+      {
+        "hop": 6,
+        "name": "kafka_dev_lab_dev_curated.fact_transaction"
+      },
+      {
+        "hop": 6,
+        "name": "kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot"
+      },
+      {
+        "hop": 7,
+        "name": "kafka_dev_lab_dev_mart.int_customer_daily_balance"
+      },
+      {
+        "hop": 7,
+        "name": "kafka_dev_lab_dev_mart.mart_account_balance_daily"
+      },
+      {
+        "hop": 7,
+        "name": "kafka_dev_lab_dev_mart.stg_fact_transaction"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.int_customer_daily_txn"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.mart_account_balance_monthly"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.mart_account_risk_daily"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.mart_channel_performance_daily"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.mart_customer_360_daily"
+      },
+      {
+        "hop": 8,
+        "name": "kafka_dev_lab_dev_mart.mart_transaction_monitoring_10m"
+      }
+    ],
+    "root": "urn:li:dataset:(urn:li:dataPlatform:oracle,coredb.corebank.account,DEV)"
+  },
+  "phase": "DRP2 live smoke + DRP4/DRP6 live publication",
+  "smoke_test": {
+    "aspects": 9,
+    "attempts": 1,
+    "published": 9,
+    "read_back": [
+      "datasetProperties",
+      "ownership",
+      "domains",
+      "globalTags",
+      "glossaryTerms",
+      "upstreamLineage"
+    ],
+    "upstream_matches_sent": true
+  }
+}

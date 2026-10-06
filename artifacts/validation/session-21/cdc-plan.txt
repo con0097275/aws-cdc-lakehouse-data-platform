@@ -1,0 +1,43 @@
+# Session 21 — CDC window SAVED PLAN (not applied)
+Date 2026-08-16T09:07:44Z | Account 111122223333 | ap-southeast-1
+
+## Defect F3 — FOUND AND FIXED before any spend
+The first CDC plan FAILED with two errors:
+  Error: Conflicting configuration arguments
+    module.cdc_runtime[0].aws_s3_object.bootstrap  - etag conflicts with kms_key_id
+    module.source_lab[0].aws_s3_object.bootstrap   - etag conflicts with kms_key_id
+S3 does not expose an MD5 ETag for KMS-encrypted objects, so the provider rejects
+etag alongside kms_key_id. Both EC2 instances silently disappeared from the plan
+because their bootstrap objects could not be planned - the whole CDC chain was
+missing Oracle/SQL Server and Debezium. Fixed: etag -> source_hash in both modules.
+Before fix: 107 add, plan FAILED, 0 aws_instance for source_lab/cdc_runtime.
+After  fix: 130 add, plan SAVED, both instances present.
+
+## Defect F4 — cost preview understated by 24%
+plan_cost.py priced every aws_instance at a flat 0.0264 (t3.small) and ignored EBS,
+interface endpoints and broker count. On this plan it read $0.8541/hr against a real
+$1.1244/hr. A cost guard that reads LOW is worse than none. Now reads instance_type,
+broker count, EBS size and endpoint type from the plan, and flags unpriced types.
+
+## Plan actions
+  ('create',)            130
+  ('no-op',)             7
+  ('read',)              18
+  ('update',)            25
+  REPLACE 0   DESTROY 0
+
+## Cost preview (corrected)
+  130 to add, 25 to change, 0 to destroy
+  hourly while running : $1.1244/hr
+  6-hour window        : $6.75
+  30 days 24/7         : $820.84
+  KMS CMKs (floor)     : $1.00/month
+  EBS provisioned      : 120 GiB   (bills even while an instance is STOPPED)
+  EMR Serverless apps  : 1   (bills only while a job runs; not in the hourly above)
+  NAT gateways         : 0   (CLAUDE.md 4.2 requires 0)
+  Secrets Manager      : 0   (ADR-031 requires 0)
+
+## Tests prepared BEFORE paid infrastructure
+  421 Python tests PASS, make check 14/14, shellcheck clean
+  11 operator scripts syntax-checked and dry-run capable
+  plan sha256: 402b1a1e31ce16aafbf81c408840ff0b4dcf4180990ab6fca051e709635ae1bf

@@ -1,0 +1,8 @@
+== 2026-09-17T16:33:11Z cdc-stream.py status (Athena SELECT, read-only)
+full-cdc-oracle        ABSENT          -         -       -          -  ABSENT
+full-cdc-sqlserver     ABSENT          -         -       -          -  ABSENT
+exit=0
+== cdc-stream.py health
+full-cdc-oracle        ABSENT    no state row for this app id: it has never started, or the state write is failing
+full-cdc-sqlserver     ABSENT    no state row for this app id: it has never started, or the state write is failing
+exit=1

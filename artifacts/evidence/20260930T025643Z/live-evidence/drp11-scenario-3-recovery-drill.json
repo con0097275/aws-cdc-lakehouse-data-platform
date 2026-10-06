@@ -1,0 +1,69 @@
+{
+  "captured_at": "2026-09-30T01:35:02.301134+00:00",
+  "does_not_prove": [
+    "a rebuild of the PRODUCTION curated/mart tables \u2014 that needs EMR",
+    "Airflow orchestrating the sequence (the provider is not installed)"
+  ],
+  "elapsed_seconds": 96,
+  "ledger_state": {
+    "dq_rows": 154,
+    "resolved_incidents": 1,
+    "succeeded_executions": 1
+  },
+  "method": "controlled drill on a sandbox Iceberg chain (drill_src -> drill_mid -> drill_mart) in kafka_dev_lab_dev_curated, on real Glue/Athena",
+  "phase": "DRP11 scenario 3 \u2014 the FULL recovery loop, executed",
+  "proves": [
+    "bounded automatic recovery executes",
+    "the root is validated BEFORE any descendant runs",
+    "descendants rerun in topological turn order",
+    "DQ + reconciliation + certification close the incident",
+    "the corrected value is verifiable: mart sum 80.0 -> 60.0"
+  ],
+  "sequence": [
+    {
+      "detail": "k=2 duplicated in drill_mid; mart sum = 80.0 (wrong)",
+      "step": "plant defect"
+    },
+    {
+      "detail": "FAIL, dupes=1, severity BLOCKER",
+      "step": "DQ"
+    },
+    {
+      "detail": "OPEN",
+      "step": "incident"
+    },
+    {
+      "detail": "2 turns, approval AUTOMATIC",
+      "step": "plan"
+    },
+    {
+      "detail": "drill_mid rebuilt from drill_src",
+      "step": "repair root"
+    },
+    {
+      "detail": "PASS \u2014 descendants gated until this point",
+      "step": "validate root"
+    },
+    {
+      "detail": "turn 1: drill_mart rebuilt",
+      "step": "rerun descendants"
+    },
+    {
+      "detail": "PASS; mart sum 80.0 -> 60.0, corrected",
+      "step": "validate downstream"
+    },
+    {
+      "detail": "drill_src=3 drill_mid=3 -> PASS",
+      "step": "reconciliation"
+    },
+    {
+      "detail": "SUCCEEDED, 2 turns recorded",
+      "step": "execution"
+    },
+    {
+      "detail": "incident RESOLVED",
+      "step": "close"
+    }
+  ],
+  "why_a_drill": "rebuilding the production marts needs an EMR submission (45-60 min, one at a time) and a write to a certified table from a laptop. The LOOP needs neither to be exercised."
+}

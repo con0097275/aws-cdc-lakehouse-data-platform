@@ -1,0 +1,117 @@
+{
+  "captured_at": "2026-09-30T02:16:23+00:00",
+  "config_version": "gv1:3d3914603e0fd5a4",
+  "method": "controlled drill on sandbox Iceberg tables in the real lake; real Glue catalog, real Athena engine, real decision code",
+  "not_proven": [
+    "a production EMR submission rebuilding the real marts",
+    "the Spark DQ engine (these verdicts carry engine=athena)"
+  ],
+  "phase": "DRP11 scenarios 1, 5, 6",
+  "scenario_1_normal": {
+    "dq": [
+      {
+        "check": "completeness.acct_id_not_null",
+        "status": "PASS"
+      },
+      {
+        "check": "uniqueness.acct_id",
+        "status": "PASS"
+      }
+    ],
+    "flow": "EOD",
+    "gate": {
+      "advance_watermark": true,
+      "certify": true,
+      "outcome": "CERTIFIED"
+    },
+    "rank": 5,
+    "reconciliation": {
+      "metric": "sum_bal",
+      "source": 425.5,
+      "status": "PASS",
+      "target": 425.5
+    },
+    "rows": 3,
+    "run_id": "eod-drill1-17ff2234",
+    "scope": "SEGMENTED, not one continuous run. This drill proves the reliability half live: DQ -> reconciliation -> certification gate -> watermark. The data-plane hops (source I/U/D -> Kafka -> FULL_CDC -> REALTIME/EOD) were live-tested separately on 2026-09-30 (REALTIME succeeded=7 rows=5770, EOD closed=10 certified=5), and the DataHub hop by the 18-asset traversal in drp2-drp6-live-evidence.json. A single correlated run touching all hops at once still needs one EMR submission.",
+    "snapshot_source": "3403013549295959617",
+    "snapshot_target": "6577565394486688310",
+    "status_stamped": "CERTIFIED",
+    "verdict": "PASS (reliability chain live; data-plane and DataHub hops evidenced separately)",
+    "watermark_written": true
+  },
+  "scenario_5_late_cdc_auto_correct": {
+    "anti_downgrade": {
+      "acct_2_existing": "CERTIFIED",
+      "overwrite_allowed": false,
+      "rule": "a HIGHER tier always wins; AUTO_CORRECT(3) cannot overwrite CERTIFIED(5)"
+    },
+    "final_rows": {
+      "1": {
+        "bal": 110.0,
+        "status": "PROVISIONAL_CORRECTED"
+      },
+      "2": {
+        "bal": 250.0,
+        "status": "CERTIFIED"
+      },
+      "3": {
+        "bal": 75.5,
+        "status": "PROVISIONAL_NRT"
+      }
+    },
+    "flow": "AUTO_CORRECT",
+    "gate": {
+      "outcome": "CERTIFIED"
+    },
+    "keys_corrected": [
+      1
+    ],
+    "late_keys": [
+      1,
+      2
+    ],
+    "run_id": "ac-drill5-17ff2234",
+    "status_stamped": "PROVISIONAL_CORRECTED",
+    "unaffected_key_untouched": true,
+    "verdict": "PASS"
+  },
+  "scenario_6_full_fill": {
+    "dq": [
+      {
+        "check": "referential.unknown_sk_resolved",
+        "status": "WARN"
+      },
+      {
+        "check": "consistency.tier_not_downgraded",
+        "status": "PASS"
+      }
+    ],
+    "flow": "FULL_FILL",
+    "gate": {
+      "outcome": "CERTIFIED"
+    },
+    "processing_status_after": {
+      "CERTIFIED": 3
+    },
+    "reconciliation": {
+      "metric": "resolvable_sk_count",
+      "source": 2.0,
+      "status": "PASS",
+      "target": 2.0
+    },
+    "run_id": "ff-drill6-17ff2234",
+    "stamps_a_status": false,
+    "tier_preserved": true,
+    "unknown_sk_after": 1,
+    "unknown_sk_before": 3,
+    "unresolved_remaining": "C9 \u2014 no dimension row has arrived; it keeps UNKNOWN_SK -1, not NULL",
+    "verdict": "PASS",
+    "why": "resolving a surrogate key does not change how accurate the measures are, so FULL_FILL must not stamp a tier \u2014 stamping one would DOWNGRADE certified rows"
+  },
+  "summary": {
+    "scenario_1": "PASS (reliability chain live; data-plane and DataHub hops evidenced separately)",
+    "scenario_5": "PASS",
+    "scenario_6": "PASS"
+  }
+}

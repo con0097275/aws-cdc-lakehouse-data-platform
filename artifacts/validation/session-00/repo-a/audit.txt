@@ -1,0 +1,71 @@
+# Repo A evidence — ~/terraform-kafka-kraft/kafka-kraft-aws/kafka-aws-production-lab
+# Captured: 2026-08-13T03:49:03Z. READ-ONLY. Repo A was not modified.
+# NOTE: state METADATA only. Resource bodies are deliberately not reproduced -
+#       terraform.tfstate.backup holds 43 live records and is sensitive (CLAUDE.md 3.8).
+
+## State lineage — the decisive evidence that repo A is authoritative
+  terraform.tfstate          lineage=bd2a46c8-9ae6-abd3-d27b-1c18076b9d75 serial= 106 resources=  0 outputs=  0 tf=1.15.8
+  terraform.tfstate.backup   lineage=bd2a46c8-9ae6-abd3-d27b-1c18076b9d75 serial=  52 resources= 43 outputs= 10 tf=1.15.8
+  => same lineage, serial 52->106, 43 resources -> 0. Apply then destroy, one workspace.
+
+## Is there a backend block? (Gap 1)
+  (no match) -> local state only; terraform_remote_state is impossible
+
+## Version pinning (SRD 3.4)
+terraform {
+  required_version = "~> 1.15.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.56.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.9.0"
+    }
+  }
+}
+
+## Outputs declared (10) - of which 5 are contract keys (GAP 4)
+1:output "aws_account_id" {
+6:output "aws_region" {
+10:output "msk_cluster_arn" {
+14:output "bootstrap_brokers_sasl_iam" {
+19:output "toolbox_instance_id" {
+23:output "grafana_password_parameter_name" {
+27:output "ssm_shell_command" {
+31:output "grafana_port_forward_command" {
+35:output "sample_iam_policy_arns" {
+44:output "prometheus_port_forward_command" {
+
+## Private route tables have zero routes (Gap 8)
+resource "aws_route_table" "private" {
+  count = var.az_count
+
+  vpc_id = aws_vpc.this.id
+
+  tags = {
+    Name = "${local.name}-private-${local.azs[count.index]}"
+  }
+}
+
+## MSK server properties (Gaps 12, 13)
+12:    auto.create.topics.enable=false
+22:    log.retention.hours=${var.topic_log_retention_hours}
+143-  description = "Default broker topic retention for this short-lived lab."
+145-  default     = 24
+
+## CloudWatch alarms: Kafka-broker-only (Gap 11)
+  count = 6
+
+## Naming discrepancy (D14) and the inherited budget (F2/S00R-1)
+1:project_name       = "kafka-prod-lab"
+2:environment        = "lab"
+11:# kafka.t3.small is no longer offered for new clusters (verified live 2026-07-26).
+12:broker_instance_type = "kafka.m7g.large"
+21:toolbox_instance_type = "t3.small"
+29:monthly_budget_usd =80
+
+## Git history
+  fatal: not a git repository (or any of the parent directories): .git

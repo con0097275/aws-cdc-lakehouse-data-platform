@@ -1,0 +1,251 @@
+# Business metric registry — the single governed definition of each KPI.
+#
+# WHY A REPO-OWNED YAML AND NOT dbt's SEMANTIC LAYER (BAI-P1 §2):
+#   dbt-core 1.9.4 is installed, but `dbt-metricflow` is NOT, and the compiled manifest
+#   contains 0 metrics and 0 semantic_models. Adding MetricFlow would pull a second query
+#   engine and pin dbt-core, into a lab that runs dbt-spark in `method: session` on EMR.
+#   That is a heavy dependency bought for architectural fashion, which BAI-P1 §2 and
+#   CLAUDE.md §3.9 both warn against. Lineage is NOT duplicated: it is read from dbt's own
+#   manifest.json (§9).
+#
+# `source_relation` is the DEPLOYED GLUE DATABASE (kafka_dev_lab_dev_mart), not dbt's
+# `mart` alias. The Athena guard allow-lists by SUFFIX (_mart/_curated/_ops/_snapshot),
+# so the dbt name was refused live with `database 'mart' is not allow-listed` — a defect
+# every fixture test missed because the fixture rewrote the relation.
+#
+# EVERY METRIC HERE IS PROVEN BY BAI-P0 AGAINST REAL MODEL SQL. Nothing is aspirational:
+# only `mart_account_balance_daily` is materialised, so every metric below reads it. The
+# five unbuilt marts contribute no metrics until they exist.
+
+version: 1
+registry_id: business_metrics_v1
+owner: my-aws-profile
+domain: retail_banking
+
+# --------------------------------------------------------------------------- #
+# Certification tiers, weakest -> strongest. Mirrors the reporting accuracy ladder.
+# A metric declares the WEAKEST tier it will accept; anything weaker is refused rather
+# than returned with a caveat nobody reads.
+# --------------------------------------------------------------------------- #
+certification_ranks:
+  REALTIME: 0
+  PROVISIONAL_NRT: 1
+  PROVISIONAL_CORRECTED: 2
+  RECONCILED: 3
+  CERTIFIED: 4
+
+# --------------------------------------------------------------------------- #
+# Dimensions. `available: false` means the column is DESIGNED but the dimension table is
+# not materialised, so a query using it must fail LOUDLY at compile time. Silently
+# dropping an unavailable dimension would answer a different question than the one asked.
+# --------------------------------------------------------------------------- #
+dimensions:
+  account_sk:
+    column: account_sk
+    available: true
+    description: "Account surrogate key. Present on the mart; NOT a business attribute."
+  customer_sk:
+    column: customer_sk
+    available: true
+    description: "Customer surrogate key. Present on the mart."
+  processing_status:
+    column: processing_status
+    available: true
+    description: "Certification tier of the row."
+  product_code:
+    column: product_code
+    available: false
+    requires_join: "curated.dim_account ON account_sk"
+    blocked_reason: "dim_account is not materialised (BAI-P0 gap 1)"
+  currency:
+    column: currency
+    available: false
+    requires_join: "curated.dim_account ON account_sk"
+    blocked_reason: "dim_account is not materialised (BAI-P0 gap 1)"
+  branch_id:
+    column: branch_id
+    available: false
+    requires_join: "curated.dim_customer ON customer_sk"
+    blocked_reason: "dim_customer is not materialised (BAI-P0 gap 1)"
+  segment_code:
+    column: segment_code
+    available: false
+    requires_join: "curated.dim_customer ON customer_sk"
+    blocked_reason: "dim_customer is not materialised (BAI-P0 gap 1)"
+
+metrics:
+  # ---------------------------------------------------------------- balances
+  - metric_id: total_closing_balance
+    business_name: Total closing balance
+    aliases: [total balance, closing balance, total deposits, deposit balance,
+              deposit amount, balance, total closing balances]
+    description: >
+      Closing balance summed across all accounts for one business date. SEMI-ADDITIVE:
+      correct summed across accounts WITHIN a date, never summed ACROSS dates.
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: closing_balance
+    aggregation: sum
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day]
+    # The correction recorded in BAI-P0 §2. `additive` governs decomposition ACROSS
+    # segments; `time_additivity` governs rollup ACROSS dates. Conflating them is how a
+    # monthly "total balance" becomes the sum of 30 daily snapshots -- a number ~30x too
+    # large that no downstream check would catch.
+    additive: true
+    time_additivity: semi_additive_last
+    allowed_dimensions: [account_sk, customer_sk, product_code, branch_id, segment_code]
+    unit: currency
+    currency: VND
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  - metric_id: avg_balance_per_account
+    business_name: Average balance per account
+    aliases: [average balance, mean balance, avg balance, balance per account]
+    description: "Mean closing balance per account on a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: closing_balance
+    aggregation: avg
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day]
+    additive: false            # an average does not sum across segments
+    time_additivity: non_additive
+    allowed_dimensions: [product_code, branch_id, segment_code]
+    unit: currency
+    currency: VND
+    format: "#,##0.00"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  # ------------------------------------------------------------------ flows
+  - metric_id: total_debit_amount
+    business_name: Total debit amount
+    aliases: [debits, total debits, debit amount, outflow]
+    description: "Debit amount summed across accounts for a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: debit_amount
+    aggregation: sum
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day, week, month]
+    additive: true
+    time_additivity: additive        # a flow, unlike a balance, DOES sum across dates
+    allowed_dimensions: [account_sk, customer_sk, product_code, branch_id, segment_code]
+    unit: currency
+    currency: VND
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  - metric_id: total_credit_amount
+    business_name: Total credit amount
+    aliases: [credits, total credits, credit amount, inflow]
+    description: "Credit amount summed across accounts for a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: credit_amount
+    aggregation: sum
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day, week, month]
+    additive: true
+    time_additivity: additive
+    allowed_dimensions: [account_sk, customer_sk, product_code, branch_id, segment_code]
+    unit: currency
+    currency: VND
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  - metric_id: net_cash_flow
+    business_name: Net cash flow
+    aliases: [net flow, net movement, net cash, netflow]
+    description: "Credit minus debit across accounts for a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_expression: "credit_amount - debit_amount"
+    aggregation: sum
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day, week, month]
+    additive: true
+    time_additivity: additive
+    allowed_dimensions: [account_sk, customer_sk, product_code, branch_id, segment_code]
+    unit: currency
+    currency: VND
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  # ------------------------------------------------------------------ volume
+  - metric_id: total_txn_count
+    business_name: Total transaction count
+    aliases: [transaction count, txn count, transactions, number of transactions]
+    description: "Transaction count summed across accounts for a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: txn_count
+    aggregation: sum
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day, week, month]
+    additive: true
+    time_additivity: additive
+    allowed_dimensions: [account_sk, customer_sk, product_code, branch_id, segment_code]
+    unit: count
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active
+
+  - metric_id: active_account_count
+    business_name: Active account count
+    aliases: [active accounts, account count, number of accounts, accounts]
+    description: "Distinct accounts present on a business date."
+    source_model: mart_account_balance_daily
+    source_relation: kafka_dev_lab_dev_mart.mart_account_balance_daily
+    dbt_node: model.aws_cdc_lakehouse.mart_account_balance_daily
+    measure_column: account_sk
+    aggregation: count_distinct
+    business_grain: account_sk + business_date
+    time_column: business_date
+    supported_time_grains: [day]
+    additive: false             # COUNT(DISTINCT) does not sum across segments
+    time_additivity: non_additive
+    allowed_dimensions: [product_code, branch_id, segment_code]
+    unit: count
+    format: "#,##0"
+    minimum_certification: RECONCILED
+    freshness_sla_hours: 30
+    owner: risk-data
+    domain: retail_banking
+    status: active

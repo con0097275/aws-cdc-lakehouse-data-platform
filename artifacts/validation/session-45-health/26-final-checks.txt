@@ -1,0 +1,24 @@
+=== registry artifacts (private IP)
+{"artifacts":[],"count":0}
+connect_rest=200
+
+=== Oracle REAL row counts
+ACCOUNT=320
+CUSTOMER=200
+LOAN=50
+TRANSACTION=2000
+BRANCH=4
+
+=== sqlserver init scripts staged?
+/opt/source-lab/oracle/:
+01-init.sql
+02-enable-cdc.sql
+03-seed.sql
+99-verify-cdc.sql
+
+/opt/source-lab/sqlserver/:
+01-init.sql
+02-enable-cdc.sql
+03-seed.sql
+99-verify-cdc.sql
+

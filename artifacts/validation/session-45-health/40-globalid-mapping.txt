@@ -1,0 +1,5 @@
+   globalId 4: cdc.oracle.COREBANK.ACCOUNT.Envelope
+   globalId 14: cdc.oracle.COREBANK.TRANSACTION.Envelope
+   globalId 26: cdc.sqlserver.digital.dbo.digital_event.Envelope
+
+   live says: 4=ACCOUNT-value  14=LOAN-value  26=payment_method-value

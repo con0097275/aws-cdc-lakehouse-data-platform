@@ -1,0 +1,24 @@
+# Gate 1 PASSED — state backend live
+Date: 2026-08-15T12:00:44Z  Account: 111122223333  Region: ap-southeast-1
+
+## Bucket verification (all 7 checks from GATE-1 doc)
+bucket           : aws-cdc-lakehouse-tfstate-111122223333
+versioning       : Enabled
+encryption       : AES256
+public access    : all four blocks true
+anonymous GET    : 403 (403 expected)
+ownership        : BucketOwnerEnforced
+lifecycle        : expire-noncurrent-state-versions
+tags             : 6 applied (Project=kafka-dev-lab)
+
+## ADR-021 critical check
+state bucket managed by the stack : 0 matches  (PASS)
+
+## Saved plan — cheap tier, enable_kafka_platform=false
+  32 to add, 0 to change, 0 to destroy
+  hourly while running : $0.0000/hr
+  6-hour window        : $0.00
+  30 days 24/7         : $0.00
+  KMS CMKs (floor)     : $1.00/month
+  NAT gateways         : 0   (CLAUDE.md 4.2 requires 0)
+  Secrets Manager      : 0   (ADR-031 requires 0)

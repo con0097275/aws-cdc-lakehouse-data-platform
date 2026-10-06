@@ -1,0 +1,106 @@
+Session 34 — defects found by running Phase 14 for real
+Date 2026-08-22   Account 111122223333 / ap-southeast-1
+
+Every one of these was a SILENT failure: the component reported healthy, RUNNING or
+SUCCEEDED while doing nothing, or the symptom pointed away from the cause.
+
+ 1. MSK security-group flap
+    aws_security_group.msk declared ingress INLINE while cdc_runtime and emr_serverless
+    attached standalone rules to the same SG. Terraform treats inline as authoritative and
+    revokes the rest on every apply, so port 9098 was silently withdrawn from both. Kafka
+    Connect crash-looped on "Timed out waiting for a node assignment" with a CORRECT
+    bootstrap string and working DNS. FIX: all four inline blocks converted to standalone
+    aws_vpc_security_group_ingress_rule resources.
+
+ 2. SQL Server schema never created
+    healthcheck.sh ran 02-enable-cdc.sql and 03-seed.sql but never 01-init.sql, because the
+    files sit in /docker-entrypoint-initdb.d/ -- a POSTGRES auto-run convention the mssql
+    image does not implement. Reported as "missing password in digital": sa was correct all
+    along, the DATABASE did not exist. FIX: sqlserver_init_if_missing(), idempotent.
+
+ 3. Snapshot isolation never enabled
+    ALLOW_SNAPSHOT_ISOLATION appeared nowhere in the repo. Debezium needs it for its
+    snapshot; without it the connector registers RUNNING and captures nothing.
+
+ 4. Oracle corebank password unknowable
+    01-init.sql: CREATE USER corebank IDENTIFIED BY "&1". The Oracle image auto-runs startup
+    scripts with NO arguments, so &1 was never bound. Schema and seed load as SYSTEM, so
+    every check passed; the breakage surfaced later as ORA-01017 from the workload command.
+
+ 5. Both CDC users had unbindable password placeholders
+    oracle: IDENTIFIED BY "&1"; sqlserver: PASSWORD = '$(DBZ_PASSWORD)'. Neither bound.
+    Worse, .env carried only the sys/sa secrets while the CONNECTORS authenticate with the
+    separate *-cdc-password values -- so even a correct binding would have used the wrong
+    secret. FIX: user-data stages both CDC secrets; healthcheck reconciles AND VERIFIES.
+
+ 6. create-topics.sh emitted names Debezium never writes to
+    cdc.oracle.corebank.<t>      -> cdc.oracle.COREBANK.<T>   (Oracle folds to uppercase)
+    cdc.sqlserver.digital.<t>    -> cdc.sqlserver.digital.dbo.<t>
+    plus SIX missing internal topics. With auto.create.topics.enable=false this fails
+    silently: connectors RUNNING, eight topics at offset 0.
+
+ 7. Transaction metadata topic missing  <-- blocked ALL post-snapshot CDC
+    provide.transaction.metadata=true makes Debezium write <topic.prefix>.transaction.
+    Absent, the producer retried the same metadata fetch every second and delivered NO data
+    events behind it. An UPDATE committed in Oracle never reached its topic while both
+    connector and task reported RUNNING.
+
+ 8. Heartbeat topic name ignored
+    Both templates set heartbeat.topics.prefix; Debezium 2.7.3 IGNORES it and uses
+    __debezium-heartbeat.<topic.prefix>. The configured topics sat at offset 0 forever.
+
+ 9. sp_cdc_start_job aborted every re-run
+    It raises "job already running"; sqlcmd runs with -b, so the script died BEFORE the
+    CREATE LOGIN section -- succeeding once, then silently never creating dbzuser again.
+
+10. Oracle ARCHIVELOG restart was unconditional  <-- stranded Oracle twice
+    SHUTDOWN IMMEDIATE ran every time. On re-run the SQL*Plus session dropped mid-way
+    ("SP2-0640: Not connected") and STARTUP never ran, leaving Oracle DOWN while the Docker
+    healthcheck still reported HEALTHY. Symptom: ORA-12514 from every client.
+    FIX: the restart is now generated conditionally from v$database.log_mode.
+
+11. Both containers permanently "unhealthy" while working
+    docker-compose used $${PRIVATE_IP} in the healthchecks -- $$ defers to the CONTAINER's
+    environment, where the variable does not exist -- so the probe ran `curl http://:8083/`
+    and could never pass. FailingStreak 272. A permanently-unhealthy working container is
+    worse than none: it trains you to ignore the column that shows the real outage.
+
+12. event_id collided across cluster rebuilds
+    event_id = sha2(topic|partition|offset). A rebuilt MSK restarts every partition at
+    offset 0, so a genuinely new snapshot reproduced the same ids: 5,728 fresh events were
+    ALL discarded as duplicates, the table stayed at its previous count, no curated
+    partition appeared, and nothing errored. FIX: dv_event_id includes the broker record
+    timestamp; dv_src_event_id carries source coordinates only.
+
+13. EOD gate could never open
+    ops.eod_watermark was "CODE ONLY -- no table exists" and nothing wrote the Iceberg
+    EOD_<date> tag, so check_eod_ready had never been exercised. Also
+    AthenaLayerStateReader resolved "<table>$refs" in the OPS database while the table
+    lives in CURATED. FIX: the EOD job now closes the day; the reader takes tables_database.
+
+14. EMR logs pointed at CloudWatch from a no-NAT subnet
+    Every reporting job FAILED before any Spark code ran, with stateDetails about LOGGING
+    rather than the transformation -- so the flow correctly refused to advance its
+    watermark and the cause looked like a data problem.
+
+15. Two dbt vars were emitted that no macro reads
+    fulfill_flow sent is_backfill; stream_batch_flow sent source_layer_substituted. Neither
+    is in VAR_CONTRACT, so both modes failed the contract check the first time they ran for
+    real. The guard is right to be strict -- dbt silently ignores unknown vars.
+
+16. FULFILL never emitted RECONCILED
+    It stamped CERTIFIED (claiming a backfill closed the day like an EOD run) or
+    PROVISIONAL_CORRECTED (ranking a reconciliation BELOW a routine correction), even though
+    spark/common/flows.py defines RECONCILED at rank 3.
+
+17. source-lab.sh built SSM payloads with the CLI shorthand
+    register-connectors.sh had already been fixed; source-lab.sh had not. A password
+    containing a character the shorthand parser treats as syntax arrived MANGLED, and a
+    mangled password is indistinguishable from a wrong one: ORA-01017 and "Login failed for
+    user 'sa'" on credentials that worked when run directly on the host.
+
+18. .env drifted from SSM
+    Containers were built from .env; connectors render from SSM; the two held DIFFERENT
+    passwords. The connectors would have registered and then failed to authenticate,
+    surfacing as HTTP 400 "Failed to resolve Oracle database version" -- a connectivity
+    message for a credential fault. FIX: SSM made authoritative everywhere.

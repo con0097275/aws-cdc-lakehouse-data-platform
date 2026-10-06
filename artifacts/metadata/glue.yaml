@@ -1,0 +1,27 @@
+# Glue is authoritative for physical tables, schemas and partitions.
+# extract_owners is OFF: ownership is DERIVED from cdc/registry/sources.yaml and
+# would otherwise be overwritten by whatever the Glue table happens to carry.
+# Profiling is OFF everywhere -- it reads values, and this catalogue is read widely.
+
+source:
+  type: glue
+  config:
+    aws_region: ${AWS_REGION}
+    database_pattern:
+      allow:
+      - ^kafka_dev_lab_dev_curated$
+      - ^kafka_dev_lab_dev_full_cdc$
+      - ^kafka_dev_lab_dev_mart$
+      - ^kafka_dev_lab_dev_ops$
+      - ^kafka_dev_lab_dev_snapshot$
+      - ^kafka_dev_lab_dev_stream$
+    env: DEV
+    extract_owners: false
+    extract_transforms: false
+    profiling:
+      enabled: false
+sink:
+  type: datahub-rest
+  config:
+    server: ${DATAHUB_GMS_URL}
+    token: ${DATAHUB_GMS_TOKEN}

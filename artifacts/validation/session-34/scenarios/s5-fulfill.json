@@ -1,0 +1,38 @@
+{
+  "job_id": "mart_account_balance_daily",
+  "flow_mode": "FULFILL",
+  "coordinator_run_id": "p14s34-s5-1787378975",
+  "execution_id": "p14s34-s5-1787378975:FULFILL:mart_account_balance_daily:2026-08-17:1",
+  "turn": 1,
+  "attempt_number": 1,
+  "dependencies": [],
+  "config_version": "cfg-20237926f3c07ed2",
+  "business_date": "2026-08-17",
+  "watermark_before": {
+    "last_success_date_of_data": "2026-08-17",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14s34-s5d-1787309143:FULFILL:mart_account_balance_daily:2026-08-17:1"
+  },
+  "watermark_after": {
+    "last_success_date_of_data": "2026-08-17",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14s34-s5-1787378975:FULFILL:mart_account_balance_daily:2026-08-17:1"
+  },
+  "executed": true,
+  "succeeded_dates": [
+    "2026-08-17"
+  ],
+  "failed_dates": [],
+  "remaining_dates": [],
+  "outcomes": [
+    {
+      "business_date": "2026-08-17",
+      "status": "SUCCEEDED",
+      "execution_id": "p14s34-s5-1787378975:FULFILL:mart_account_balance_daily:2026-08-17:1",
+      "spark_app_id": null,
+      "detail": null
+    }
+  ],
+  "status": "SUCCEEDED",
+  "finished_at": "2026-08-22T06:12:09.185975+00:00"
+}

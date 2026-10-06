@@ -1,0 +1,22 @@
+$ python3 -m pytest spark/tests/test_drp1_metadata.py spark/tests/test_drp1_contracts.py spark/tests/test_drp2_datahub.py spark/tests/test_drp3_openlineage.py spark/tests/test_drp4_ingestion.py spark/tests/test_drp5_quality.py spark/tests/test_drp6_lineage.py spark/tests/test_drp8_impact_recovery.py spark/tests/test_drp10_observability.py -q
+
+........................................................................ [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 53%]
+........................................................................ [ 71%]
+........................................................................ [ 88%]
+.............................................                            [100%]
+=============================== warnings summary ===============================
+spark/tests/test_drp2_datahub.py::TestUrnIdentity::test_one_urn_per_table_across_every_lake_layer
+spark/tests/test_drp3_openlineage.py::TestB2LiveEmission::test_the_listener_attached_and_emitted
+spark/tests/test_drp5_quality.py::TestDataHubAssertions::test_every_check_becomes_an_assertion
+spark/tests/test_drp8_impact_recovery.py::TestRecoveryDrill::test_the_loop_completed
+  ~/.local/lib/python3.10/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+405 passed, 4 warnings in 7.64s

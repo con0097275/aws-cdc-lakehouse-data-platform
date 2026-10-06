@@ -1,0 +1,8 @@
+=== upload the fixed gate to the SAME key terraform manages (convergent: same content = no tf diff)
+  uploaded
+  local md5 : acecc8e6b0482e19d584fe4c777094df
+=== pull it onto the running host (instance profile reads S3; exec bit restored)
+acecc8e6b0482e19d584fe4c777094df  /opt/source-lab/healthcheck.sh
+healthcheck.sh
+healthcheck.sh.bak-20260920T093604Z
+

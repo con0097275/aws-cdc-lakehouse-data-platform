@@ -1,0 +1,118 @@
+FIRST REAL CDC RECORDS — 2026-08-20T09:40Z.  SQL Server path proven end to end.
+
+SQL Server -> Debezium 2.7.3 -> Avro/Apicurio -> MSK
+
+  topic                                      p0    p1    p2   total   seeded  match
+  cdc.sqlserver.digital.dbo.digital_event   995   978  1027    3000     3000  YES
+  cdc.sqlserver.digital.dbo.app_user         54    55    41     150      150  YES
+  cdc.sqlserver.digital.dbo.merchant         15    18    17      50       50  YES
+  cdc.sqlserver.digital.dbo.channel           0     2     2       4        4  YES
+
+  connector sqlserver-digital-source  RUNNING / task 0 RUNNING
+
+Every count matches the seed exactly, which is the check that matters: a snapshot that
+half-runs looks identical to one that finished until you compare totals.
+
+================================================================================
+FOUR MORE DEFECTS CLEARED TO GET HERE
+================================================================================
+8. THE APICURIO CONVERTER HAD NO DEPENDENCIES
+     NoClassDefFoundError: io/apicurio/registry/serde/AbstractKafkaSerializer
+   Downloading apicurio-registry-utils-converter alone is not enough -- it needs
+   serde-common, registry-client, registry-common, schema-resolver and the rest.
+   FIX: install the DISTRIBUTION bundle, which is the artifact meant for Connect:
+     apicurio-registry-distro-connect-converter-2.6.2.Final.tar.gz  (28 jars)
+   unpacked into its own plugin directory /opt/connect-plugins/apicurio-converter/.
+   The two incomplete standalone jars were moved to .disabled so no classloader can
+   pick the broken copy.
+
+9. SQL SERVER SNAPSHOT ISOLATION WAS NEVER ENABLED
+     SQLServerException: Snapshot isolation transaction failed accessing database
+   The connector sets snapshot.isolation.mode=snapshot, but 01-init.sql never ran
+     ALTER DATABASE digital SET ALLOW_SNAPSHOT_ISOLATION ON
+   FIX: enabled, plus READ_COMMITTED_SNAPSHOT.
+     snapshot_isolation_state_desc = ON, is_read_committed_snapshot_on = 1
+
+10. DEBEZIUM'S INTERNAL TOPICS WERE NEVER CREATED
+     {cdc.sqlserver=UNKNOWN_TOPIC_OR_PARTITION}
+    provide.transaction.metadata=true makes Debezium write a topic named exactly after
+    topic.prefix, and it also needs schema-history and heartbeat topics. create-topics.sh
+    creates none of them, and the connector is deliberately not allowed to auto-create.
+    FIX: created cdc.oracle, cdc.sqlserver (3p), cdc.{oracle,sqlserver}.schema-history
+    (1p, cleanup.policy=compact) and the two heartbeat topics.
+
+11. THE PRE-CREATED DATA TOPIC NAMES WERE WRONG  <-- the one that hid the others
+     {cdc.sqlserver.digital.dbo.app_user=UNKNOWN_TOPIC_OR_PARTITION}
+    Debezium names a SQL Server topic <prefix>.<database>.<SCHEMA>.<table>. create-topics.sh
+    made cdc.sqlserver.digital.app_user -- no `dbo` -- and the connector template's comment
+    claims exactly that wrong shape:
+      "TopicNameStrategy maps to cdc.sqlserver.digital.<table>"
+    So four topics sat empty at offset 0 while the connector reported RUNNING and healthy.
+    FIX: created the four correctly-named topics. Records appeared immediately.
+
+    REPO FIX STILL NEEDED: create-topics.sh must emit the schema component, and Oracle's
+    equivalents are almost certainly wrong too -- Debezium Oracle uses the UPPERCASE schema,
+    i.e. cdc.oracle.COREBANK.CUSTOMER, not cdc.oracle.corebank.customer.
+
+================================================================================
+STILL OPEN
+================================================================================
+  ORACLE CONNECTOR NOT REGISTERED
+    ORA-01005: Login denied due to invalid password  -- a NULL password reaching the driver
+    while the connector config carries a 24-character value, and while the same credential
+    logs in fine through sqlplus against both FREE and FREEPDB1.
+    Not yet explained. The Oracle CDC user, its privileges, the network path and the JDBC
+    driver have all been eliminated.
+
+================================================================================
+ORACLE PATH ALSO PROVEN — 2026-08-20T10:05Z
+================================================================================
+  topic                            p0    p1    p2   total   seeded  match
+  cdc.oracle.COREBANK.TRANSACTION 637   667   696    2000     2000  YES
+  cdc.oracle.COREBANK.ACCOUNT      92   121   107     320      320  YES
+  cdc.oracle.COREBANK.CUSTOMER     67    69    64     200      200  YES
+  cdc.oracle.COREBANK.BRANCH        1     1     2       4        4  YES
+
+  connector oracle-corebank-source  RUNNING / task 0 RUNNING
+
+  Oracle LogMiner -> Debezium 2.7.3 -> Avro/Apicurio -> MSK, with exact seed parity.
+
+--------------------------------------------------------------------------------
+12. ORA-01005 WAS A DUPLICATE JDBC DRIVER   <-- the hard one
+--------------------------------------------------------------------------------
+    ORA-01005: Login denied due to invalid password
+    while the connector config carried the correct 24-character value, byte-identical to
+    SSM, and the same credential logged in through sqlplus to both FREE and FREEPDB1.
+
+    Eliminated in order: the CDC user existed; its privileges were sufficient; the network
+    path and both ports were open; the password matched SSM by sha256; a DELIBERATELY WRONG
+    password produced the IDENTICAL error, which proved the password never reached Oracle
+    at all; and switching to a username without '#' changed nothing.
+
+    /opt/connect-plugins/debezium-oracle/ contained TWO drivers:
+        ojdbc11.jar
+        ojdbc8-21.11.0.0.jar
+    Both register oracle.jdbc.driver.OracleDriver. The stale ojdbc8 won and could not
+    complete 23ai's password verifier exchange, which surfaces as a NULL password.
+
+    FIX: move ojdbc8 out of the plugin directory. The connector registered HTTP 201 on the
+    next attempt, first time.
+
+13. THE SCHEMA HISTORY TOPIC MUST NOT BE COMPACTED  (my error, then fixed)
+      InvalidRecordException: Compacted topic cannot accept message without key
+      in topic partition cdc.oracle.schema-history-0
+    I created it with cleanup.policy=compact, following the connector template's comment
+    ("Its own compacted topic"). Debezium's schema-history records carry NO KEY, so a
+    compacted topic rejects every one. The template comment is wrong; the topic needs
+    cleanup.policy=delete with retention.ms=-1.
+    The SQL Server connector never hit this because Debezium auto-created ITS history topic
+    with the correct default.
+    FIX: cdc.oracle.schema-history.v2 created with delete/-1 and the connector repointed.
+    The role cannot ALTER an existing topic's config -- msk-produce grants AlterTopic but
+    not AlterTopicDynamicConfiguration -- which is why a new topic was needed.
+
+14. create-topics.sh PRODUCES THE WRONG TOPIC NAMES FOR BOTH SOURCES
+    SQL Server: needs <prefix>.<database>.<SCHEMA>.<table>  e.g. cdc.sqlserver.digital.dbo.app_user
+    Oracle:     needs <prefix>.<SCHEMA>.<TABLE>             e.g. cdc.oracle.COREBANK.CUSTOMER
+    The script created cdc.sqlserver.digital.app_user and cdc.oracle.corebank.account.
+    Eight topics sat at offset 0 while both connectors reported RUNNING and healthy.

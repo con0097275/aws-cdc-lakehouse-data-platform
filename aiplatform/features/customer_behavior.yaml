@@ -1,0 +1,34 @@
+# The pilot feature group. Scoped to what the lakehouse ACTUALLY holds today -- one mart
+# table and a curated snapshot -- not to the Kimball model that ddl declares but has not
+# materialised. AI-P5 confirms with `aws glue get-tables` before building.
+name: customer_behavior
+entity_keys: [customer_sk]
+event_time_column: feature_event_time
+owner: risk-data
+domain: banking
+classification: internal
+description: >
+  Behavioural features per customer, derived from the curated daily snapshot and the
+  transaction fact. Grain is customer_sk + feature_event_time.
+
+partition_by: [source_cob_date]
+
+batch:        {enabled: true}
+streaming:    {enabled: false}     # ADR-053: no streaming features
+online_store: {enabled: false}     # no low-latency consumer exists yet
+
+features:
+  - name: txn_count_7d
+    type: bigint
+    description: Transactions in the 7 days up to and including feature_event_time.
+    source_lineage: ["kafka_dev_lab_dev_mart.fact_transaction.transaction_id"]
+  - name: avg_txn_amount_30d
+    type: double
+    description: Mean base-currency transaction amount over 30 days.
+    source_lineage: ["kafka_dev_lab_dev_mart.fact_transaction.amount_base"]
+  - name: closing_balance
+    type: decimal
+    description: >
+      Closing balance as of the snapshot. Semi-additive -- any aggregate across dates must
+      use LAST, never SUM (S10-8).
+    source_lineage: ["kafka_dev_lab_dev_curated.fact_account_daily_snapshot.closing_balance"]

@@ -1,0 +1,88 @@
+# Golden question set for the data platform assistant.
+#
+# `expect_source` is the file the answer MUST be grounded in. Groundedness is measured as
+# "did the retrieved/looked-up evidence come from the right place", NOT as string similarity
+# to a reference answer — a paraphrase that cites the right section is correct, and a
+# fluent answer citing the wrong document is not, however well it reads.
+#
+# `expect_mode` pins the ROUTING decision. A question that should be a free lookup silently
+# becoming a paid retrieval is a cost regression that no accuracy metric would catch.
+
+version: 1
+
+questions:
+  # ---- structured lookups: must route to a tool, must cost $0 ----
+  - q: "who owns mart.dim_customer and what is its retention"
+    expect_mode: tool
+    expect_tool: explain_dataset
+    expect_contains: ["banking-data", "2555"]
+
+  - q: "explain snapshot.banking_customer"
+    expect_mode: tool
+    expect_tool: explain_dataset
+    expect_contains: ["L3", "denied"]
+
+  - q: "what is the lineage of mart.dim_customer"
+    expect_mode: tool
+    expect_tool: find_lineage
+    expect_contains: ["spark.build_kimball"]
+
+  - q: "what is upstream of snapshot.banking_customer"
+    expect_mode: tool
+    expect_tool: find_lineage
+    expect_contains: ["full_cdc.oracle_corebank_customer"]
+
+  - q: "the KafkaConsumerLagGrowing alert is firing, what is the runbook"
+    expect_mode: tool
+    expect_tool: find_runbook
+    expect_contains: ["retention", "24"]
+
+  - q: "EOD failed, how do I recover"
+    expect_mode: tool
+    expect_tool: suggest_recovery
+    expect_contains: ["idempotent"]
+
+  # ---- open questions: retrieval, must cite the right document ----
+  - q: "why is closing_balance semi additive"
+    expect_mode: retrieval
+    expect_source: docs/KIMBALL_MODEL.md
+    expect_contains: ["SEMI"]
+
+  - q: "why does the BI role get denied access to L1 and L2"
+    expect_mode: retrieval
+    expect_source: docs/ATHENA.md
+    expect_contains: ["Deny"]
+
+  - q: "why is partition pruning important for athena cost"
+    expect_mode: retrieval
+    expect_source: docs/ATHENA.md
+    expect_contains: ["scan"]
+
+  - q: "what does NOT_EVALUATED mean in a data quality result"
+    expect_mode: retrieval
+    expect_source: docs/DATA_QUALITY.md
+    expect_contains: ["not a pass"]
+
+  - q: "why is the guarded MERGE kept in pyspark instead of dbt"
+    expect_mode: retrieval
+    expect_source: docs/DBT_SPARK.md
+    expect_contains: ["DUPLICATE"]
+
+  - q: "what is the RPO if the streaming job is down for more than 24 hours"
+    expect_mode: retrieval
+    expect_source: docs/DR.md
+    expect_contains: ["24"]
+
+  # ---- must REFUSE ----
+  # Names a plausible dataset that is NOT registered. The earlier version of this case
+  # named no dataset at all, so retrieval was the correct route and the test was asserting
+  # the wrong thing — a bad test, not a bad answer.
+  - q: "explain mart.does_not_exist"
+    expect_mode: tool
+    expect_tool: explain_dataset
+    expect_contains: ["not in the registry"]
+
+  # ---- must NOT hallucinate ----
+  - q: "what is the airspeed velocity of an unladen swallow"
+    expect_mode: retrieval
+    expect_contains: ["No matching documentation"]

@@ -1,0 +1,12 @@
+== 2026-09-17T16:32:42Z identity
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+profile=my-aws-profile region=ap-southeast-1 env=dev
+== buckets
+2026-08-15 18:58:27 aws-cdc-lakehouse-tfstate-111122223333
+2026-09-17 20:30:17 kafka-dev-lab-dev-lake-111122223333
+2026-04-24 06:47:30 test-task-snowlake-japfa
+2026-04-24 05:36:26 testsnowflake-operator

@@ -1,0 +1,6 @@
+Error while executing topic command : Topic authorization failed.
+Error while executing topic command : Topic authorization failed.
+Error while executing topic command : Topic authorization failed.
+Error while executing topic command : Topic authorization failed.
+Error while executing topic command : Topic authorization failed.
+

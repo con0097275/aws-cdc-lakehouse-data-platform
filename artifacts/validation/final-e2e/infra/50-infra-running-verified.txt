@@ -1,0 +1,78 @@
+INFRA RUNNING — VERIFIED 2026-09-03T09:37:11Z
+Window start 2026-09-03T09:06:04Z · elapsed 31 min · spent ~$0.64 at $1.2340/hr
+==================================================================
+
+APPLY: performed by the OPERATOR in an interactive terminal.
+  This session did NOT apply and did NOT use -auto-approve.
+  Terraform state: 3 -> 292 resources.  git HEAD 1d3cf5b.
+  Drift re-check (scripts/tf.sh plan): 0 add, 1 change, 0 destroy.
+    the 1 change = module.data_lake.aws_s3_object.prefix["logs/airflow/"]
+    known non-converging diff, two resources own the same key (G-P3-3). Benign.
+
+COMPONENT VERIFICATION
+  network                vpc-01063d55c6d35f1b5 10.42.0.0/16 · 6 subnets · 1 IGW · NAT 0
+  vpc endpoints          S3 Gateway, DynamoDB Gateway, Glue Interface — all available
+  MSK                    kafka-dev-lab-dev ACTIVE · 3 brokers · 3.9.x.kraft
+  source lab             oracle healthy ARCHIVELOG FREEPDB1 RW · sqlserver healthy · 4 tables CDC
+  CDC runtime            cdc-connect healthy · REST answering
+  Apicurio               cdc-apicurio healthy · kafkasql-journal topic present
+  connectors             oracle-corebank-source RUNNING task0 RUNNING; sqlserver-digital-source RUNNING task0 RUNNING
+  topics                 17 incl. all 8 per-table CDC topics + 2 schema-history
+  EMR Serverless         00g8g05ud5dj2u25 CREATED · ARM64 · auto-stop 15m
+  Airflow                all pods Running · UI HTTP 200 · cloud-init done
+  DynamoDB               4/4 ACTIVE PAY_PER_REQUEST
+  S3 lake                SSE-KMS · public access blocked · 1647 objects
+  Glue                   7 databases · 0 TABLES (see BLOCKER 2)
+  Athena                 kafka-dev-lab-dev-wg ENABLED · 10 GiB cutoff ENFORCED
+  CloudWatch             9 alarms · 6 OK · 1 INSUFFICIENT_DATA · 2 ALARM (both expected, see notes)
+  IAM                    11 workload roles incl. ai-knowledge-base, reporting
+  AI runtime             make ai-tools exit 0 · make ai-governance exit 0 · WRITE_TOOLS {} · 0 always-on
+
+CREDENTIAL CHAIN (hash-compared; secrets never printed)
+  oracle_cdc_password    SSM d7b1321f = .env d7b1321f = connect-secrets d7b1321f
+  sqlserver_cdc_password SSM ebc12439 = .env ebc12439 = connect-secrets ebc12439
+
+############ BLOCKER 1 — LAKE CMK DIVERGENCE. FIX BEFORE ANY SPARK JOB. ############
+  The apply minted a NEW lake CMK 2fd510a7 and granted the Spark/reporting roles
+  ONLY that key. The pre-existing lake objects are on OTHER keys:
+     865 objects  383f6d53 [Enabled]      258 objects  44bf584e [Enabled]
+     254 objects  8d20ebe1 [Enabled]      161 objects  d1f568fd [DELETED]
+      49 objects  7f03af9e [AWS-managed]   40 objects  e66f4dfa [Enabled]
+      20 objects  2fd510a7 [current]
+  Verified: spark-eod, spark-stream and reporting policies reference 2fd510a7 ONLY.
+  Any Spark read of existing FULL_CDC/curated/mart data fails kms:Decrypt AccessDenied,
+  which surfaces as a KMS error, not an S3 error — the wrong service to debug.
+  FIX (operator, needs TTY phrase REENCRYPT LAKE, ~2 min, copy-in-place):
+      bash scripts/reencrypt-lake-cmk.sh reencrypt --execute
+
+############ BLOCKER 2 — GLUE CATALOG IS EMPTY ############
+  All 7 Glue databases hold 0 TABLES; the apply recreated the catalog, so every
+  Iceberg metadata pointer is gone. The S3 DATA survived (161 objects under
+  warehouse/full_cdc/cdc_events alone) but is ORPHANED from the catalog.
+  Consequence: 'CREATE TABLE IF NOT EXISTS' in the jobs makes a NEW empty Iceberg
+  table at the same S3 path; prior history stays unreferenced. Fine for a fresh E2E
+  run (we re-ingest from source), but 'lake preserved' != 'data queryable'.
+  This is why athena-smoke returned BLOCKED_BY_DESIGN on all 6 queries.
+
+DEFECTS FOUND THIS WINDOW
+  D1 cdc-window-start.sh treats SSM Online as node readiness; passed the operator
+     through to a node whose user-data was still staging. Caused failure #1.
+  D2 enable-cdc restarts Oracle then immediately reconciles CDC passwords; the
+     reconnect hits ORA-12514 and '|| true' swallows it, so ALTER USER never ran.
+     Cleared with: bash /opt/source-lab/healthcheck.sh --init  (no restart).
+  D3 ORACLE_CDC_PASSWORD never enters the Oracle container (compose passes only
+     ORACLE_PWD), so the startup hook creates C##DBZUSER with an unbound &1 and the
+     reconcile is the ONLY thing that ever sets the real password.
+  D4 docker/cdc-runtime/smoke-test.sh:18 still calls bare 'kafka-topics'.
+     Session 41 fixed scripts/cdc-runtime.sh:66 (uses $KCLI) but not this file, so
+     'cdc-runtime.sh smoke' fails while 'cdc-runtime.sh topics' works. Test-only.
+  D5 cdc-window-start.sh reported CDC_WINDOW_START_TIME 2026-08-16T09:53:12Z from a
+     stale stamp, and its burn constant 1.1244/hr predates the Glue endpoint and
+     airflow/reporting. True start 09:06:04Z, true baseline 1.2340/hr.
+
+STANDING RISK
+  auto_destroy_after = 2026-08-25T00:00:00Z is EXPIRED. Every resource carries an
+  already-expired AutoDestroyAfter tag. ADR-027 gives NO protection this window;
+  a wall-clock alarm is the only thing that will bring the lab down.
+  ALARM notes: active-controller-missing fired on datapoints 09:03-09:05, BEFORE MSK
+  reached ACTIVE (stale); reporting-no-success has simply never had a run.

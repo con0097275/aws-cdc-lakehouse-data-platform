@@ -1,0 +1,57 @@
+# Session 14 — validation transcript
+# Captured: 2026-08-14T17:35:16Z
+
+=== LIVE AWS STATE (nothing applied) ===
+  MSK clusters   : 0
+  EC2 running    : 0
+  Glue databases : 1  <- still only the OPEN-20 orphan
+
+=== DEFECT D14-1 — a masked VIEW is not a masked TABLE ===
+  Session 13 denied BI the L1/L2 prefixes. Necessary, NOT sufficient.
+  snapshot.banking_customer and mart.dim_customer hold unmasked full_name/dob and sit
+  under warehouse/snapshot/* and warehouse/mart/* — prefixes the BI policy ALLOWS.
+  An Athena view requires read access to the UNDERLYING table, so v_dim_customer_bi
+  masked nothing: a caller who can query the view can query the base table.
+  Session 13 stated this principle and then relied on a view over a readable table.
+
+  Fix (IAM-only, Lake Formation stays off per scope item 5):
+    1. Explicit Deny on the PII-bearing curated tables, S3 AND Glue catalog,
+       driven by var.pii_table_prefixes.
+    2. MATERIALIZED mart.dim_customer_bi written by the Kimball build with
+       full_name/dob already tokenised. BI reads real data that never held the values.
+    3. Registry marks both base tables bi_access: denied.
+  A test fails if the Terraform deny list and the registry drift.
+
+=== GOVERNANCE ARTEFACTS ===
+  registry      : 12 datasets, 3 domains
+  classification: {'restricted': 4, 'confidential': 3, 'internal': 4, 'operational': 1}
+  bi_access     : {'denied': 6, 'read': 6}
+  dq rules      : 26 checks over 7 datasets
+  check types   : {'freshness': 3, 'uniqueness': 7, 'completeness': 7, 'validity': 4, 'reconciliation': 2, 'referential_integrity': 3}
+  severity      : {'ERROR': 22, 'WARN': 4}
+  lineage       : 8 jobs, evidence={'declared': 3, 'observed': 4, 'dbt_manifest': 1}
+  optional off  : ['marquez', 'glue_data_quality', 'lake_formation']
+
+=== OPEN-20 DECISION: ISOLATE (not adopt, not delete) ===
+  39 orphan Glue tables in 'vannk-dev-oracle-db', no crawler, predates this project.
+  Not adopted: unknown provenance — adopting asserts metadata nobody verified.
+  Not deleted: not ours to assume; destroying 39 catalogued tables is irreversible.
+  Isolated:    every role is scoped to THIS project's Glue databases by name, so the
+               orphan is already outside every grant. Cost is $0.
+  Owner action still required. NOT silently closed.
+
+=== TESTS ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+51 passed, 1 warning in 13.35s
+
+=== FULL SUITE ===
+319 passed, 5 warnings in 123.10s
+
+  NOTE: the first full run showed 263 passed / 56 ERRORS. Cause was a test-isolation bug
+  introduced by this session, not a product defect: pytest runs every file in ONE process
+  and SparkSession.builder.getOrCreate() returns the EXISTING session, so the new plain
+  (non-Iceberg) fixture — alphabetically earlier than the Iceberg suites — decided the
+  session config for the whole run and the Iceberg tests lost their `local` catalog.
+  Fixed by configuring EVERY Spark fixture identically, which makes file ordering
+  irrelevant. Recorded rather than quietly re-run.
+Closing down clientserver connection

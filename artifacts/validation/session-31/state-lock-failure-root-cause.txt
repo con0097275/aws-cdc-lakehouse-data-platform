@@ -1,0 +1,90 @@
+STATE LOCK FAILURE — two defects, both found by evidence, both fixed. 2026-08-20.
+
+SYMPTOM
+  bash scripts/tf.sh plan
+  Error: Error acquiring the state lock
+    operation error S3: PutObject ... 403 AccessDenied
+    ...aws-cdc-lakehouse/dev/terraform.tfstate.tflock
+
+  Misleading in two ways: it names PutObject AND GetObject, and the operator holds
+  AdministratorAccess -- so "permissions" looks ruled out. It was not.
+
+--------------------------------------------------------------------------------
+DEFECT 1 — the bucket policy denied Terraform's lock write
+--------------------------------------------------------------------------------
+  The state bucket carried:
+
+    Sid DenyUnencryptedObjectUploads
+    Deny s3:PutObject on /*
+    Condition StringNotEquals s3:x-amz-server-side-encryption = AES256
+
+  That tests the REQUEST HEADER, not the stored result. Terraform 1.11+ takes its lock by
+  writing <key>.tflock (use_lockfile = true) and does NOT send the SSE header -- the
+  backend's `encrypt = true` governs the STATE object write, not the lock object. An
+  explicit Deny in a resource policy beats AdministratorAccess, which is why admin did not
+  help and made the cause harder to see.
+
+  The bucket already has DEFAULT encryption (AES256, bucket key enabled), so a header-less
+  upload was encrypted at rest anyway. The policy was rejecting a request shape, not an
+  unencrypted object.
+
+  PROVEN, not inferred, against the live bucket with the my-aws-profile profile:
+    PutObject, no header                     -> AccessDenied, "explicit deny"
+    PutObject --server-side-encryption AES256 -> 200, ServerSideEncryption: AES256
+
+  FIX: add a Null condition so the Deny fires only when the header IS present and is wrong.
+    "Null": { "s3:x-amz-server-side-encryption": "false" }
+
+  RE-VERIFIED after the change:
+    PutObject, no header        -> 200, stored as AES256   (default encryption applied)
+    PutObject --sse aws:kms     -> AccessDenied, "explicit deny"   (guard intact)
+
+  Applied to the live bucket and fixed in scripts/bootstrap-state-backend.sh.
+  Previous policy preserved at artifacts/validation/session-31/state-bucket-policy.before.json
+
+--------------------------------------------------------------------------------
+DEFECT 2 — the backend was authenticating as the WRONG ACCOUNT
+--------------------------------------------------------------------------------
+  backend.hcl had no `profile`. The S3 backend resolves credentials through the default
+  chain, INDEPENDENTLY of providers.tf and BEFORE any provider is configured. On this
+  workstation:
+
+    aws sts get-caller-identity --profile default
+      444455556666   arn:aws:iam::444455556666:user/vannk
+
+  A different account. providers.tf pins the PROVIDER to my-aws-profile and carries a long
+  comment about exactly this hazard (OPEN-13) -- the backend was never given the same
+  treatment.
+
+  This is why the failure looked intermittent: every command in this session that worked
+  had been run as `AWS_PROFILE=my-aws-profile terraform ...`. scripts/tf.sh does not export
+  AWS_PROFILE, so the operator's invocation used the default chain and the wrong account.
+  `require_identity` checks the AWS CLI, not Terraform, so it passed while Terraform failed.
+
+  FIX: profile = "my-aws-profile" in backend.hcl, in the generator, and in backend.hcl.example.
+  Requires `terraform init -reconfigure` after the change.
+
+--------------------------------------------------------------------------------
+VERIFICATION
+--------------------------------------------------------------------------------
+  env -u AWS_PROFILE bash scripts/tf.sh plan     -> SUCCEEDS, lock acquired and released
+  head-object on the .tflock key                 -> 404 Not Found (no lock held)
+  terraform state list                           -> 3 resources, unchanged
+
+  Both defects were real and independent. Fixing only #2 would have hit #1 immediately.
+
+--------------------------------------------------------------------------------
+WARNING — terraform/envs/dev/tfplan NOW HOLDS A FRESH MSK-CREATING PLAN
+--------------------------------------------------------------------------------
+  The successful plan run above overwrote the stale plan with a current one. It is no
+  longer stale, and it is still NOT the approved reporting plan:
+
+    164 to add, 0 to change, 0 to destroy
+    aws_msk_cluster        CREATE x1     ~$0.7650/hr
+    aws_emrserverless_app  CREATE x1
+    aws_instance           CREATE x3
+    aws_dynamodb_table     CREATE x0     <-- the reporting tables are still not in it
+    hourly                 $1.1244/hr
+
+  Because terraform.tfvars still has enable_kafka_platform = true and
+  enable_reporting_framework = false. Set the flags before planning for an apply.

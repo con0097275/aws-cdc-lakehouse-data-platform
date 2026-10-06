@@ -1,0 +1,26 @@
+{
+  "job_id": "mart_account_balance_daily",
+  "flow_mode": "EOD",
+  "coordinator_run_id": "p14b-eod-1788432893",
+  "execution_id": "p14b-eod-1788432893:EOD:mart_account_balance_daily:2026-09-03:1",
+  "turn": 1,
+  "attempt_number": 1,
+  "dependencies": [],
+  "config_version": "cfg-1682b193a20ce2ae",
+  "business_date": "2026-09-03",
+  "watermark_before": {
+    "last_success_date_of_data": "2026-09-03",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14b-eod-1788432686:EOD:mart_account_balance_daily:2026-09-03:1"
+  },
+  "watermark_after": {
+    "last_success_date_of_data": "2026-09-03",
+    "watermark_ts": "None",
+    "last_success_execution_id": "p14b-eod-1788432893:EOD:mart_account_balance_daily:2026-09-03:1"
+  },
+  "spark_app_id": "/applications/00g8g05ud5dj2u25/jobs/00g8g2h8q3ah3o27",
+  "tracking_url": "https://console.aws.amazon.com/emr/home#/serverless/applications/00g8g05ud5dj2u25/jobs/00g8g2h8q3ah3o27",
+  "status": "SUCCEEDED",
+  "detail": null,
+  "finished_at": "2026-09-03T10:57:26.831535+00:00"
+}

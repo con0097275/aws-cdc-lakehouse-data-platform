@@ -1,0 +1,12 @@
+== FULL_CDC per table (after run 4)
+  account      [['350', '350', '350']]
+  branch       [['4', '4', '4']]
+  customer     [['210', '210', '210']]
+  loan         [['50', '50', '50']]
+  transaction  [['2050', '2050', '2050']]
+== ops.streaming_app_state (Phase B control plane, LIVE)
+[['full-cdc-oracle', 'STOPPED', None, '0', '2', None]]
+== ops.cdc_event_index
+[['2664']]
+== control plane tables now present
+[['0']] [['0']]

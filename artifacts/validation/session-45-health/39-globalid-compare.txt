@@ -1,0 +1,9 @@
+=== DEPLOYED schemas.json: globalIds + topics
+   by_global_id count: 32 ids: ['1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2']
+   by_topic count    : 16
+   topics            : ['__debezium-heartbeat.cdc.oracle', '__debezium-heartbeat.cdc.sqlserver', 'cdc.oracle', 'cdc.oracle.COREBANK.ACCOUNT', 'cdc.oracle.COREBANK.BRANCH', 'cdc.oracle.COREBANK.CUSTOMER']
+=== LIVE Apicurio globalIds (per-artifact meta)
+   cdc.oracle.COREBANK.ACCOUNT-value globalId=4
+   cdc.oracle.COREBANK.LOAN-value globalId=14
+   cdc.sqlserver.digital.dbo.payment_method-value globalId=26
+

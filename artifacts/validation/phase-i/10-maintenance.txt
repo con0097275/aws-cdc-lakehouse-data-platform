@@ -1,0 +1,6 @@
+STATE e2e-maintenance 00g8tu77su243o27 FAILED
+Job failed, please check complete logs in configured logging destination. ExitCode: 2. Last few exceptions: cdc_maintenance_job.py: error: the following arguments are required: --metrics...
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8tu77su243o27/SPARK_DRIVER/stdout.gz
+SUBMITTED e2e-maintenance-2 run=00g8tu99mbnqm827
+STATE e2e-maintenance-2 00g8tu99mbnqm827 SUCCESS
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8tu99mbnqm827/SPARK_DRIVER/stdout.gz

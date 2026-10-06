@@ -1,0 +1,3 @@
+SUBMITTED provision-control-plane run=00g8ttja8u24u827
+STATE provision-control-plane 00g8ttja8u24u827 SUCCESS
+LOG s3://kafka-dev-lab-dev-lake-111122223333/logs/emr/applications/00g8tlee3db1gu25/jobs/00g8ttja8u24u827/SPARK_DRIVER/stdout.gz

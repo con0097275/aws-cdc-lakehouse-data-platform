@@ -1,0 +1,36 @@
+{
+  "captured_at": "2026-09-30T02:12:35+00:00",
+  "certification": {
+    "advance_watermark": false,
+    "certify": false,
+    "mark_snapshot_invalid": true,
+    "outcome": "INVALID"
+  },
+  "detected": {
+    "check": "validity.operation_is_known",
+    "rows": 3,
+    "severity": "BLOCKER",
+    "violations": 1
+  },
+  "does_not_prove": [
+    "the Debezium/normalizer quarantine path in the real ingest job",
+    "schema-registry rejection of an incompatible payload"
+  ],
+  "method": "controlled drill on a sandbox Iceberg landing table, real Glue/Athena",
+  "phase": "DRP11 scenario 2 \u2014 bad CDC -> quarantine",
+  "poison": "op='X', not in (c,u,d,r)",
+  "proves": [
+    "a poison record is detected by the operation-validity check",
+    "it is quarantined BY REFERENCE, so no payload leaves the source table",
+    "valid rows are retained \u2014 quarantine copies aside, it does not delete",
+    "the snapshot is marked INVALID and nothing certifies"
+  ],
+  "quarantine": {
+    "created_this_run": true,
+    "rows": 1,
+    "stored": "payload_ref \u2014 a POINTER, never a copy of the row",
+    "table": "kafka_dev_lab_dev_ops.dq_quarantine"
+  },
+  "valid_rows_retained": 2,
+  "verdict": "PASS"
+}

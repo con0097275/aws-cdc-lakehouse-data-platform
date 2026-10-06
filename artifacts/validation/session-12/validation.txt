@@ -1,0 +1,47 @@
+# Session 12 — validation transcript
+# Captured: 2026-08-14T16:40:58Z
+
+=== LIVE AWS STATE (nothing applied) ===
+  MSK clusters       : 0
+  EC2 running        : 0
+  Airflow nodes      : 0
+
+=== VERSIONS RESOLVED FROM UPSTREAM 2026-08-14 (not invented) ===
+  Airflow Helm chart : 1.22.0   appVersion 3.2.2   published 2026-06-01
+  chart sha256       : 1f7d1dfe3d58e2c54899950aba907a43625a18c8b6fb3c54760c21592129a5b6
+  k3s                : v1.36.3+k3s1  (stable channel)
+  postgresql subchart: 13.2.24
+  NOTE: chart appVersion 3.2.2 is pinned, NOT PyPI's newer Airflow 3.3.1 — the chart
+        is tested against its own appVersion.
+
+=== TERRAFORM ===
+  fmt/validate       : Success
+  plan (saved)       : artifacts/validation/session-12/terraform-plan.log
+  module.airflow_k3s : 5 resources CREATE, 0 change, 0 destroy, 0 replace
+    + aws_instance.this
+    + aws_security_group.this
+    + aws_vpc_security_group_egress_rule.https
+    + aws_vpc_security_group_ingress_rule.from_toolbox
+    + aws_s3_object.log_prefix
+  whole plan         : 126 create, 22 read, 0 destroy (Sessions 02-12 all unapplied)
+
+  An existing invariant fired correctly during planning:
+    enable_airflow requires enable_emr_serverless — DAGs submit external Spark jobs
+    (CLAUDE.md 7); with no Spark runtime every task fails.
+
+=== INCREMENTAL COST (docs/PRICE_REFERENCE.md, ap-southeast-1) ===
+  t3.large running          $0.1056/hr
+  gp3 30 GiB                $2.88/month — billed even while STOPPED
+  demo window 4h x 20d      $11.33/mo   = 37.8% of the $30 budget (ADR-030)
+  stopped all month         $2.88/mo
+  destroyed                 $0.00/mo
+  left running 24/7         $79.97/mo   = 267% of budget  <- why stop is scripted
+
+=== DAG TESTS ===
+...............................                                          [100%]
+31 passed in 0.76s
+
+=== FULL PYTHON SUITE ===
+..........................                                               [100%]
+242 passed in 120.65s (0:02:00)
+Closing down clientserver connection

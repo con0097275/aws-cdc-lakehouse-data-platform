@@ -1,0 +1,6 @@
+T0=11:27:07
+REST_UP=11:27:37 after 10 polls
+--- connector states after restart ---
+["sqlserver-digital-source","oracle-corebank-source"]  oracle-corebank-source -> RUNNING ['UNASSIGNED']
+  sqlserver-digital-source -> RUNNING ['RUNNING']
+

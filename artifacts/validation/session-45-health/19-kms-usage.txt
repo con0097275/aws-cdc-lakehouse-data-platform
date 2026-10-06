@@ -1,0 +1,19 @@
+=== KMS key used by objects written 2026-09-17 (sample 12)
+  table-plan.json                                      28b39c6a-5feb-4841-895f-320fc3ce75c8
+  backfill.py                                          28b39c6a-5feb-4841-895f-320fc3ce75c8
+  cdc-framework.zip                                    28b39c6a-5feb-4841-895f-320fc3ce75c8
+  cdc_maintenance_job.py                               28b39c6a-5feb-4841-895f-320fc3ce75c8
+  eod_engine.py                                        28b39c6a-5feb-4841-895f-320fc3ce75c8
+  full_cdc_job.py                                      28b39c6a-5feb-4841-895f-320fc3ce75c8
+  full_cdc_stream_job.py                               28b39c6a-5feb-4841-895f-320fc3ce75c8
+  per_table.py                                         28b39c6a-5feb-4841-895f-320fc3ce75c8
+  provision_cdc_tables.py                              28b39c6a-5feb-4841-895f-320fc3ce75c8
+  realtime_engine.py                                   28b39c6a-5feb-4841-895f-320fc3ce75c8
+  schemas.json                                         7f03af9e-509c-4477-b983-8e46d2d8d9f7
+  stderr_0.gz                                          28b39c6a-5feb-4841-895f-320fc3ce75c8
+=== distinct keys across a broader sample (60 objects)
+     45 2746e5f4-fbfc-4fd9-bc54-41137880887d
+     10 28b39c6a-5feb-4841-895f-320fc3ce75c8
+      2 8d20ebe1-39e8-4f10-be31-957cd4b8fad2
+      2 0b5b383b-5628-4e2f-a130-9be8b7345ae8
+      1 7f03af9e-509c-4477-b983-8e46d2d8d9f7

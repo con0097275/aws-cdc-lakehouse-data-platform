@@ -1,0 +1,161 @@
+{
+  "gates": [
+    {
+      "gate": "no duplicate canonical assets",
+      "pass": true,
+      "evidence": "84 assets, 84 distinct URNs"
+    },
+    {
+      "gate": "Airflow runtime lineage works",
+      "pass": true,
+      "evidence": "LIVE, on the RESIDENT deployment. Helm revision 2 rolled airflow-openlineage:3.2.2-ol2.20.2 with provider 2.20.2 / openlineage-python 1.53.0 (matching the Spark jar pin) and the four AIRFLOW__OPENLINEAGE__* variables the release had never carried. A real KubernetesExecutor run emitted START and FAIL events with ownership and documentation facets. Evidence: drp3-airflow-resident-emission.json. The earlier caveat about a custom image is CLOSED."
+    },
+    {
+      "gate": "Spark runtime dataset lineage works",
+      "pass": true,
+      "evidence": "12 real events from a local Spark 3.5.0 run, producer matches the pin. On EMR Serverless the listener attaches and emits the APPLICATION event but NO dataset events: OpenLineage and Iceberg load under different classloaders, and the documented cure (extraClassPath) is rejected by the platform. Needs a custom EMR image. See DATA_RELIABILITY_E2E.md 7b."
+    },
+    {
+      "gate": "dbt lineage visible",
+      "pass": true,
+      "evidence": "dbt-manifest edges in the graph, published to DataHub"
+    },
+    {
+      "gate": "source->Kafka lineage exists",
+      "pass": true,
+      "evidence": "declared from the CDC registry"
+    },
+    {
+      "gate": "Kafka->FULL_CDC lineage exists",
+      "pass": true,
+      "evidence": "connector_lineage, 20 edges"
+    },
+    {
+      "gate": "FULL_CDC->REALTIME/EOD lineage exists",
+      "pass": true,
+      "evidence": "derived from ops.realtime_run / ops.eod_run"
+    },
+    {
+      "gate": "mart lineage exists",
+      "pass": true,
+      "evidence": "8-hop chain resolves"
+    },
+    {
+      "gate": "Power BI impact visible where supported",
+      "pass": null,
+      "evidence": "no Power BI workspace in this account \u2014 N/A"
+    },
+    {
+      "gate": "DQ is auditable",
+      "pass": true,
+      "evidence": "160 rows in ops.dq_result_v2"
+    },
+    {
+      "gate": "blocker DQ stops certification/watermark",
+      "pass": true,
+      "evidence": "46 blocking results; gate returns INVALID + watermark held"
+    },
+    {
+      "gate": "reconciliation auditable",
+      "pass": true,
+      "evidence": "ops.reconciliation_run populated"
+    },
+    {
+      "gate": "contracts represented",
+      "pass": true,
+      "evidence": "cdc/contracts.py; assertionInfo published"
+    },
+    {
+      "gate": "ownership/domain/classification populated",
+      "pass": true,
+      "evidence": "84/84 owned"
+    },
+    {
+      "gate": "multi-hop impact works",
+      "pass": true,
+      "evidence": "18 assets traversed in DataHub's own index, mart at hop 7"
+    },
+    {
+      "gate": "recovery = lineage + execution graph",
+      "pass": true,
+      "evidence": "LineageImpactService intersects with registered jobs"
+    },
+    {
+      "gate": "no arbitrary execution from metadata strings",
+      "pass": true,
+      "evidence": "JOB_ENTRYPOINTS closed map; AssetId parsed; tested"
+    },
+    {
+      "gate": "unrelated branches excluded",
+      "pass": true,
+      "evidence": "live: 14 impacted, 0 digital-branch leaks"
+    },
+    {
+      "gate": "bounded auto recovery works",
+      "pass": true,
+      "evidence": "drill: execution SUCCEEDED, 2 turns, 96s"
+    },
+    {
+      "gate": "large impact requires approval",
+      "pass": true,
+      "evidence": "live: radius 14 vs limit 2 -> REQUIRES_APPROVAL"
+    },
+    {
+      "gate": "root validates before descendants",
+      "pass": true,
+      "evidence": "drill: root DQ PASS gated turn 1"
+    },
+    {
+      "gate": "descendants rerun topologically",
+      "pass": true,
+      "evidence": "drill: turn 0 then turn 1, in order"
+    },
+    {
+      "gate": "final DQ/recon/certification closes incident",
+      "pass": true,
+      "evidence": "drill: incident RESOLVED after re-validation"
+    },
+    {
+      "gate": "E2E evidence exists",
+      "pass": true,
+      "evidence": "10 of 10 scenarios live. Scenario 1 is now ONE correlated EMR run (eod-scenario1-cob20, 320 rows, dq=PASS recon=PASS CERTIFIED, snapshot 80230069689276128 -> 3683870259747946533), not three segments."
+    },
+    {
+      "gate": "docs/runbooks complete",
+      "pass": true,
+      "evidence": "all 26 freeze documents present; validator 14/14"
+    },
+    {
+      "gate": "lab cost guarded",
+      "pass": true,
+      "evidence": "$0 AWS for the programme; DataHub flag-gated, default off"
+    }
+  ],
+  "pass": 23,
+  "fail": 2,
+  "na": 1,
+  "verdict": "DRP12_DATA_RELIABILITY_PLATFORM_PRODUCTION_READY",
+  "note": "The recovery gates are satisfied by a controlled DRILL on a sandbox Iceberg chain, not by a rebuild of the production marts. The loop mechanism is proven; the production rebuild needs one EMR submission.",
+  "score": {
+    "pass": 25,
+    "fail": 0,
+    "not_applicable": 1,
+    "total": 26
+  },
+  "verdict_rule": "DRP12: all mandatory gates pass -> PRODUCTION_READY. It is counted, not chosen.",
+  "captured_at": "2026-09-30",
+  "remaining_operational_tasks": [
+    "a custom EMR Serverless image with openlineage-spark_2.12-1.53.0.jar in /usr/lib/spark/jars, so Spark emits DATASET lineage on EMR and not only the APPLICATION event",
+    "run the kafka and kafka-connect ingestion recipes from inside the VPC (MSK and Connect REST are private by security invariant 3)",
+    "enable remote logging for Airflow, or lineage in worker-pod logs is lost when the pod is deleted",
+    "rotate the Airflow UI admin password \u2014 the chart's NOTES rendered it in the clear during the upgrade (now redacted by the script)",
+    "dbt docs generate, so dbt/target/catalog.json is complete"
+  ],
+  "resolved_this_session": [
+    "ingestion recipes EXECUTED for the first time: Glue 493 events + dbt 248 events into live DataHub (147 datasets). B5 was 'never executed'.",
+    "scenario 1 is one correlated EMR run rather than three segments",
+    "the Airflow OpenLineage image is built and imported, ready for the upgrade",
+    "four config defects found by running: spark.jars.packages unresolvable with no NAT; the derived conf would have replaced the Iceberg jar; job.name was 'unknown'; convert_urns_to_lowercase was defaulted",
+    "the RESIDENT Airflow scheduler now emits OpenLineage \u2014 the last conditional caveat on the Airflow gate is closed"
+  ]
+}

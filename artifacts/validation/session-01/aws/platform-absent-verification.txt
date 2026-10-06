@@ -1,0 +1,38 @@
+# Live read-only platform verification
+# Date: 2026-08-12T08:58:13Z  Session 01
+# Purpose: PROJECT_STATE.md must state a verified fact, not a memory of Session 00 (2026-08-07).
+
+$ aws kafka list-clusters-v2 --query length(ClusterInfoList)
+0
+
+$ aws ec2 describe-vpcs --query Vpcs[?IsDefault==`false`].VpcId
+[]
+
+$ aws ec2 describe-instances --query Reservations[].Instances[?State.Name!=`terminated`].InstanceId
+[]
+
+$ aws ec2 describe-nat-gateways --query NatGateways[?State!=`deleted`].NatGatewayId
+[]
+
+$ aws ec2 describe-vpc-endpoints --query VpcEndpoints[].VpcEndpointId
+[]
+
+$ aws kms list-aliases --query AliasList[?starts_with(AliasName,`alias/kafka`)||starts_with(AliasName,`alias/lake`)||starts_with(AliasName,`alias/cdc`)].AliasName
+null
+
+$ aws glue get-databases --query DatabaseList[].Name
+[
+    "vannk-dev-oracle-db"
+]
+
+$ aws athena list-work-groups --query WorkGroups[].Name
+[
+    "primary"
+]
+
+$ aws emr-serverless list-applications --query applications[].name
+[]
+
+$ aws redshift-serverless list-namespaces --query namespaces[].namespaceName
+[]
+

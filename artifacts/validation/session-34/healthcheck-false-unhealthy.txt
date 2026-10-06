@@ -1,0 +1,54 @@
+Defect 5 — both cdc-runtime containers reported "unhealthy" while working perfectly
+Date: 2026-08-21   Instance i-00d1b513011cc492d
+
+SYMPTOM
+  docker ps:  cdc-connect  Up 2 hours (unhealthy)
+              cdc-apicurio Up 2 hours (unhealthy)
+  FailingStreak 272 and 180 respectively -- i.e. it had NEVER once passed.
+
+WHY THIS WAS NEARLY MISREAD
+  curl http://localhost:8080/health/ready returned 000 (refused), which reads as
+  "Apicurio is down". It is not. The startup log says:
+
+      Listening on: http://10.42.0.138:8080
+
+  QUARKUS_HTTP_HOST binds Apicurio to the PRIVATE IP only, so loopback is genuinely
+  refused and localhost is not a valid probe target. Against the private IP:
+
+      /health/ready                       -> 200
+      /apis/registry/v2/search/artifacts  -> 200  {"artifacts":[],"count":0}
+      Connect :8083/                      -> 200
+
+  Both services were healthy the whole time.
+
+ROOT CAUSE
+  docker-compose.yml used TWO different escapings of the same variable:
+
+      line 17  CONNECT_REST_ADVERTISED_HOST_NAME: ${PRIVATE_IP}    <- correct
+      line 83  QUARKUS_HTTP_HOST:                 ${PRIVATE_IP}    <- correct
+      line 41  test: curl -sf http://$${PRIVATE_IP}:8083/          <- WRONG
+      line 118 test: curl -sf http://$${PRIVATE_IP}:8080/...       <- WRONG
+
+  A single $ is interpolated by Compose at parse time from .env and bakes the address
+  into the container config. $$ escapes it and defers expansion to the CONTAINER's
+  shell -- and PRIVATE_IP does not exist there. Verified directly:
+
+      docker exec cdc-apicurio sh -c 'echo [$PRIVATE_IP]'  ->  []
+      docker exec cdc-connect  sh -c 'echo [$PRIVATE_IP]'  ->  []
+
+  So the probe executed `curl -sf http://:8083/` and could never succeed.
+
+WHY IT MATTERED ENOUGH TO FIX
+  A container that is permanently unhealthy while working is worse than one with no
+  healthcheck at all: it trains you to ignore the health column, which is exactly the
+  column that would have shown the REAL outage earlier today (Connect crash-looping on
+  the revoked MSK security-group rule). It also breaks `docker compose up --wait` and
+  any `depends_on: condition: service_healthy`, which hang until timeout.
+
+FIX
+  $${PRIVATE_IP} -> ${PRIVATE_IP} in both healthchecks, matching lines 17/83, with an
+  in-file comment recording why localhost is NOT an acceptable substitute here.
+
+VERIFIED after `docker compose up -d`:
+      cdc-connect  Up About a minute (healthy)
+      cdc-apicurio Up About a minute (healthy)

@@ -1,0 +1,95 @@
+PHASE 12 — two saved plans, neither applied. Generated 2026-08-20, -lock=false.
+
+==============================================================================
+PLAN A — current terraform.tfvars, unchanged
+  what `bash scripts/tf.sh plan` produces today
+==============================================================================
+  actions: {('create',): 164, ('no-op',): 2, ('read',): 12}
+  DESTROY / REPLACE: NONE
+
+  MSK cluster                          CREATE x1
+  EMR Serverless application           CREATE x1
+  EC2 instance (incl. Airflow k3s)     CREATE x3
+  DynamoDB table                       CREATE x0
+  KMS CMK                              CREATE x2
+  VPC endpoint                         CREATE x3
+  NAT gateway                          CREATE x0
+
+  all created types:
+      37 aws_s3_object
+      22 aws_iam_role_policy_attachment
+      11 aws_iam_policy
+       9 aws_iam_role
+       7 aws_glue_catalog_database
+       6 aws_cloudwatch_metric_alarm
+       6 aws_route_table_association
+       6 aws_security_group
+       6 aws_ssm_parameter
+       6 aws_subnet
+       6 aws_vpc_security_group_ingress_rule
+       6 random_password
+       5 aws_iam_instance_profile
+       4 aws_route_table
+       3 aws_instance
+       3 aws_vpc_endpoint
+       2 aws_iam_role_policy
+       2 aws_kms_alias
+       2 aws_kms_key
+       1 aws_athena_workgroup
+       1 aws_cloudwatch_log_group
+       1 aws_default_security_group
+       1 aws_emrserverless_application
+       1 aws_internet_gateway
+       1 aws_msk_cluster
+       1 aws_msk_configuration
+       1 aws_s3_bucket_lifecycle_configuration
+       1 aws_s3_bucket_ownership_controls
+       1 aws_s3_bucket_policy
+       1 aws_s3_bucket_public_access_block
+       1 aws_s3_bucket_server_side_encryption_configuration
+       1 aws_s3_bucket_versioning
+       1 aws_vpc
+       1 terraform_data
+
+==============================================================================
+PLAN B — reporting-only overlay
+  enable_kafka_platform=false + enable_reporting_framework=true
+==============================================================================
+  actions: {('create',): 42, ('no-op',): 2, ('read',): 2}
+  DESTROY / REPLACE: NONE
+
+  MSK cluster                          CREATE x0
+  EMR Serverless application           CREATE x0
+  EC2 instance (incl. Airflow k3s)     CREATE x0
+  DynamoDB table                       CREATE x4
+  KMS CMK                              CREATE x1
+  VPC endpoint                         CREATE x0
+  NAT gateway                          CREATE x0
+
+  all created types:
+      16 aws_s3_object
+       7 aws_glue_catalog_database
+       4 aws_dynamodb_table
+       2 aws_iam_policy
+       2 aws_iam_role_policy_attachment
+       1 aws_athena_workgroup
+       1 aws_iam_role
+       1 aws_kms_alias
+       1 aws_kms_key
+       1 aws_s3_bucket_lifecycle_configuration
+       1 aws_s3_bucket_ownership_controls
+       1 aws_s3_bucket_policy
+       1 aws_s3_bucket_public_access_block
+       1 aws_s3_bucket_server_side_encryption_configuration
+       1 aws_s3_bucket_versioning
+       1 terraform_data
+
+==============================================================================
+COST (scripts/plan_cost.py)
+==============================================================================
+  PLAN A   164 add, 0 destroy   $1.1244/hr   6h window $6.75   KMS floor $2.00/mo
+  PLAN B    42 add, 0 destroy   $0.0000/hr   6h window $0.00   KMS floor $1.00/mo
+
+  Plan A's hourly is MSK (3 x kafka.m7g.large) plus 3 EC2. Plan B has no hourly
+  component at all: DynamoDB is PAY_PER_REQUEST and every other resource is
+  storage or metadata. The $1.00 floor in B is the lake CMK.

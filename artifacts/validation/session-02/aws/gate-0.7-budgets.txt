@@ -1,0 +1,76 @@
+# Gate 0.7 live verification - 2026-08-12T11:13:48Z
+# Read-only. Session 01 declared 0.7 FAILING from repo A's budget_email="" without checking AWS.
+
+## budgets
+[
+    {
+        "Name": "My Monthly Cost Budget",
+        "Limit": "30.0",
+        "Unit": "USD",
+        "TimeUnit": "MONTHLY",
+        "Filters": {}
+    },
+    {
+        "Name": "My Zero-Spend Budget",
+        "Limit": "1.0",
+        "Unit": "USD",
+        "TimeUnit": "MONTHLY",
+        "Filters": {}
+    }
+]
+
+## My Monthly Cost Budget - notifications
+{
+    "Notifications": [
+        {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 100.0,
+            "NotificationState": "OK"
+        },
+        {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 85.0,
+            "NotificationState": "OK"
+        },
+        {
+            "NotificationType": "FORECASTED",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 100.0,
+            "NotificationState": "OK"
+        }
+    ]
+}
+## My Monthly Cost Budget - subscribers @ ACTUAL>85
+{
+    "Subscribers": [
+        {
+            "SubscriptionType": "EMAIL",
+            "Address": "owner@example.com"
+        }
+    ]
+}
+## My Monthly Cost Budget - subscribers @ FORECASTED>100
+{
+    "Subscribers": [
+        {
+            "SubscriptionType": "EMAIL",
+            "Address": "owner@example.com"
+        }
+    ]
+}
+
+## My Zero-Spend Budget - notifications
+{
+    "Notifications": [
+        {
+            "NotificationType": "ACTUAL",
+            "ComparisonOperator": "GREATER_THAN",
+            "Threshold": 0.01,
+            "ThresholdType": "ABSOLUTE_VALUE",
+            "NotificationState": "ALARM"
+        }
+    ]
+}
+## My Zero-Spend Budget - subscribers @ ACTUAL>0.01

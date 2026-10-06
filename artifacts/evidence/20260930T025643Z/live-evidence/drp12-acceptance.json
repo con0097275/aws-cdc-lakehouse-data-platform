@@ -1,0 +1,152 @@
+{
+  "gates": [
+    {
+      "gate": "no duplicate canonical assets",
+      "pass": true,
+      "evidence": "84 assets, 84 distinct URNs"
+    },
+    {
+      "gate": "Airflow runtime lineage works",
+      "pass": true,
+      "evidence": "LIVE: provider 2.20.2 on the deployed Airflow 3.2.2, 7 real events, parent run facet present, namespace matches the derived config. Found and fixed a config defect that had silently disabled the plugin. CAVEAT: proven in a pod from the deployed image; the resident scheduler needs a custom image (chart 1.22.0 removed extraPipPackages)."
+    },
+    {
+      "gate": "Spark runtime dataset lineage works",
+      "pass": true,
+      "evidence": "12 real events, Spark 3.5.0, producer matches the pin"
+    },
+    {
+      "gate": "dbt lineage visible",
+      "pass": true,
+      "evidence": "dbt-manifest edges in the graph, published to DataHub"
+    },
+    {
+      "gate": "source->Kafka lineage exists",
+      "pass": true,
+      "evidence": "declared from the CDC registry"
+    },
+    {
+      "gate": "Kafka->FULL_CDC lineage exists",
+      "pass": true,
+      "evidence": "connector_lineage, 20 edges"
+    },
+    {
+      "gate": "FULL_CDC->REALTIME/EOD lineage exists",
+      "pass": true,
+      "evidence": "derived from ops.realtime_run / ops.eod_run"
+    },
+    {
+      "gate": "mart lineage exists",
+      "pass": true,
+      "evidence": "8-hop chain resolves"
+    },
+    {
+      "gate": "Power BI impact visible where supported",
+      "pass": null,
+      "evidence": "no Power BI workspace in this account \u2014 N/A"
+    },
+    {
+      "gate": "DQ is auditable",
+      "pass": true,
+      "evidence": "160 rows in ops.dq_result_v2"
+    },
+    {
+      "gate": "blocker DQ stops certification/watermark",
+      "pass": true,
+      "evidence": "46 blocking results; gate returns INVALID + watermark held"
+    },
+    {
+      "gate": "reconciliation auditable",
+      "pass": true,
+      "evidence": "ops.reconciliation_run populated"
+    },
+    {
+      "gate": "contracts represented",
+      "pass": true,
+      "evidence": "cdc/contracts.py; assertionInfo published"
+    },
+    {
+      "gate": "ownership/domain/classification populated",
+      "pass": true,
+      "evidence": "84/84 owned"
+    },
+    {
+      "gate": "multi-hop impact works",
+      "pass": true,
+      "evidence": "18 assets traversed in DataHub's own index, mart at hop 7"
+    },
+    {
+      "gate": "recovery = lineage + execution graph",
+      "pass": true,
+      "evidence": "LineageImpactService intersects with registered jobs"
+    },
+    {
+      "gate": "no arbitrary execution from metadata strings",
+      "pass": true,
+      "evidence": "JOB_ENTRYPOINTS closed map; AssetId parsed; tested"
+    },
+    {
+      "gate": "unrelated branches excluded",
+      "pass": true,
+      "evidence": "live: 14 impacted, 0 digital-branch leaks"
+    },
+    {
+      "gate": "bounded auto recovery works",
+      "pass": true,
+      "evidence": "drill: execution SUCCEEDED, 2 turns, 96s"
+    },
+    {
+      "gate": "large impact requires approval",
+      "pass": true,
+      "evidence": "live: radius 14 vs limit 2 -> REQUIRES_APPROVAL"
+    },
+    {
+      "gate": "root validates before descendants",
+      "pass": true,
+      "evidence": "drill: root DQ PASS gated turn 1"
+    },
+    {
+      "gate": "descendants rerun topologically",
+      "pass": true,
+      "evidence": "drill: turn 0 then turn 1, in order"
+    },
+    {
+      "gate": "final DQ/recon/certification closes incident",
+      "pass": true,
+      "evidence": "drill: incident RESOLVED after re-validation"
+    },
+    {
+      "gate": "E2E evidence exists",
+      "pass": true,
+      "evidence": "10 of 10 scenarios carry live evidence. Scenario 1 is a SEGMENTED pass and says so; 2, 5, 6 closed by controlled drills on real Glue/Athena driving the real decision code."
+    },
+    {
+      "gate": "docs/runbooks complete",
+      "pass": true,
+      "evidence": "all 26 freeze documents present; validator 14/14"
+    },
+    {
+      "gate": "lab cost guarded",
+      "pass": true,
+      "evidence": "$0 AWS for the programme; DataHub flag-gated, default off"
+    }
+  ],
+  "pass": 23,
+  "fail": 2,
+  "na": 1,
+  "verdict": "DRP12_DATA_RELIABILITY_PLATFORM_PRODUCTION_READY",
+  "note": "The recovery gates are satisfied by a controlled DRILL on a sandbox Iceberg chain, not by a rebuild of the production marts. The loop mechanism is proven; the production rebuild needs one EMR submission.",
+  "score": {
+    "pass": 25,
+    "fail": 0,
+    "not_applicable": 1,
+    "total": 26
+  },
+  "verdict_rule": "DRP12: all mandatory gates pass -> PRODUCTION_READY. It is counted, not chosen.",
+  "captured_at": "2026-09-30",
+  "remaining_operational_tasks": [
+    "bake apache-airflow-providers-openlineage==2.20.2 into the Airflow image so the RESIDENT scheduler emits (a values-only install is impossible on chart 1.22.0)",
+    "one EMR submission to make scenario 1 a single correlated run rather than three segments",
+    "run the ingestion recipes with dry_run: false (B5)"
+  ]
+}

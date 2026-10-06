@@ -1,0 +1,24 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from cdc.lineage_graph import build_static_graph
+from cdc.urns import UrnMinter, default_catalog
+from cdc.metadata_plane import load
+from cdc.assets import AssetId
+m = UrnMinter(load().environment, default_catalog()); g = build_static_graph(m)
+p = g.path(m.dataset_urn(AssetId.parse('src:oracle.coredb.corebank.account')),
+           m.dataset_urn(AssetId.parse('mart:mart_account_balance_daily')))
+print('hops:', len(p))
+for i, x in enumerate(p, 1): print(f'  {i}. {m.parse_dataset(x)[1]}')
+print('weakest evidence on the path:', g.weakest_evidence(p).value)
+
+
+hops: 8
+  1. coredb.corebank.account
+  2. cdc.oracle.COREBANK.ACCOUNT
+  3. kafka_dev_lab_dev_full_cdc.cdc_oracle_coredb_corebank_account
+  4. kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account
+  5. kafka_dev_lab_dev_curated.banking_account
+  6. kafka_dev_lab_dev_curated.fact_account_daily_snapshot
+  7. kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot
+  8. kafka_dev_lab_dev_mart.mart_account_balance_daily
+weakest evidence on the path: declared

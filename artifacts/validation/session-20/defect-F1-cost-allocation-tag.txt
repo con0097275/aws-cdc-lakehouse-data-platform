@@ -1,0 +1,35 @@
+# Foundation defect F1 — cost allocation tag inactive (risk R7)
+Found: 2026-08-15  |  Account 111122223333
+
+## Defect
+aws ce list-cost-allocation-tags --tag-keys Project  ->  Project UserDefined Inactive
+aws ce list-cost-allocation-tags --status Active     ->  (empty: ZERO tags active account-wide)
+
+## Impact
+module.budget_guardrails filters on CostFilters TagKeyValue = user:Project$kafka-dev-lab.
+A budget can only filter on a cost allocation tag that is ACTIVE. While inactive, AWS never
+breaks cost data out by that key, so the budget reads $0.00 regardless of real spend and all
+three notifications (FORECASTED>50, ACTUAL>80, ACTUAL>100) can never fire.
+This is exactly risk R7 / ADR-023: 'the budget silently monitors a project that does not exist'.
+The tag STRING matched correctly - the defect was that the tag was never activated for billing,
+which is an account-level Billing setting that Terraform's aws_budgets_budget does not manage.
+Backstop during the gap: the two account-wide budgets ($30 / $1) were unaffected.
+
+## Fix applied (free, reversible, no infrastructure created)
+aws ce update-cost-allocation-tags-status --cost-allocation-tags-status \
+  TagKey=Project,Status=Active ... (6 CLAUDE.md 4.11 tags)
+Result: {"Errors": []}
+  Owner	Active	2026-08-15T12:21:20Z
+  ManagedBy	Active	2026-08-15T12:21:20Z
+  AutoDestroyAfter	Active	2026-08-15T12:21:20Z
+  CostCenter	Active	2026-08-15T12:21:20Z
+  Project	Active	2026-08-15T12:21:20Z
+  Environment	Active	2026-08-15T12:21:20Z
+
+## Propagation caveat - why this is NOT yet PASS
+Activation is NOT retroactive: AWS does not backfill cost allocation data for usage incurred
+before activation, and newly activated keys take up to 24h to appear in Cost Explorer/Budgets.
+The budget therefore CANNOT be proven functional today. Verify after 2026-08-16T12:21Z with:
+  aws budgets describe-budget --account-id 111122223333 --budget-name kafka-dev-lab-dev-monthly \
+    --query 'Budget.CalculatedSpend'
+Expect a non-zero ActualSpend once the lake CMK's $1.00/key-month accrues against the tag.

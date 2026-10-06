@@ -1,0 +1,23 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from cdc.governance_plan import compile_inventory
+i = compile_inventory()
+print('config_version:', i.config_version())
+print('coverage      :', i.coverage())
+print('findings      :', len(i.findings))
+for f in i.findings: print('   ', f)
+from collections import Counter
+print('by kind       :', dict(Counter(a.asset.kind.value for a in i.assets)))
+print('by domain     :', dict(Counter(a.governance.domain for a in i.assets)))
+print('classification:', dict(Counter(a.governance.classification.value for a in i.assets)))
+print('with PII      :', sum(1 for a in i.assets if a.governance.has_pii))
+
+
+config_version: gv1:3d3914603e0fd5a4
+coverage      : {'assets': 84, 'owned': 84, 'classified': 84, 'described': 84, 'owned_pct': 100.0}
+findings      : 1
+    curated:dim_customer_bi: [undeclared_asset] exists but is declared only in spark/reporting/ (Python only) (BI-facing customer dimension with no config declaration); a table nobody can find from config cannot be onboarded, decommissioned or reasoned about
+by kind       : {'curated': 21, 'eod': 10, 'full_cdc': 10, 'mart': 13, 'realtime': 10, 'src': 10, 'topic': 10}
+by domain     : {'core_banking': 40, 'digital_channel': 34, 'shared': 10}
+classification: {'confidential': 54, 'internal': 30}
+with PII      : 35

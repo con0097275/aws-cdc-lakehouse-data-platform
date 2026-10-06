@@ -1,0 +1,13 @@
+# The dataset registry and DQ rules. Structured YAML rather than prose: the router sends
+# ownership/PII/retention questions to explain_dataset, and these chunks are the fallback
+# when the question is phrased as prose.
+source_id: governance_registry
+document_type: contract
+owner: data-governance
+domain: ops
+classification: internal
+description: Dataset registry, lineage graph and DQ rules.
+include:
+  - "governance/catalog/domains.yml"
+  - "governance/lineage/openlineage.yml"
+  - "governance/dq/rules.yml"

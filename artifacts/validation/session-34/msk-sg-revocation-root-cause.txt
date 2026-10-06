@@ -1,0 +1,51 @@
+MSK security-group flap — root cause and durable fix
+Date: 2026-08-21   Account: 111122223333   Region: ap-southeast-1
+
+SYMPTOM
+  cdc-connect crash-loops:
+    ERROR Stopping due to error (org.apache.kafka.connect.cli.AbstractConnectCli:100)
+    ConnectException: Failed to connect to and describe Kafka cluster.
+    Caused by: TimeoutException: Timed out waiting for a node assignment. Call: listNodes
+
+RULED OUT (both were the obvious suspects, both are fine)
+  - bootstrap string is CORRECT and matches the live cluster:
+      rendered: b-1/b-2/b-3.kafkadevlabdev.ikwo95.c6.kafka.ap-southeast-1.amazonaws.com:9098
+      live    : same (aws kafka get-bootstrap-brokers, cluster 55efb0a2-...-6)
+    => RESTART-TOMORROW.md item 4 ("new MSK = new broker DNS") did NOT bite this time.
+  - DNS resolves from the host: b-1... -> 10.42.12.33
+
+ACTUAL CAUSE
+  MSK SG sg-0985995e135d5ef46 permits 9098 from ONE source group only:
+      sg-02cf1e3e256e24b6c  = kafka-dev-lab-dev-toolbox
+  Missing:
+      sg-068cb5490766980c5  = kafka-dev-lab-dev-cdc-runtime
+      sg-073bcf5116a43f851  = kafka-dev-lab-dev-emr-serverless
+
+  aws_security_group.msk (kafka_platform/network.tf) declared its ingress with INLINE
+  `ingress` blocks, while two other modules attach standalone rules to the same SG:
+      cdc_runtime_ec2/main.tf:63  aws_vpc_security_group_ingress_rule.msk_from_cdc_runtime
+      emr_serverless/main.tf:108  aws_vpc_security_group_ingress_rule.msk_from_emr
+
+  Terraform forbids mixing inline ingress with standalone rule resources on one SG.
+  The inline set is authoritative: every apply revokes any rule not declared inline.
+  The rebuild apply therefore silently removed 9098 for cdc-runtime AND for EMR.
+
+  This is exactly the risk logged as item 5 in session-33/RESTART-TOMORROW.md
+  ("the MSK security-group flap ... any plan will want to revoke EMR and CDC access
+  on port 9098"). It was predicted, then it happened.
+
+BLAST RADIUS
+  - Kafka Connect cannot start  -> no CDC ingest at all
+  - EMR Serverless cannot read MSK -> STREAMING_RT would fail the same way later,
+    and would have looked like a Spark bug rather than a network one
+
+DURABLE FIX APPLIED (code only, NOT yet applied to AWS)
+  kafka_platform/network.tf: all four inline MSK ingress blocks converted to
+  standalone aws_vpc_security_group_ingress_rule resources:
+      msk_self, msk_from_toolbox, msk_jmx_from_toolbox, msk_node_from_toolbox
+  Now no rule set is authoritative, so nothing revokes anything.
+  `terraform validate` => Success.
+
+  Expect the plan to show the 4 new rule resources being CREATED and the inline
+  rules being removed from the SG body. Ports and sources are unchanged; this is a
+  representation change, not a permission change. Verify that before applying.

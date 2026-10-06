@@ -1,0 +1,50 @@
+# Session 00 — read-only AWS inventory
+# Captured: 2026-08-13T03:47:24Z by the Session 00 closeout pass
+# Every command below is describe/list/get. No mutation.
+
+$ aws sts get-caller-identity
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+$ aws kafka list-clusters-v2 --query 'length(ClusterInfoList)'
+0
+
+$ aws ec2 describe-vpcs --query 'Vpcs[?IsDefault==`false`].VpcId'
+[]
+
+$ aws ec2 describe-instances (non-terminated)
+[]
+
+$ aws ec2 describe-volumes
+[]
+
+$ aws ec2 describe-nat-gateways (non-deleted)
+[]
+
+$ aws ec2 describe-vpc-endpoints
+[]
+
+$ aws emr-serverless list-applications
+[]
+
+$ aws redshift-serverless list-workgroups
+[]
+
+$ aws budgets describe-budgets --account-id 111122223333
+[
+    {
+        "Name": "My Monthly Cost Budget",
+        "Limit": "30.0",
+        "Unit": "USD",
+        "Type": "COST"
+    },
+    {
+        "Name": "My Zero-Spend Budget",
+        "Limit": "1.0",
+        "Unit": "USD",
+        "Type": "COST"
+    }
+]

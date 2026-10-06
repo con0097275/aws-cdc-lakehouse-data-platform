@@ -1,0 +1,461 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+terraform plan (read-only)
+-------------------------------------------------------------------------------
+[0m[1mmodule.emr_serverless[0].data.aws_region.current: Reading...[0m[0m
+[0m[1mdata.aws_partition.current: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.ec2_trust: Reading...[0m[0m
+[0m[1mmodule.reporting_ops[0].aws_cloudwatch_metric_alarm.execution_failed[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting-execution-failed][0m
+[0m[1mmodule.reporting_ops[0].aws_cloudwatch_metric_alarm.no_successful_execution[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting-no-success][0m
+[0m[1mmodule.reporting_ops[0].aws_cloudwatch_metric_alarm.watermark_lag[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting-watermark-lag][0m
+[0m[1mmodule.emr_serverless[0].data.aws_region.current: Read complete after 0s [id=ap-southeast-1][0m
+[0m[1mdata.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.ec2_trust: Read complete after 0s [id=2851119427][0m
+[0m[1mmodule.emr_serverless[0].data.aws_prefix_list.dynamodb: Reading...[0m[0m
+[0m[1mmodule.budget_guardrails.aws_budgets_budget.project_monthly: Refreshing state... [id=111122223333:kafka-dev-lab-dev-monthly][0m
+[0m[1mmodule.emr_serverless[0].data.aws_prefix_list.s3: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.ec2["source_lab"]: Refreshing state... [id=kafka-dev-lab-dev-source-lab][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.ec2["trino"]: Refreshing state... [id=kafka-dev-lab-dev-trino][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.ec2["airflow"]: Refreshing state... [id=kafka-dev-lab-dev-airflow][0m
+[0m[1mdata.aws_caller_identity.current: Read complete after 0s [id=111122223333][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.ec2["connect"]: Refreshing state... [id=kafka-dev-lab-dev-connect][0m
+[0m[1mmodule.emr_serverless[0].data.aws_prefix_list.s3: Read complete after 1s [id=pl-6fa54006][0m
+[0m[1mterraform_data.invariants: Refreshing state... [id=f8ffec9d-7412-a734-0d91-914fe6ec81a5][0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.assume_emr[0]: Reading...[0m[0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.assume_emr[0]: Read complete after 0s [id=2451068980][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.athena_bi_trust: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.athena_bi_trust: Read complete after 0s [id=473595240][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["redshift_serverless"]: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["redshift_serverless"]: Read complete after 0s [id=1661122772][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["spark_stream"]: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["spark_stream"]: Read complete after 0s [id=2451068980][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["spark_eod"]: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.service_trust["spark_eod"]: Read complete after 0s [id=2451068980][0m
+[0m[1mmodule.reporting_ops[0].aws_iam_role.reporting[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting][0m
+[0m[1mmodule.emr_serverless[0].data.aws_prefix_list.dynamodb: Read complete after 1s [id=pl-67a5400e][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.athena_bi: Refreshing state... [id=kafka-dev-lab-dev-athena-bi][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.service["redshift_serverless"]: Refreshing state... [id=kafka-dev-lab-dev-redshift-serverless][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.service["spark_eod"]: Refreshing state... [id=kafka-dev-lab-dev-spark-eod][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role.service["spark_stream"]: Refreshing state... [id=kafka-dev-lab-dev-spark-stream][0m
+[0m[1mmodule.kafka_platform[0].data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.data_lake.data.aws_partition.current: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox_ec2_discovery: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_availability_zones.available: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_partition.current: Reading...[0m[0m
+[0m[1mmodule.data_lake.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox_assume_role: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_ssm_parameter.al2023_ami: Reading...[0m[0m
+[0m[1mmodule.data_lake.data.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1mmodule.kafka_platform[0].data.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox_assume_role: Read complete after 0s [id=2851119427][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox_ec2_discovery: Read complete after 0s [id=639410314][0m
+[0m[1mmodule.kafka_platform[0].aws_vpc.this: Refreshing state... [id=vpc-0bb86267f1426babf][0m
+[0m[1mmodule.kafka_platform[0].random_password.grafana_admin: Refreshing state... [id=none][0m
+[0m[1mmodule.kafka_platform[0].aws_msk_configuration.this: Refreshing state... [id=arn:aws:kafka:ap-southeast-1:111122223333:configuration/kafka-dev-lab-dev-configuration/1547f83f-376d-4a23-8bb6-f4aa4042b929-6][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_role.toolbox: Refreshing state... [id=kafka-dev-lab-dev-toolbox][0m
+[0m[1mmodule.data_lake.aws_s3_bucket.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.under_replicated_partitions: Refreshing state... [id=kafka-dev-lab-dev-under-replicated-partitions][0m
+[0m[1mmodule.kafka_platform[0].data.aws_caller_identity.current: Read complete after 0s [id=111122223333][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.broker_cpu: Refreshing state... [id=kafka-dev-lab-dev-broker-cpu-high][0m
+[0m[1mmodule.kafka_platform[0].data.aws_availability_zones.available: Read complete after 0s [id=ap-southeast-1][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.broker_disk: Refreshing state... [id=kafka-dev-lab-dev-broker-disk-high][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.kms: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.kms: Read complete after 0s [id=2388515951][0m
+[0m[1mmodule.kafka_platform[0].aws_kms_key.this: Refreshing state... [id=63c6f03f-8253-4fb1-b4ff-6197e9b36a55][0m
+[0m[1mmodule.data_lake.data.aws_caller_identity.current: Read complete after 0s [id=111122223333][0m
+[0m[1mmodule.data_lake.data.aws_iam_policy_document.lake_key: Reading...[0m[0m
+[0m[1mmodule.data_lake.data.aws_iam_policy_document.lake_key: Read complete after 0s [id=2515174426][0m
+[0m[1mmodule.data_lake.aws_kms_key.lake: Refreshing state... [id=e66f4dfa-3c59-4a63-a637-1bc4836e1866][0m
+[0m[1mmodule.kafka_platform[0].data.aws_ssm_parameter.al2023_ami: Read complete after 0s [id=/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.ssm_core["connect"]: Refreshing state... [id=kafka-dev-lab-dev-connect/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.ssm_core["trino"]: Refreshing state... [id=kafka-dev-lab-dev-trino/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.ssm_core["source_lab"]: Refreshing state... [id=kafka-dev-lab-dev-source-lab/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.ssm_core["airflow"]: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1mmodule.lake_iam[0].aws_iam_instance_profile.ec2["source_lab"]: Refreshing state... [id=kafka-dev-lab-dev-source-lab][0m
+[0m[1mmodule.lake_iam[0].aws_iam_instance_profile.ec2["airflow"]: Refreshing state... [id=kafka-dev-lab-dev-airflow][0m
+[0m[1mmodule.lake_iam[0].aws_iam_instance_profile.ec2["connect"]: Refreshing state... [id=kafka-dev-lab-dev-connect][0m
+[0m[1mmodule.lake_iam[0].aws_iam_instance_profile.ec2["trino"]: Refreshing state... [id=kafka-dev-lab-dev-trino][0m
+[0m[1mmodule.kafka_platform[0].aws_security_group.toolbox: Refreshing state... [id=sg-0c03bb74c037360e2][0m
+[0m[1mmodule.kafka_platform[0].aws_internet_gateway.this: Refreshing state... [id=igw-080ddf80bb705da9f][0m
+[0m[1mmodule.kafka_platform[0].aws_default_security_group.this: Refreshing state... [id=sg-020a83cb4393ae944][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.private[2]: Refreshing state... [id=subnet-088d74d2dc5b2c166][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.private[0]: Refreshing state... [id=subnet-0f1a984b4d452ce01][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.private[1]: Refreshing state... [id=subnet-077d68ac2e7b14861][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table.private[0]: Refreshing state... [id=rtb-0481956e85ebc407f][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table.private[1]: Refreshing state... [id=rtb-0f579fb4618ba0353][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table.private[2]: Refreshing state... [id=rtb-06c7c201c739b567f][0m
+[0m[1mmodule.kafka_platform[0].aws_security_group.msk: Refreshing state... [id=sg-0c1d84e87af28cd2e][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.public[0]: Refreshing state... [id=subnet-08ace77bd1eae900f][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.public[1]: Refreshing state... [id=subnet-038eeb3c9f8a63e25][0m
+[0m[1mmodule.kafka_platform[0].aws_subnet.public[2]: Refreshing state... [id=subnet-0ef0e8cafcb4b0d24][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table.public: Refreshing state... [id=rtb-03988936510121cca][0m
+[0m[1mmodule.kafka_platform[0].aws_ssm_parameter.grafana_admin_password: Refreshing state... [id=/kafka-dev-lab-dev/grafana/admin-password][0m
+[0m[1mmodule.kafka_platform[0].aws_kms_alias.this: Refreshing state... [id=alias/kafka-dev-lab-dev][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_log_group.msk: Refreshing state... [id=/aws/msk/kafka-dev-lab-dev/brokers][0m
+[0m[1mmodule.data_lake.aws_kms_alias.lake: Refreshing state... [id=alias/kafka-dev-lab-dev-lake][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.private[1]: Refreshing state... [id=rtbassoc-04dd94025dc8efa9d][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.private[0]: Refreshing state... [id=rtbassoc-07778a6d8453c5ad7][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.private[2]: Refreshing state... [id=rtbassoc-02e01018ead9f4b7c][0m
+[0m[1mmodule.emr_serverless[0].aws_security_group.emr: Refreshing state... [id=sg-0dc7032a60b51d841][0m
+[0m[1mmodule.vpc_endpoints[0].aws_security_group.glue_endpoint[0]: Refreshing state... [id=sg-01ea711ce71e18f1b][0m
+[0m[1mmodule.kafka_platform[0].aws_vpc_security_group_ingress_rule.msk_from_toolbox: Refreshing state... [id=sgr-032be9c3d88aeef4d][0m
+[0m[1mmodule.kafka_platform[0].aws_vpc_security_group_ingress_rule.msk_node_from_toolbox: Refreshing state... [id=sgr-07a8601ce869de7fa][0m
+[0m[1mmodule.kafka_platform[0].aws_vpc_security_group_ingress_rule.msk_jmx_from_toolbox: Refreshing state... [id=sgr-0f67a1477985df05d][0m
+[0m[1mmodule.kafka_platform[0].aws_vpc_security_group_ingress_rule.msk_self: Refreshing state... [id=sgr-02a1d62d56f60c87e][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.public[1]: Refreshing state... [id=rtbassoc-0bfd780fee001f177][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.public[0]: Refreshing state... [id=rtbassoc-058840f111cd7539b][0m
+[0m[1mmodule.kafka_platform[0].aws_route_table_association.public[2]: Refreshing state... [id=rtbassoc-0f72cbb184a0a191e][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.secrets_read: Reading...[0m[0m
+[0m[1mmodule.emr_serverless[0].aws_emrserverless_application.spark: Refreshing state... [id=00g8aaf6fobsj625][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.secrets_read: Read complete after 0s [id=904195693][0m
+[0m[1mmodule.vpc_endpoints[0].aws_vpc_endpoint.glue[0]: Refreshing state... [id=vpce-0516eb33b9380bd53][0m
+[0m[1mmodule.emr_serverless[0].aws_vpc_security_group_ingress_rule.msk_from_emr: Refreshing state... [id=sgr-0c1563ccd5e334bbe][0m
+[0m[1mmodule.reporting_ops[0].aws_dynamodb_table.summary_config: Refreshing state... [id=kafka-dev-lab-dev-summary-config][0m
+[0m[1mmodule.reporting_ops[0].aws_dynamodb_table.streaming_app_state: Refreshing state... [id=kafka-dev-lab-dev-streaming-app-state][0m
+[0m[1mmodule.reporting_ops[0].aws_dynamodb_table.watermark: Refreshing state... [id=kafka-dev-lab-dev-job-watermark-state][0m
+[0m[1mmodule.reporting_ops[0].aws_dynamodb_table.execution: Refreshing state... [id=kafka-dev-lab-dev-job-execution][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.secrets_read: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-secrets-read][0m
+[0m[1mmodule.vpc_endpoints[0].aws_vpc_endpoint.s3: Refreshing state... [id=vpce-073a257f620335006][0m
+[0m[1mmodule.vpc_endpoints[0].aws_vpc_endpoint.dynamodb: Refreshing state... [id=vpce-08996822ee050e75f][0m
+[0m[1mmodule.kafka_platform[0].aws_msk_cluster.this: Refreshing state... [id=arn:aws:kafka:ap-southeast-1:111122223333:cluster/kafka-dev-lab-dev/edbb6779-cd99-46ce-b875-d37c6e0c6110-6][0m
+[0m[1mmodule.data_lake.data.aws_iam_policy_document.lake: Reading...[0m[0m
+[0m[1mmodule.data_lake.data.aws_iam_policy_document.lake: Read complete after 0s [id=3293061214][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_public_access_block.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_lifecycle_configuration.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_server_side_encryption_configuration.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_versioning.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_ownership_controls.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["checkpoints/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/checkpoints/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["models/artifacts/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/models/artifacts/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/quarantine/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/quarantine/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["artifacts/dbt/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/artifacts/dbt/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/stream/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/stream/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/ops/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/ops/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["dq-results/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/dq-results/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["quarantine-payloads/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/quarantine-payloads/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["features/offline/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/features/offline/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/curated/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/curated/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/full_cdc/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/full_cdc/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["checkpoints/reporting/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/checkpoints/reporting/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["ops/config/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/ops/config/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["query-results/athena/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/query-results/athena/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/mart/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/mart/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["logs/emr-serverless/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/logs/emr-serverless/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["logs/airflow/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/logs/airflow/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["warehouse/snapshot/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/warehouse/snapshot/][0m
+[0m[1mmodule.data_lake.aws_s3_object.prefix["ai/knowledge/"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/ai/knowledge/][0m
+[0m[1mmodule.data_lake.aws_s3_bucket_policy.lake: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_admin: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_consumer: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_producer: Reading...[0m[0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_admin: Read complete after 0s [id=332407457][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_consumer: Read complete after 0s [id=1221205503][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.sample_producer: Read complete after 0s [id=3655005864][0m
+[0m[1mmodule.kafka_platform[0].data.aws_iam_policy_document.toolbox: Read complete after 0s [id=228555180][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.bootstrap_read: Reading...[0m[0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.runtime_state: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.bootstrap_read: Read complete after 0s [id=2244069155][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.offline_partitions: Refreshing state... [id=kafka-dev-lab-dev-offline-partitions][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.active_controller_high: Refreshing state... [id=kafka-dev-lab-dev-multiple-active-controllers][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_policy.sample_admin: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-sample-admin][0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.runtime_state: Read complete after 0s [id=2829073720][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_policy.sample_producer: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-sample-producer][0m
+[0m[1mmodule.kafka_platform[0].aws_cloudwatch_metric_alarm.active_controller_low: Refreshing state... [id=kafka-dev-lab-dev-active-controller-missing][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.reporting_submit: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.reporting_submit: Read complete after 0s [id=1948675338][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_policy.sample_consumer: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-sample-consumer][0m
+[0m[1mmodule.athena[0].aws_athena_workgroup.this: Refreshing state... [id=kafka-dev-lab-dev-wg][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.msk_produce: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.msk_produce: Read complete after 0s [id=324150332][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.msk_consume: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.msk_consume: Read complete after 0s [id=2546909348][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.bootstrap_read: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-bootstrap-read][0m
+[0m[1mmodule.reporting_ops[0].aws_iam_policy.runtime_state: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-runtime-state][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["quarantine"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_quarantine][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["snapshot"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_snapshot][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["stream"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_stream][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["curated"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_curated][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["full_cdc"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_full_cdc][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["mart"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_mart][0m
+[0m[1mmodule.glue_catalog.aws_glue_catalog_database.this["ops"]: Refreshing state... [id=111122223333:kafka_dev_lab_dev_ops][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.reporting_submit[0]: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-submit][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.msk_produce: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-msk-produce][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.msk_consume: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-msk-consume][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.athena_query: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.lake_write: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.athena_query: Read complete after 0s [id=2252388518][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.lake_write: Read complete after 0s [id=2995856708][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.lake_read: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.lake_read: Read complete after 0s [id=3805710833][0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.mart_read: Reading...[0m[0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.lake_access[0]: Reading...[0m[0m
+[0m[1mmodule.lake_iam[0].data.aws_iam_policy_document.mart_read: Read complete after 0s [id=246120462][0m
+[0m[1mmodule.reporting_ops[0].data.aws_iam_policy_document.lake_access[0]: Read complete after 0s [id=3166750350][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.athena_query: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-athena-query][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.lake_write: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-write][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.lake_read: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_policy.mart_read: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-mart-read][0m
+[0m[1mmodule.reporting_ops[0].aws_iam_policy.lake_access[0]: Refreshing state... [id=arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-lake][0m
+[0m[1mmodule.reporting_ops[0].aws_iam_role_policy_attachment.reporting_state[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-runtime-state][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_instance_profile.toolbox: Refreshing state... [id=kafka-dev-lab-dev-toolbox][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_role_policy.toolbox_ec2_discovery: Refreshing state... [id=kafka-dev-lab-dev-toolbox:kafka-dev-lab-dev-toolbox-ec2-discovery][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_role_policy.toolbox: Refreshing state... [id=kafka-dev-lab-dev-toolbox:kafka-dev-lab-dev-toolbox][0m
+[0m[1mmodule.kafka_platform[0].aws_iam_role_policy_attachment.ssm_core: Refreshing state... [id=kafka-dev-lab-dev-toolbox/arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.airflow_runtime_state[0]: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-runtime-state][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.airflow_submit[0]: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-submit][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.airflow_athena: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-athena-query][0m
+[0m[1mmodule.reporting_ops[0].aws_iam_role_policy_attachment.reporting_lake[0]: Refreshing state... [id=kafka-dev-lab-dev-reporting/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-reporting-lake][0m
+[0m[1mmodule.kafka_platform[0].aws_instance.toolbox: Refreshing state... [id=i-0032e89ddcca94cff][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["trino:read"]: Refreshing state... [id=kafka-dev-lab-dev-trino/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["source_lab:secrets"]: Refreshing state... [id=kafka-dev-lab-dev-source-lab/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-secrets-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["airflow:secrets"]: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-secrets-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["trino:secrets"]: Refreshing state... [id=kafka-dev-lab-dev-trino/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-secrets-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["source_lab:bootstrap"]: Refreshing state... [id=kafka-dev-lab-dev-source-lab/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-bootstrap-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["connect:bootstrap"]: Refreshing state... [id=kafka-dev-lab-dev-connect/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-bootstrap-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["athena_bi:read"]: Refreshing state... [id=kafka-dev-lab-dev-athena-bi/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-mart-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["spark_eod:read"]: Refreshing state... [id=kafka-dev-lab-dev-spark-eod/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["spark_stream:read"]: Refreshing state... [id=kafka-dev-lab-dev-spark-stream/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["connect:produce"]: Refreshing state... [id=kafka-dev-lab-dev-connect/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-msk-produce][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["airflow:read"]: Refreshing state... [id=kafka-dev-lab-dev-airflow/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["athena_bi:query"]: Refreshing state... [id=kafka-dev-lab-dev-athena-bi/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-athena-query][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["spark_eod:write"]: Refreshing state... [id=kafka-dev-lab-dev-spark-eod/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-write][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["spark_stream:consume"]: Refreshing state... [id=kafka-dev-lab-dev-spark-stream/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-msk-consume][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["redshift_serverless:read"]: Refreshing state... [id=kafka-dev-lab-dev-redshift-serverless/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["spark_stream:write"]: Refreshing state... [id=kafka-dev-lab-dev-spark-stream/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-lake-write][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["connect:secrets"]: Refreshing state... [id=kafka-dev-lab-dev-connect/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-secrets-read][0m
+[0m[1mmodule.lake_iam[0].aws_iam_role_policy_attachment.workload["connect:consume"]: Refreshing state... [id=kafka-dev-lab-dev-connect/arn:aws:iam::111122223333:policy/kafka-dev-lab-dev-msk-consume][0m
+[0m[1mmodule.cdc_runtime[0].random_password.apicurio_admin: Refreshing state... [id=none][0m
+[0m[1mmodule.source_lab[0].data.aws_ssm_parameter.al2023_ami: Reading...[0m[0m
+[0m[1mmodule.cdc_runtime[0].data.aws_ssm_parameter.al2023_ami: Reading...[0m[0m
+[0m[1mmodule.source_lab[0].random_password.oracle: Refreshing state... [id=none][0m
+[0m[1mmodule.source_lab[0].aws_security_group.source_lab: Refreshing state... [id=sg-0fbe7e21ad05d2a66][0m
+[0m[1mmodule.source_lab[0].random_password.sqlserver: Refreshing state... [id=none][0m
+[0m[1mmodule.source_lab[0].random_password.oracle_cdc: Refreshing state... [id=none][0m
+[0m[1mmodule.source_lab[0].random_password.sqlserver_cdc: Refreshing state... [id=none][0m
+[0m[1mmodule.cdc_runtime[0].aws_security_group.cdc_runtime: Refreshing state... [id=sg-0c3cca142f275d90c][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["verify-artifacts.sh"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/verify-artifacts.sh][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["docker-compose.yml"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/docker-compose.yml][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["create-topics.sh"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/create-topics.sh][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["jmx-connect.yml"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/jmx-connect.yml][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["versions.env"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/versions.env][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["client.properties"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/client.properties][0m
+[0m[1mmodule.source_lab[0].data.aws_ssm_parameter.al2023_ami: Read complete after 0s [id=/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["smoke-test.sh"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/smoke-test.sh][0m
+[0m[1mmodule.cdc_runtime[0].aws_s3_object.bootstrap["connect-worker.properties"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/cdc-runtime/connect-worker.properties][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["sqlserver/03-seed.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/sqlserver/03-seed.sql][0m
+[0m[1mmodule.cdc_runtime[0].data.aws_ssm_parameter.al2023_ami: Read complete after 0s [id=/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["sqlserver/01-init.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/sqlserver/01-init.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["sqlserver/99-verify-cdc.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/sqlserver/99-verify-cdc.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["generators/sqlserver-workload.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/generators/sqlserver-workload.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["oracle/02-enable-cdc.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/oracle/02-enable-cdc.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["oracle/99-verify-cdc.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/oracle/99-verify-cdc.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["oracle/01-init.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/oracle/01-init.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["docker-compose.yml"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/docker-compose.yml][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["healthcheck.sh"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/healthcheck.sh][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["oracle/03-seed.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/oracle/03-seed.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["generators/oracle-workload.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/generators/oracle-workload.sql][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap[".gitkeep"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/.gitkeep][0m
+[0m[1mmodule.source_lab[0].aws_s3_object.bootstrap["sqlserver/02-enable-cdc.sql"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/sqlserver/02-enable-cdc.sql][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.stage2[0]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/stage2.sh][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.helm_values[0]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/values.yaml][0m
+[0m[1mmodule.airflow_k3s[0].data.aws_ami.al2023[0]: Reading...[0m[0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.chart_digest[0]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/chart.sha256][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_plan[0]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/plan.json][0m
+[0m[1mmodule.airflow_k3s[0].random_password.metadata_db[0]: Refreshing state... [id=none][0m
+[0m[1mmodule.airflow_k3s[0].random_password.admin_ui[0]: Refreshing state... [id=none][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["dag_eod_pipeline.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/dag_eod_pipeline.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["common.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/common.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["reporting_common.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/reporting_common.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["streaming_rt_lifecycle.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/streaming_rt_lifecycle.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["dag_recovery.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/dag_recovery.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["dag_l1_stream.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/dag_l1_stream.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["dag_intraday_flows.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/dag_intraday_flows.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["datamart_fulfill.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/datamart_fulfill.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["datamart_stream_batch.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/datamart_stream_batch.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["datamart_eod.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/datamart_eod.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["dag_cdc_health.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/dag_cdc_health.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["summary_plan.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/summary_plan.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.dag["datamart_auto_correct.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/dags/datamart_auto_correct.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["streaming_rt_app.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/streaming_rt_app.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["history.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/history.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["watermark.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/watermark.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["fulfill.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/fulfill.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["metrics.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/metrics.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["runtime_state.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/runtime_state.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["auto_correct_flow.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/auto_correct_flow.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["stream_batch_flow.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/stream_batch_flow.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["dependency_engine.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/dependency_engine.py][0m
+[0m[1mmodule.airflow_k3s[0].data.aws_ami.al2023[0]: Read complete after 1s [id=ami-03a1c252b1de9eacb][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["submitter.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/submitter.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["status.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/status.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["config_loader.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/config_loader.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["gates.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/gates.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["dynamodb_state.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/dynamodb_state.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["coordinator.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/coordinator.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["streaming_rt.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/streaming_rt.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["emr_dbt_bootstrap.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/emr_dbt_bootstrap.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["__init__.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/__init__.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["stream_batch.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/stream_batch.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["plan.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/plan.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["auto_correct.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/auto_correct.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["run_dbt_job.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/run_dbt_job.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["fulfill_flow.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/fulfill_flow.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["dataset_gates.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/dataset_gates.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["eod_flow.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/eod_flow.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["graph.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/graph.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["manifest_sync.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/manifest_sync.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["models.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/models.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["source_resolver.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/source_resolver.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["ops_client.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/ops_client.py][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.reporting_package["business_calendar.py"]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/bootstrap/airflow/reporting/package/business_calendar.py][0m
+[0m[1mmodule.cdc_runtime[0].aws_ssm_parameter.apicurio_admin_password: Refreshing state... [id=/kafka-dev-lab/dev/cdc-runtime/apicurio-admin-password][0m
+[0m[1mmodule.source_lab[0].aws_ssm_parameter.oracle_cdc_password: Refreshing state... [id=/kafka-dev-lab/dev/source-lab/oracle-cdc-password][0m
+[0m[1mmodule.source_lab[0].aws_ssm_parameter.oracle_password: Refreshing state... [id=/kafka-dev-lab/dev/source-lab/oracle-password][0m
+[0m[1mmodule.source_lab[0].aws_ssm_parameter.sqlserver_password: Refreshing state... [id=/kafka-dev-lab/dev/source-lab/sqlserver-sa-password][0m
+[0m[1mmodule.source_lab[0].aws_ssm_parameter.sqlserver_cdc_password: Refreshing state... [id=/kafka-dev-lab/dev/source-lab/sqlserver-cdc-password][0m
+[0m[1mmodule.cdc_runtime[0].aws_vpc_security_group_ingress_rule.jmx_from_toolbox: Refreshing state... [id=sgr-05d47d171b4037ad9][0m
+[0m[1mmodule.cdc_runtime[0].aws_vpc_security_group_ingress_rule.msk_from_cdc_runtime: Refreshing state... [id=sgr-0579cbc38f2540286][0m
+[0m[1mmodule.cdc_runtime[0].aws_vpc_security_group_ingress_rule.apicurio_metrics_from_toolbox: Refreshing state... [id=sgr-0be958e7603e6da9f][0m
+[0m[1mmodule.airflow_k3s[0].aws_security_group.this[0]: Refreshing state... [id=sg-0b5ffd09844c4f054][0m
+[0m[1mmodule.airflow_k3s[0].aws_s3_object.log_prefix[0]: Refreshing state... [id=kafka-dev-lab-dev-lake-111122223333/logs/airflow/][0m
+[0m[1mmodule.cdc_runtime[0].aws_instance.cdc_runtime: Refreshing state... [id=i-03d15623919758e54][0m
+[0m[1mmodule.airflow_k3s[0].aws_ssm_parameter.metadata_db_password[0]: Refreshing state... [id=/kafka-dev-lab/dev/airflow/metadata-db-password][0m
+[0m[1mmodule.airflow_k3s[0].aws_ssm_parameter.admin_ui_password[0]: Refreshing state... [id=/kafka-dev-lab/dev/airflow/admin-password][0m
+[0m[1mmodule.source_lab[0].aws_instance.source_lab: Refreshing state... [id=i-0ba6b24241bb01eda][0m
+[0m[1maws_vpc_security_group_ingress_rule.sqlserver_from_cdc_runtime[0]: Refreshing state... [id=sgr-06b86c9109c73644a][0m
+[0m[1maws_vpc_security_group_ingress_rule.oracle_from_cdc_runtime[0]: Refreshing state... [id=sgr-0400140e3e866ff94][0m
+[0m[1mmodule.airflow_k3s[0].aws_vpc_security_group_egress_rule.https[0]: Refreshing state... [id=sgr-09a99a9dc595d8d88][0m
+[0m[1mmodule.airflow_k3s[0].aws_vpc_security_group_ingress_rule.from_toolbox[0]: Refreshing state... [id=sgr-0b594ba4f424bf0de][0m
+[0m[1mmodule.airflow_k3s[0].aws_instance.this[0]: Refreshing state... [id=i-0cb002bb46458d9b6][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [33m~[0m update in-place[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.data_lake.aws_s3_object.prefix["logs/airflow/"][0m will be updated in-place
+[0m  [33m~[0m[0m resource "aws_s3_object" "prefix" {
+        id                            = "kafka-dev-lab-dev-lake-111122223333/logs/airflow/"
+      [33m~[0m[0m tags                          = {
+          [31m-[0m[0m "Component" = "airflow" [90m-> null[0m[0m
+          [31m-[0m[0m "Name"      = "kafka-dev-lab-dev-airflow" [90m-> null[0m[0m
+        }
+      [33m~[0m[0m tags_all                      = {
+          [31m-[0m[0m "Component"        = "airflow" [90m-> null[0m[0m
+          [31m-[0m[0m "Name"             = "kafka-dev-lab-dev-airflow" [90m-> null[0m[0m
+            [90m# (6 unchanged elements hidden)[0m[0m
+        }
+        [90m# (27 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.source_lab[0].aws_s3_object.bootstrap["docker-compose.yml"][0m will be updated in-place
+[0m  [33m~[0m[0m resource "aws_s3_object" "bootstrap" {
+        id                            = "kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/docker-compose.yml"
+      [33m~[0m[0m source_hash                   = "b310a40d5c3b1f81626d01a5b78e1298" [33m->[0m[0m "5f001a40169688df0004630c0ec7d0cf"
+      [33m~[0m[0m tags                          = {
+          [32m+[0m[0m "Component" = "source-lab-bootstrap"
+        }
+      [33m~[0m[0m tags_all                      = {
+          [32m+[0m[0m "AutoDestroyAfter" = "2026-08-25T00:00:00Z"
+          [32m+[0m[0m "Component"        = "source-lab-bootstrap"
+          [32m+[0m[0m "CostCenter"       = "learning"
+          [32m+[0m[0m "Environment"      = "dev"
+          [32m+[0m[0m "ManagedBy"        = "Terraform"
+          [32m+[0m[0m "Owner"            = "my-aws-profile"
+          [32m+[0m[0m "Project"          = "kafka-dev-lab"
+        }
+      [33m~[0m[0m version_id                    = "3qeuDIjnLQ9OmjLJkrPVDbPHttb.Hzyw" -> (known after apply)
+        [90m# (26 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.source_lab[0].aws_s3_object.bootstrap["generators/oracle-workload.sql"][0m will be updated in-place
+[0m  [33m~[0m[0m resource "aws_s3_object" "bootstrap" {
+        id                            = "kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/generators/oracle-workload.sql"
+      [33m~[0m[0m source_hash                   = "aaaedc7a81c50f37fea5f9c1b0e3a0c0" [33m->[0m[0m "d539c93b05b4f2a40be292ccdd602fff"
+      [33m~[0m[0m tags                          = {
+          [32m+[0m[0m "Component" = "source-lab-bootstrap"
+        }
+      [33m~[0m[0m tags_all                      = {
+          [32m+[0m[0m "AutoDestroyAfter" = "2026-08-25T00:00:00Z"
+          [32m+[0m[0m "Component"        = "source-lab-bootstrap"
+          [32m+[0m[0m "CostCenter"       = "learning"
+          [32m+[0m[0m "Environment"      = "dev"
+          [32m+[0m[0m "ManagedBy"        = "Terraform"
+          [32m+[0m[0m "Owner"            = "my-aws-profile"
+          [32m+[0m[0m "Project"          = "kafka-dev-lab"
+        }
+      [33m~[0m[0m version_id                    = "U9cKQUZ9TUN5gtNUlJ3YkYUOoHuw8xLk" -> (known after apply)
+        [90m# (26 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # module.source_lab[0].aws_s3_object.bootstrap["generators/sqlserver-workload.sql"][0m will be updated in-place
+[0m  [33m~[0m[0m resource "aws_s3_object" "bootstrap" {
+        id                            = "kafka-dev-lab-dev-lake-111122223333/bootstrap/source-lab/generators/sqlserver-workload.sql"
+      [33m~[0m[0m source_hash                   = "c988f218fe4f909bb34277b824eff86e" [33m->[0m[0m "8afd8858dc8594e7061fb44cf6df8ed9"
+      [33m~[0m[0m tags                          = {
+          [32m+[0m[0m "Component" = "source-lab-bootstrap"
+        }
+      [33m~[0m[0m tags_all                      = {
+          [32m+[0m[0m "AutoDestroyAfter" = "2026-08-25T00:00:00Z"
+          [32m+[0m[0m "Component"        = "source-lab-bootstrap"
+          [32m+[0m[0m "CostCenter"       = "learning"
+          [32m+[0m[0m "Environment"      = "dev"
+          [32m+[0m[0m "ManagedBy"        = "Terraform"
+          [32m+[0m[0m "Owner"            = "my-aws-profile"
+          [32m+[0m[0m "Project"          = "kafka-dev-lab"
+        }
+      [33m~[0m[0m version_id                    = "gLopueVc8A6n36_kZ6nsxq3PPobfBsDK" -> (known after apply)
+        [90m# (26 unchanged attributes hidden)[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 4 to change, 0 to destroy.
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mCheck block assertion failed[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  on main.tf line 95, in check "cost_guardrails":
+[33m│[0m [0m  95:     condition     = [4mvar.monthly_budget_usd <= 50[0m[0m
+[33m│[0m [0m    [90m├────────────────[0m
+[33m│[0m [0m[0m    [90m│[0m [1mvar.monthly_budget_usd[0m is 100
+[33m│[0m [0m[0m
+[33m│[0m [0mmonthly_budget_usd exceeds the $50 budget of record (ADR-030, amended
+[33m│[0m [0m2026-08-23).
+[33m╵[0m[0m
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+Releasing state lock. This may take a few moments...
+-------------------------------------------------------------------------------
+cost drivers in the saved plan
+-------------------------------------------------------------------------------
+  0 to add, 4 to change, 0 to destroy
+  hourly while running : $0.0000/hr
+  6-hour window        : $0.00
+  30 days 24/7         : $0.00
+  KMS CMKs (floor)     : $0.00/month
+  EBS provisioned      : 0 GiB   (bills even while an instance is STOPPED)
+  EMR Serverless apps  : 0   (bills only while a job runs; not in the hourly above)
+  NAT gateways         : 0   (CLAUDE.md 4.2 requires 0)
+  Secrets Manager      : 0   (ADR-031 requires 0)

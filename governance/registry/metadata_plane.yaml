@@ -1,0 +1,149 @@
+# The metadata plane: WHERE DataHub runs, WHICH environment it speaks for, and what happens
+# when it is unreachable.
+#
+# THREE MODES, AND `disabled` IS A REAL ONE
+# ------------------------------------------
+#   disabled     no metadata plane. Publishing is a no-op that RECORDS what it would have
+#                sent. This is the lab_low_cost default, and it is not a degraded `local`:
+#                every caller must work correctly with the plane switched off, or the
+#                platform has taken a dependency on a catalogue.
+#   local        an on-demand quickstart on the workstation. Started by hand, stopped by
+#                hand, $0 in AWS. No public exposure, no data leaves the machine.
+#   production   a resident deployment. DESIGNED in docs/DATAHUB_ARCHITECTURE.md and NOT
+#                BUILT -- `enable_datahub` stays false until DRP0 open question 3 (can the
+#                k3s node host it under lab_low_cost?) is answered with a measurement.
+#
+# VERSIONS ARE RESOLVED, NOT CHOSEN
+# ----------------------------------
+# Every pin below was read from the registry on 2026-09-30 and carries its evidence.
+# CLAUDE.md §3.9 forbids `latest`, and docs/VERSIONS.md records what pinning from
+# expectation already cost this project once.
+
+version: 1
+updated: 2026-09-30
+
+metadata_plane:
+  # lab_low_cost (CLAUDE.md §4.1). Raising this to `local` is a deliberate act; raising it
+  # to `production` additionally requires the flag, the sizing evidence and an approval.
+  mode: disabled
+
+  # DataHub is the ONLY primary catalog/metadata/lineage/governance platform (ADR-087).
+  # OpenMetadata is never deployed in parallel; if DataHub fails a hard requirement, a
+  # comparison ADR is written and the programme STOPS there.
+  platform: datahub
+
+environments:
+  # `fabric` is the DataHub environment component of every URN. Two environments must never
+  # share one, or a dev lineage edge lands on a prod dataset and the graph quietly becomes
+  # a lie about production.
+  dev:
+    fabric: DEV
+    namespace: cdc-lakehouse-dev
+    aws_environment: dev
+  test:
+    fabric: QA
+    namespace: cdc-lakehouse-test
+    aws_environment: test
+  prod:
+    fabric: PROD
+    namespace: cdc-lakehouse-prod
+    aws_environment: prod
+
+# This deployment. Everything the client emits carries this environment's fabric, and the
+# client REFUSES a URN carrying any other one.
+active_environment: dev
+
+versions:
+  # Resolved 2026-09-30 from hub.docker.com. v1.7.0.1 is the newest STABLE 1.7 server image;
+  # v1.8.0rc* are pre-release and v1.6.0.3 is a backport patch on the older line.
+  server:
+    image_tag: v1.7.0.1
+    released: 2026-09-03
+    images:
+      acryldata/datahub-gms: sha256:74e15e982b94d0e147de41d05133ef3df48f74a1004a9c997805e0aa7e010173
+      acryldata/datahub-frontend-react: sha256:99513cc1c45e4cc053ceb0f9aeb04a3263a8a747907bb0e85cac2eb03461310d
+      acryldata/datahub-actions: sha256:c5fd70130157b2b76a05f49aba0c6fec56e2921395219ef8b154503e72fd4b90
+  # Resolved 2026-09-30 from pypi.org. The CLI and the server images are published on
+  # INDEPENDENT patch cadences within one line: the newest CLI is 1.7.0.13 and the newest
+  # server image is v1.7.0.1, and there is no 1.7.0.1 on PyPI at all. "Same release line"
+  # therefore means the same 1.7.0 minor, which is what `metadata_plane.py` checks.
+  cli:
+    package: acryl-datahub
+    version: 1.7.0.13
+    requires_python: ">=3.10"
+
+# What happens when the metadata plane is unreachable.
+#
+# BEST_EFFORT   record the failure, increment a counter, CONTINUE. The business data is
+#               already committed and correct; failing the job would turn a catalogue
+#               outage into a data outage.
+# REQUIRED      fail the task. Only for work whose ENTIRE PURPOSE is metadata -- if the
+#               ingestion workflow cannot reach DataHub it has done nothing, and reporting
+#               success would make a stale catalogue look fresh.
+outage_policy:
+  default: BEST_EFFORT
+  by_flow:
+    full_cdc_ingestion: BEST_EFFORT
+    realtime_materialize: BEST_EFFORT
+    eod_build: BEST_EFFORT
+    dbt_spark_build: BEST_EFFORT
+    auto_correct: BEST_EFFORT
+    fulfill: BEST_EFFORT
+    stream_batch: BEST_EFFORT
+    streaming_rt: BEST_EFFORT
+    iceberg_maintenance: BEST_EFFORT
+    # The metadata ingestion workflow itself.
+    metadata_ingestion: REQUIRED
+    # Impact analysis reads the lineage graph. With the plane down it cannot know the blast
+    # radius, and a recovery planned on a guess is worse than no plan (DRP8/DRP9).
+    lineage_impact: REQUIRED
+
+client:
+  # Wall-clock per request. Short on purpose: a metadata publish sitting behind a 60s
+  # timeout inside a Spark task turns a catalogue outage into a pipeline slowdown.
+  timeout_seconds: 10
+  # BOUNDED. 3 attempts with exponential backoff, then give up and record it. Unbounded
+  # retry against a service that is down is how a BEST_EFFORT publish becomes a hang.
+  max_attempts: 3
+  backoff_seconds: 0.5
+  backoff_multiplier: 2.0
+  # Default true everywhere. A publish has to be asked for explicitly, in the same way every
+  # AWS-mutating script in this repository defaults to a dry run (docs/APPROVAL_GATES.md).
+  dry_run: true
+
+auth:
+  # NEVER a literal. The token is read from this environment variable at runtime, and the
+  # config loader REFUSES a config that contains an inline token (CLAUDE.md §3.1, §3.6).
+  token_env: DATAHUB_GMS_TOKEN
+  # For `production`, the same secret is sourced from SSM SecureString / Secrets Manager and
+  # injected as this variable. It is never a Terraform output in plaintext.
+  token_ssm_parameter: /kafka-dev-lab/dev/datahub/gms-token
+  gms_url_env: DATAHUB_GMS_URL
+
+local:
+  # The OFFICIAL deployment path for this version, driven by the pinned CLI rather than a
+  # hand-maintained compose file that would drift from upstream on every release.
+  command: datahub docker quickstart --version v1.7.0.1
+  gms_url: http://localhost:8080
+  frontend_url: http://localhost:9002
+  # Measured requirement of the quickstart profile, checked by scripts/datahub-local.sh
+  # before it starts anything. A quickstart that OOMs halfway leaves a half-initialised
+  # metadata store, which looks like a DataHub bug and is not one.
+  min_memory_gb: 10
+  min_disk_gb: 20
+  # Binds to localhost only. No published port reaches a network interface, and no
+  # inbound security-group rule exists anywhere in this mode (CLAUDE.md §3.3).
+  bind: 127.0.0.1
+
+production:
+  # DESIGN ONLY -- nothing below is provisioned. docs/DATAHUB_ARCHITECTURE.md §4.
+  enable_datahub: false
+  networking: private_only
+  ingress: ssm_port_forward
+  tls: required
+  authentication: required
+  secret_source: ssm_securestring
+  metadata_store: persistent_volume
+  backup: required
+  health_check: /health
+  blocked_until: "DRP0 open question 3 — k3s node sizing under lab_low_cost"

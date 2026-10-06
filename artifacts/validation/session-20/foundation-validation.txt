@@ -1,0 +1,87 @@
+# Session 20 — FOUNDATION VALIDATION EVIDENCE
+Date 2026-08-15 | Account 111122223333 | Region ap-southeast-1 | Workspace default
+enable_kafka_platform = false  (MSK never created)
+
+## Validation suite
+make check-all : 14/14 static checks PASS, 417/417 tests PASS, shellcheck clean (severity=warning)
+
+## Athena FOUNDATION tests (no Iceberg tables required) — ALL PASS
+F-01 SELECT 1                          SUCCEEDED   0 bytes
+F-02 SHOW DATABASES                    SUCCEEDED   0 bytes
+F-03 information_schema.schemata       SUCCEEDED 266 bytes  -> all 7 project DBs returned
+F-04 information_schema.tables         SUCCEEDED   0 bytes
+Reference execution 4728501e-987a-4e5e-91af-18085cb7b017:
+  workgroup used   : kafka-dev-lab-dev-wg   (deployed one, not primary)
+  result object    : query-results/athena/4728501e-....csv (207 B) + .metadata (84 B)
+  result encryption: aws:kms  key/c449919b-f71a-485b-948e-9724d10d40d3  (the lake CMK)
+  => proves the KMS key-policy grant to athena.amazonaws.com with kms:CallerAccount works live
+
+## Workgroup enforcement — PROVEN, not merely configured
+BytesScannedCutoffPerQuery = 10737418240 (10 GiB); EnforceWorkGroupConfiguration = true
+Safe test: client passed OutputLocation=s3://.../ATTEMPTED-OVERRIDE/
+Result   : exec 16c1ac33-7e4e-46f2-bbed-b10adf591701 SUCCEEDED, written to query-results/athena/
+=> the client override was DISCARDED by the workgroup. The same enforcement flag governs the
+   bytes-scanned cutoff, so the cutoff is enforced too. No large scan was billed to prove it.
+
+## DEFECT F2 (found and FIXED this session)
+serving/athena/queries/*.sql hardcode UNPREFIXED schema names (stream, mart, full_cdc) but the
+deployed Glue databases are kafka_dev_lab_dev_*. All 6 failed SCHEMA_NOT_FOUND and would have
+kept failing even after Spark created the tables - the suite could never have passed anywhere.
+Proof of root cause:
+  stream.oracle_corebank_customer                   -> SCHEMA_NOT_FOUND
+  kafka_dev_lab_dev_stream.oracle_corebank_customer -> TABLE_NOT_FOUND  (exec bf67ef54-...)
+Fix: scripts/athena-smoke.sh substitutes the prefix from `terraform output glue_databases`,
+so the SQL stays environment-agnostic instead of hardcoding dev names into version control.
+
+## 6 smoke queries AFTER the F2 fix — all reach the real catalog
+01_layer_smoke.sql        eb3f83b0-5e95-494c-8504-243aa9f2ce89  FAILED  0  BLOCKED_BY_DESIGN
+02_partition_pruning.sql  6186959d-9502-4c8d-9ba3-f0e2dda397db  FAILED  0  BLOCKED_BY_DESIGN
+03_join_aggregate.sql     25b22c14-af1e-4fb0-8a32-033ca73b8575  FAILED  0  BLOCKED_BY_DESIGN
+04_iceberg_metadata.sql   c341e1f9-1af6-41d0-8901-eccc2e45acb8  FAILED  0  BLOCKED_BY_DESIGN
+05_reconciliation.sql     9d066ca8-5538-4878-8976-b2e94099f8a6  FAILED  0  BLOCKED_BY_DESIGN
+06_bi_role_security.sql   46dd04a0-bcc9-4da9-8e2d-55fb4f5d42c6  FAILED  0  BLOCKED_BY_DESIGN
+Every one now resolves its SCHEMA against Glue and fails only on the missing TABLE.
+0 bytes scanned across all six => $0.00 Athena cost for the entire smoke run.
+
+## CloudWatch log groups
+project log groups (kafka-dev-lab) : 0   (correct - no compute deployed)
+infinite-retention groups          : 3   ALL pre-existing and unrelated (OPEN-26)
+  /aws-glue/crawlers                        95,437 B
+  /aws/codebuild/airflow-dev-pipeline      638,378 B
+  /aws/codebuild/airflow-staging-pipeline  800,856 B
+total 1.53 MB at $0.03/GB-month = $0.00005/month. Remediation NOT required for the
+foundation; they belong to other projects and were not modified.
+
+## Terraform drift (re-run after all checks)
+detailed-exitcode = 0 ; "No changes. Your infrastructure matches the configuration."
+actions: {('no-op',): 32}   unexpected CREATE 0 | REPLACE 0 | DESTROY 0 | drift 0
+
+## PROJECT billable inventory (11 tagged resources)
+TYPE                               QTY  HOURLY     MONTHLY_IDLE   BILLS_WHILE_IDLE
+KMS customer managed key (lake)    1    $0.0000    $1.00          YES - flat per key-month
+S3 lake bucket (13 x 0-byte)       1    $0.0000    ~$0.00         yes, by stored GB (~0 now)
+S3 state bucket (~100 KB)          1    $0.0000    ~$0.01         yes, by stored GB
+Glue catalog databases             7    $0.0000    $0.00          no - free tier (1M objects)
+Athena workgroup                   1    $0.0000    $0.00          NO - bills bytes scanned only
+AWS Budget (standard)              1    $0.0000    $0.00          no - BudgetsUsage $0/budget-day
+  ------------------------------------------------------------------
+PROJECT TOTAL                      12   $0.0000/hr ~$1.01/mo     
+  => The foundation idle cost IS approximately the lake KMS CMK alone ($1.00 of ~$1.01).
+  => Nothing in the foundation bills by the hour. No MSK, EC2, EMR, NAT, EKS, RDS, LB.
+
+## UNRELATED account resources (NOT this project)
+  Tax 0.02                                       $0.02
+  AmazonCloudWatch 0                             $0
+  Amazon Simple                                  $0.1529025841
+  Amazon Simple                                  $0
+  Amazon Simple                                  $0
+  Amazon GuardDuty                               $0.0236956
+  Amazon EC2                                     $0.0296349516
+  Amazon DynamoDB                                $0
+  account MTD total: $0.2463  (44 pre-existing buckets, ECR, GuardDuty, tax)
+
+## Cost Explorer cross-check
+  AWS Key Management Service MTD = $0.00 - the lake CMK was created TODAY and has not
+  yet accrued. Expect ~$1.00 to appear on the next billing cycle. This is the same
+  propagation window as defect F1 and is why the project cost cannot be confirmed
+  against Cost Explorer today.

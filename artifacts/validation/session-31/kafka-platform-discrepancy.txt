@@ -1,0 +1,41 @@
+PHASE 12 — enable_kafka_platform discrepancy, resolved from evidence
+Collected 2026-08-20. Read-only: sts, terraform state, s3api, kafka, dynamodb,
+emr-serverless, kms, cloudtrail, resourcegroupstaggingapi. No mutation.
+
+IDENTITY
+  profile my-aws-profile / account 111122223333 / arn user/my-aws-profile
+  region ap-southeast-1 / environment dev / workspace default
+
+THE CLAIM UNDER TEST
+  DECISION_LOG O22-2: "tfvars true, applied tier ran false"
+  PROJECT_STATE:      "MSK never created - enable_kafka_platform=false"
+
+WHAT THE EVIDENCE SHOWS
+  terraform.tfvars:86      enable_kafka_platform = true
+  terraform state list     3 resources (caller_identity, budget, lake bucket)
+  live MSK clusters        0
+  live DynamoDB tables     0
+  live EMR applications    1, state=TERMINATED (kafka-dev-lab-dev-spark)
+  live KMS CMKs tagged     2, both PendingDeletion, scheduled 2026-08-23
+  CloudTrail CreateCluster 2026-08-16T09:21:31Z  user my-aws-profile
+  CloudTrail DeleteCluster 2026-08-16T10:58:14Z  user my-aws-profile
+  state object versions    587,338 B at 09:44  ->  16,226 B at 11:03
+
+CONCLUSION
+  The flag was HONOURED, not ignored. The full platform - MSK included - was applied
+  on 2026-08-16 at 09:21 UTC and destroyed the same morning at 10:58-11:03 UTC, a
+  window of about 1h37m. The state file shrinking from 587 KB to 16 KB across that
+  window is the destroy, resource by resource.
+
+  The two documents above are STALE, not wrong at the time: they describe the
+  Session 20 cheap tier applied on 2026-08-15, before the 08-16 apply/destroy cycle.
+  'enable_kafka_platform=false' was true of the 08-15 tier and has not been true since.
+
+  Nothing is drifted. State and reality agree: 3 resources in state, and the two
+  buckets plus two expiring KMS keys that survive a destroy by design.
+
+ORPHANS - in AWS, not in state
+  arn:aws:emr-serverless:...:/applications/00g81hc564122m25  TERMINATED, $0
+  arn:aws:kms:...:key/c449919b...  PendingDeletion 2026-08-23  $1/month until then
+  arn:aws:kms:...:key/a3f3f553...  PendingDeletion 2026-08-23  $1/month until then
+  None of these is recreated by a plan; the two CMKs are replaced by new keys.

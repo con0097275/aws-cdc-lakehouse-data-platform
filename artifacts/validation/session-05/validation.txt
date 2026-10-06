@@ -1,0 +1,56 @@
+# Session 05 — validation transcript
+# Captured: 2026-08-14T07:24:48Z
+
+=== LIVE AWS STATE (this is why correctness could not be demonstrated) ===
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+  MSK clusters : 0
+
+  EC2 running  : 0
+  state bucket : DOES NOT EXIST
+
+=== STATIC VALIDATION OF CONNECTOR TEMPLATES ===
+
+  corebank-source.json.tmpl
+    valid JSON                : yes (62 keys)
+    password fields           : ['database.password']
+    plaintext passwords       : NONE - all ${ssm:...}
+    transforms configured     : '' (empty = envelope preserved)
+    decimal.handling.mode     : precise
+    tombstones.on.delete      : true
+    snapshot.mode             : initial
+    message.key.columns set   : True
+    DLQ topic                 : cdc.dlq.oracle
+    schema history topic      : cdc.oracle.schema-history
+    heartbeat.interval.ms     : 30000
+
+  digital-source.json.tmpl
+    valid JSON                : yes (52 keys)
+    password fields           : ['database.password']
+    plaintext passwords       : NONE - all ${ssm:...}
+    transforms configured     : '' (empty = envelope preserved)
+    decimal.handling.mode     : precise
+    tombstones.on.delete      : true
+    snapshot.mode             : initial
+    message.key.columns set   : True
+    DLQ topic                 : cdc.dlq.sqlserver
+    schema history topic      : cdc.sqlserver.schema-history
+    heartbeat.interval.ms     : 30000
+
+=== SHELL SYNTAX ===
+  ok   scripts/cdc-correctness-test.sh
+  ok   scripts/register-connectors.sh
+
+=== render against the unapplied stack (must fail CLEANLY, not crash) ===
+WARNING: Terraform outputs are empty — the stack is not applied.
+WARNING:   source_lab.private_ip                    = <empty>
+WARNING:   cdc_runtime.registry_url_internal        = <empty>
+WARNING:   kafka_platform.msk_bootstrap_brokers...  = <empty>
+REFUSING: cannot render connector config against an unapplied stack
+
+=== CORRECTNESS TESTS ===
+  NOT RUN. All six require a live MSK cluster, live source databases and a live
+  Connect worker. None exist. See docs/CDC_CONTRACT_IMPLEMENTATION.md section 6.

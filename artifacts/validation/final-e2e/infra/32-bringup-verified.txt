@@ -1,0 +1,47 @@
+INFRA BRING-UP VERIFIED — 2026-09-03T09:22:36Z
+Window start (true): 2026-09-03T09:06:04Z
+==========================================================
+
+COMPONENT                STATE
+MSK                      ACTIVE, 3 brokers, 3.9.x.kraft
+EC2 x4                   toolbox / source-lab / airflow / cdc-runtime  running
+cloud-init               done on source-lab AND cdc-runtime (09:21:37Z)
+source-oracle            healthy, ARCHIVELOG, FREEPDB1 READ WRITE
+source-sqlserver         healthy, Agent running, 4 tables tracked by CDC
+cdc-connect              healthy, REST answering (09:21:38Z)
+cdc-apicurio             healthy
+connectors               none deployed yet (expected at this stage)
+EMR Serverless           CREATED (00g8g05ud5dj2u25), ARM64, auto-stop 15m
+Airflow node             running (i-00922848a1b86b84c)
+DynamoDB                 4 tables
+Glue                     7 project databases
+Athena                   kafka-dev-lab-dev-wg ENABLED
+S3 lake                  intact, 1585 pre-existing objects preserved
+IAM                      11 roles incl. ai-knowledge-base, reporting
+CloudWatch               9 alarms (2 ALARM: stale pre-ACTIVE controller, no reporting run yet)
+NAT                      0   <- required
+
+CREDENTIAL CHAIN (hash-compared, secrets never printed)
+  oracle_cdc_password     SSM d7b1321f = .env d7b1321f = connect-secrets d7b1321f
+  sqlserver_cdc_password  SSM ebc12439 = .env ebc12439 = connect-secrets ebc12439
+  secrets file            0600, uid 1000 (Session 40 chown fix present)
+
+DEFECT FOUND AND CLEARED THIS WINDOW
+  enable-cdc restarts Oracle for ARCHIVELOG, then calls cdc_users_reconcile
+  immediately. The reconcile hit ORA-12514 (listener had not re-registered
+  service FREE), and its '|| true' swallowed the failure, so
+  ALTER USER c##dbzuser IDENTIFIED BY <cdc-pw> never ran. The verify caught it.
+  Cleared with the repo's own script, reconcile-only mode, no restart:
+      bash /opt/source-lab/healthcheck.sh --init
+  Re-verified via scripts/source-lab.sh status: ALL CHECKS PASSED.
+
+OPEN OPERATIONAL ISSUES
+  1. auto_destroy_after = 2026-08-25T00:00:00Z is EXPIRED. All resources carry an
+     already-expired AutoDestroyAfter tag; ADR-027 gives no protection this window.
+     A wall-clock alarm is the only thing that brings this lab down.
+  2. cdc-window-start.sh reported CDC_WINDOW_START_TIME 2026-08-16T09:53:12Z from a
+     stale stamp in artifacts/validation/session-21/. True start is 09:06:04Z.
+  3. That script's burn constant (1.1244/hr) predates the Glue endpoint and the
+     airflow/reporting resources. Actual baseline is 1.2340/hr.
+  4. cdc-window-start.sh treats 'SSM Online' as node readiness; it passed the
+     operator through to a node whose user-data was still staging /opt/source-lab.

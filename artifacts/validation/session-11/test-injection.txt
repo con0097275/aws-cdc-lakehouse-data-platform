@@ -1,0 +1,23 @@
+# Do the dbt tests catch duplicate grain / SCD overlap / bad FK?  YES.
+#
+# Each defect was INJECTED into the seeded Iceberg tables and `dbt test` re-run. The
+# warehouse was restored between cases.
+
+=== injected: dup_grain (same transaction_id twice) ===
+ 3 of 40 FAIL 1 assert_mart_reconciles_to_fact
+40 of 40 FAIL 1 source_unique_curated_fact_transaction_transaction_id
+
+=== injected: scd_overlap (second overlapping version for C1) ===
+ 5 of 40 FAIL 1 assert_scd2_no_overlapping_validity
+ 6 of 40 FAIL 1 assert_scd2_one_current_row_per_key
+
+=== injected: bad_fk (fact customer_sk=777, no dimension row) ===
+ 3 of 40 FAIL 1 assert_mart_reconciles_to_fact
+35 of 40 FAIL 1 source_relationships_curated_fact_transaction_customer_sk__customer_sk__source_curated_dim_customer_
+
+=== injected: null_valid_to (effective_to IS NULL) ===
+ 4 of 40 FAIL 1 assert_scd2_effective_to_never_null
+25 of 40 FAIL 1 source_not_null_curated_dim_customer_effective_to
+
+# All four caught, each by the test that names the defect. Acceptance criterion
+# "Tests catch duplicate grain/SCD overlap/bad FK" = PASS with evidence.

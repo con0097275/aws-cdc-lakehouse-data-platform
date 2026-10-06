@@ -1,0 +1,1 @@
+VERIFY OK: target/reporting/plan.json

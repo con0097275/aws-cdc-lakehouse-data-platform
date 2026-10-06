@@ -1,0 +1,10 @@
+{
+  "connector_running": {"observed": "RUNNING", "note": "sqlserver-digital-source, task 0 RUNNING"},
+  "snapshot_complete": {"observed": true, "note": "changes_only: table created live and captured from creation, so no pre-capture history exists"},
+  "topic_has_events": {"observed": 6, "note": "cdc.sqlserver.digital.dbo.payment_method end-offsets, incl. tombstone"},
+  "full_cdc_rows": {"observed": 5, "note": "c=3 u=1 d=1; typed payload, hex LSN ordering"},
+  "lag_within_sla": {"observed": true, "note": "ingested within minutes of the source change; SLA 60m"},
+  "realtime_rows": {"observed": 5, "note": "rolling_hours window, lower bound 14:01:09 = 72h back"},
+  "eod_status": {"observed": "CERTIFIED", "note": "COB 2026-09-10, ops.eod_run, dq PASS recon PASS"},
+  "reconciliation": {"observed": true, "note": "independent Athena count below cutoff_utc: 3 keys - 1 delete = 2 rows; EOD wrote 2"}
+}

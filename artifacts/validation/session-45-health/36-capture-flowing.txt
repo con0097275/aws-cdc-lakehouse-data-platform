@@ -1,0 +1,29 @@
+=== Kafka end offsets per CDC topic
+  cdc.oracle.COREBANK.ACCOUNT                    320
+  cdc.oracle.COREBANK.BRANCH                     4
+  cdc.oracle.COREBANK.CUSTOMER                   200
+  cdc.oracle.COREBANK.LOAN                       50
+  cdc.oracle.COREBANK.TRANSACTION                2000
+  cdc.sqlserver.digital.dbo.app_user             150
+  cdc.sqlserver.digital.dbo.channel              4
+  cdc.sqlserver.digital.dbo.digital_event        3000
+  cdc.sqlserver.digital.dbo.merchant             50
+  cdc.sqlserver.digital.dbo.payment_method       50
+
+=== Apicurio registered schemas
+count= 28
+    cdc.oracle.COREBANK.ACCOUNT-value
+    cdc.oracle.COREBANK.BRANCH-value
+    cdc.oracle.COREBANK.CUSTOMER-value
+    cdc.oracle.COREBANK.LOAN-value
+    cdc.oracle.COREBANK.TRANSACTION-value
+    cdc.sqlserver.digital.dbo.app_user-value
+    cdc.sqlserver.digital.dbo.channel-value
+    cdc.sqlserver.digital.dbo.digital_event-value
+    cdc.sqlserver.digital.dbo.merchant-value
+    cdc.sqlserver.digital.dbo.payment_method-value
+    __debezium-heartbeat.cdc.oracle-value
+    __debezium-heartbeat.cdc.sqlserver-value
+    cdc.oracle.COREBANK.ACCOUNT-key
+    cdc.oracle.COREBANK.BRANCH-key
+

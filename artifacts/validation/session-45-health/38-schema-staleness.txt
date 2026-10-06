@@ -1,0 +1,23 @@
+=== globalIds inside the DEPLOYED schemas.json (17 Sep)
+   keys sample: ['by_global_id', 'by_topic']
+   total keys : 2
+=== globalIds Apicurio serves NOW
+    cdc.oracle.COREBANK.ACCOUNT-value globalId None
+    cdc.oracle.COREBANK.BRANCH-value globalId None
+    cdc.oracle.COREBANK.CUSTOMER-value globalId None
+    cdc.oracle.COREBANK.LOAN-value globalId None
+    cdc.oracle.COREBANK.TRANSACTION-value globalId None
+    cdc.sqlserver.digital.dbo.app_user-value globalId None
+    cdc.sqlserver.digital.dbo.channel-value globalId None
+    cdc.sqlserver.digital.dbo.digital_event-value globalId None
+    cdc.sqlserver.digital.dbo.merchant-value globalId None
+    cdc.sqlserver.digital.dbo.payment_method-value globalId None
+    cdc.oracle-value globalId None
+    cdc.sqlserver-value globalId None
+
+=== code artifacts deployed today
+2026-09-20 17:03:02     121916 cdc-framework.zip
+2026-09-20 17:03:04      28712 full_cdc_stream_job.py
+2026-09-20 17:03:04      14834 per_table.py
+2026-09-20 17:03:08      11469 provision_cdc_tables.py
+2026-09-10 17:04:58       8157 register_tables.py

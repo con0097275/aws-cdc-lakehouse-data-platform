@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+source lab health
+-------------------------------------------------------------------------------
+  command id b38080f9-bc22-4933-bde1-3ddaf54f3b74 — waiting
+
+=== containers ===
+  [FAIL] source-oracle 
+missing
+  [PASS] source-sqlserver healthy
+
+=== Oracle CDC preconditions ===
+  [FAIL] log_mode= (LogMiner has no redo to mine)
+  [FAIL] supplemental logging= (UPDATE before-images incomplete)
+
+=== SQL Server CDC preconditions ===
+  [PASS] SQL Server Agent Running
+  [FAIL] database CDC=
+  [FAIL] tables tracked= (expected 4)
+
+=== result ===
+  FAILURES ABOVE - do NOT deploy connectors (risk R15)
+
+WARNING: status=Failed
+failed to run commands: exit status 1

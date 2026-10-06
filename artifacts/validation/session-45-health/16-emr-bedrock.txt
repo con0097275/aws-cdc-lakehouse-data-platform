@@ -1,0 +1,55 @@
+=== EMR APPLICATION DETAIL
+{
+    "State": "CREATED",
+    "AutoStart": {
+        "enabled": true
+    },
+    "AutoStop": {
+        "enabled": true,
+        "idleTimeoutMinutes": 15
+    },
+    "Max": {
+        "cpu": "16 vCPU",
+        "memory": "64 GB",
+        "disk": "100 GB"
+    },
+    "Arch": "ARM64",
+    "Release": "emr-7.2.0",
+    "Network": {
+        "subnetIds": [
+            "subnet-0eb1ce5c77f302adc",
+            "subnet-0271cf04497862333",
+            "subnet-0aed359c90cbd26c0"
+        ],
+        "securityGroupIds": [
+            "sg-0d42daab28b7c0cce"
+        ]
+    }
+}
+=== RECENT JOB RUNS
+=== BEDROCK MODELS (ap-southeast-1)
+------------------------------------------------------------
+|                   ListFoundationModels                   |
++------------------------------------------------+---------+
+|                      Model                     | Stream  |
++------------------------------------------------+---------+
+|  anthropic.claude-opus-5                       |  True   |
+|  anthropic.claude-opus-4-8                     |  True   |
+|  anthropic.claude-opus-4-7                     |  True   |
+|  anthropic.claude-haiku-4-5-20251001-v1:0      |  True   |
+|  cohere.embed-v4:0                             |  False  |
+|  anthropic.claude-sonnet-4-5-20250929-v1:0     |  True   |
+|  anthropic.claude-opus-4-5-20251101-v1:0       |  True   |
+|  anthropic.claude-fable-5                      |  True   |
+|  anthropic.claude-fable-5-1                    |  True   |
+|  anthropic.claude-opus-4-6-v1                  |  True   |
+|  anthropic.claude-sonnet-5                     |  True   |
+|  anthropic.claude-sonnet-4-6                   |  True   |
+|  anthropic.claude-3-haiku-20240307-v1:0        |  True   |
+|  anthropic.claude-3-5-sonnet-20240620-v1:0     |  True   |
+|  anthropic.claude-3-sonnet-20240229-v1:0:28k   |  True   |
+|  anthropic.claude-3-sonnet-20240229-v1:0:200k  |  True   |
+|  anthropic.claude-3-sonnet-20240229-v1:0       |  True   |
+|  anthropic.claude-3-5-sonnet-20241022-v2:0     |  True   |
+|  anthropic.claude-sonnet-4-20250514-v1:0       |  True   |
+|  cohere.embed-english-v3                       |  False  |

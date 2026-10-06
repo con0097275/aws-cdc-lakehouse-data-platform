@@ -1,0 +1,50 @@
+  VERSIONS IN FORCE
+    agent              agent:copilot-v1
+    runtime            runtime:v1
+    prompt            
+      system                 prompt:system-v1:f33d4eed325a
+      router                 prompt:router-v1:aa941bed5e82
+      answer                 prompt:answer-v1:8c3197439ab2
+    model_config      
+      model_id               anthropic.claude-3-5-sonnet-20240620-v1:0
+      temperature            0.0
+      max_tokens             800
+      fallback               anthropic.claude-3-haiku-20240307-v1:0
+    tool              
+      diagnose_metric        tool:diagnose_metric-v1
+      forecast_metric        tool:forecast_metric-v1
+      get_data_lineage       tool:get_data_lineage-v1
+      get_dq_results         tool:get_dq_results-v1
+      get_feature_definition tool:get_feature_definition-v1
+      get_model_status       tool:get_model_status-v1
+    corpus             corpus:b639b715eabf0e37
+    chunking           chunking:v2-heading-aware
+    embedding          None
+    feature_group     
+      account_behavior       feature_group:ade893538e7f0514
+      customer_behavior      feature_group:bded816b072c310d
+    training_dataset   dataset:ecbe9eade4dc35a0
+    ml_model           model:eb58e352986ba990
+    evaluation        
+      rag                    evaluation:rag_golden_v2-v2
+      agent                  evaluation:agent_golden_v2-v2
+
+    unresolvable: ['embedding']
+
+  COST CLASS PER COMPONENT
+    component                                 class           idle                                        flag
+    knowledge corpus (S3 objects)             per_job         ~$0 — a few MB under the lake bucket's lif  enable_ai_rag
+    BM25 retrieval (in-process)               per_request     $0                                          -
+    S3 Vectors index                          per_request     ~$0 — storage only, ~6.7 MB at 1,622 chunk  enable_ai_vector_index
+    Bedrock Knowledge Base                    per_request     $0 — no standing capacity                   enable_ai_rag
+    Bedrock model invocation                  per_request     $0                                          AI_ENABLE_GENERATION
+    Athena (agent queries)                    per_request     $0                                          enable_athena
+    offline feature store (Glue DB + Iceberg) per_job         $0 idle — Glue DB is free; storage is MB    enable_ai_feature_store
+    online feature store (DynamoDB)           per_request     $0 — PAY_PER_REQUEST, and NO TABLE IS CREA  enable_ai_online_feature_store
+    ML training                               per_job         $0                                          enable_ai_ml_training
+    batch inference                           per_job         $0                                          -
+    agent runtime (Lambda)                    per_request     $0 — no charge when idle                    enable_ai_agent_runtime
+    CloudWatch logs + metrics                 per_request     ~$0 at this volume                          enable_ai_agent_runtime
+
+    always-on components: NONE  (12 costed)
+    forbidden without cost review: OpenSearch Serverless, always-on SageMaker endpoint, new EKS cluster, new NAT Gateway, new persistent EC2 AI runtime, large online feature stores

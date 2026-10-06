@@ -1,0 +1,10 @@
+FULFILL plan for mart_account_balance_daily  (DRY RUN — nothing will be written)
+  requested       : 5 date(s)
+  missing         : 1 — 2026-08-06
+  failed          : 1 — 2026-08-04
+  incomplete      : 1 — 2026-08-05
+  already_successful: 2 — 2026-08-03, 2026-08-07
+    2026-08-04 <- EOD (EOD closed and tagged for this date; snapshot-pinned)
+    2026-08-05 <- EOD (EOD closed and tagged for this date; snapshot-pinned)
+    2026-08-06 <- FULL_CDC (no EOD close for this date; reconstructed from canonical CDC at an explicit cutoff)
+  WILL RUN        : 3 date(s)

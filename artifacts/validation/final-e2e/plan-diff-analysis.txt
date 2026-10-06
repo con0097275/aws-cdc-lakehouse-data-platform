@@ -1,0 +1,93 @@
+=== ACTIONS ACROSS ALL RESOURCE CHANGES ===
+   248  create
+     2  no-op
+    19  read
+
+DESTROY / REPLACE entries: 0
+
+=== CREATES BY TYPE (top 40) ===
+    90  aws_s3_object
+    28  aws_iam_role_policy_attachment
+    14  aws_iam_policy
+    11  aws_vpc_security_group_ingress_rule
+    11  aws_iam_role
+     9  aws_cloudwatch_metric_alarm
+     8  aws_ssm_parameter
+     8  random_password
+     7  aws_security_group
+     7  aws_glue_catalog_database
+     6  aws_route_table_association
+     6  aws_subnet
+     5  aws_iam_instance_profile
+     4  aws_instance
+     4  aws_route_table
+     4  aws_dynamodb_table
+     3  aws_iam_role_policy
+     3  aws_vpc_endpoint
+     2  aws_kms_alias
+     2  aws_kms_key
+     1  terraform_data
+     1  aws_vpc_security_group_egress_rule
+     1  aws_athena_workgroup
+     1  aws_s3_bucket_lifecycle_configuration
+     1  aws_s3_bucket_ownership_controls
+     1  aws_s3_bucket_policy
+     1  aws_s3_bucket_public_access_block
+     1  aws_s3_bucket_server_side_encryption_configuration
+     1  aws_s3_bucket_versioning
+     1  aws_emrserverless_application
+     1  aws_cloudwatch_log_group
+     1  aws_default_security_group
+     1  aws_internet_gateway
+     1  aws_msk_cluster
+     1  aws_msk_configuration
+     1  aws_vpc
+
+=== NO-GO TRIPWIRES ===
+  aws_vpc                                    1
+  aws_msk_cluster                            1
+  aws_msk_serverless_cluster                 0
+  aws_nat_gateway                            0
+  aws_eks_cluster                            0
+  aws_redshiftserverless_workgroup           0
+  aws_redshiftserverless_namespace           0
+  aws_opensearchserverless_collection        0
+  aws_sagemaker_endpoint                     0
+  aws_eip                                    0
+  aws_db_instance                            0
+  aws_secretsmanager_secret                  0
+  aws_lb                                     0
+
+=== NO-OP (already exists, untouched) ===
+   module.budget_guardrails.aws_budgets_budget.project_monthly
+   module.data_lake.aws_s3_bucket.lake
+
+=== EC2 INSTANCES ===
+  module.airflow_k3s[0].aws_instance.this[0]                 t3.large  root=30GiB
+  module.cdc_runtime[0].aws_instance.cdc_runtime             t3.large  root=40GiB
+  module.kafka_platform[0].aws_instance.toolbox              t3.small  root=30GiB
+  module.source_lab[0].aws_instance.source_lab               t3a.xlarge  root=50GiB
+
+=== MSK ===
+  name=kafka-dev-lab-dev kafka=3.9.x.kraft brokers=3
+  type=kafka.m7g.large ebs={'ebs_storage_info': [{'provisioned_throughput': [], 'volume_size': 20}]}
+
+=== EMR SERVERLESS ===
+  name=kafka-dev-lab-dev-spark release=emr-7.2.0 arch=ARM64
+  auto_stop=[{'enabled': True, 'idle_timeout_minutes': 15}]
+  max_capacity=[{'cpu': '16 vCPU', 'disk': '100 GB', 'memory': '64 GB'}]
+  initial_capacity=[]
+
+=== ATHENA WORKGROUP ===
+  name=kafka-dev-lab-dev-wg bytes_scanned_cutoff=10737418240
+
+=== DYNAMODB ===
+  kafka-dev-lab-dev-job-execution              billing=PAY_PER_REQUEST
+  kafka-dev-lab-dev-streaming-app-state        billing=PAY_PER_REQUEST
+  kafka-dev-lab-dev-summary-config             billing=PAY_PER_REQUEST
+  kafka-dev-lab-dev-job-watermark-state        billing=PAY_PER_REQUEST
+
+=== VPC ENDPOINTS ===
+  com.amazonaws.ap-southeast-1.dynamodb  type=Gateway
+  com.amazonaws.ap-southeast-1.glue  type=Interface
+  com.amazonaws.ap-southeast-1.s3  type=Gateway

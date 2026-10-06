@@ -1,0 +1,64 @@
+{
+  "captured_at": "2026-09-30T10:15:00Z",
+  "phase": "DRP4 / B5 — the ingestion recipes actually execute",
+  "verdict": "CLEARED for the two recipes that can run outside the VPC; the other two are blocked by design, not by a defect",
+  "before": "the recipes had never been executed. The catalogue was populated by the governance publisher, so nothing had ever proved the recipes were runnable.",
+  "environment": {
+    "datahub": "local v1.7.0.1, GMS http://localhost:8080 (binds 127.0.0.1 only)",
+    "cli": "acryl-datahub==1.7.0.13 in a dedicated venv (.venv-datahub)",
+    "why_a_venv": "the system install had an incompatible sqlglot and EVERY ingestion source failed to import with `module 'sqlglot.expressions' has no attribute 'Expr'`. A pinned venv fixes it without disturbing the user's packages."
+  },
+  "executed": {
+    "glue": {
+      "status": "SUCCESS",
+      "events": 493,
+      "failures": 0,
+      "source": "real AWS Glue, 83 tables across 6 databases",
+      "note": "first run used a file sink to prove execution without DataHub (491 events); then the live REST sink"
+    },
+    "dbt": {
+      "status": "SUCCESS",
+      "events": 248,
+      "failures": 0,
+      "warnings": 2,
+      "source": "dbt/target/manifest.json"
+    }
+  },
+  "not_executed": {
+    "kafka": {
+      "reason": "MSK brokers resolve to PRIVATE addresses (10.42.12.173, 10.42.11.19) on port 9098 and are unreachable from the workstation — verified by TCP connect, not assumed.",
+      "verdict": "this is security invariant 3 working as intended (private brokers, no public access). Running it needs an in-VPC host."
+    },
+    "kafka-connect": {
+      "reason": "the Connect REST endpoint is private for the same reason",
+      "verdict": "same — in-VPC execution required"
+    }
+  },
+  "defects_found_by_running": [
+    {
+      "defect": "the dbt recipe cannot run to a file sink at all",
+      "detail": "write_semantics: PATCH calls ctx.require_graph(), so the recipe REQUIRES a live DataHub. `ConfigurationError: Using dbt with write_semantics=PATCH requires a graph`. The PATCH choice is correct (ADR-088 — ingestion must not clobber derived ownership); what was not recorded is that it makes the recipe undeployable without a running GMS.",
+      "action": "documented"
+    },
+    {
+      "defect": "convert_urns_to_lowercase was being DEFAULTED on the dbt recipe",
+      "detail": "the CLI warns it 'defaults to true for this source but is not set in the recipe'. A default is exactly what ADR-090 refuses: if dbt lowercases a urn and Glue does not, one table becomes two urns and the graph splits at the CURATED -> MART hop into halves that each look complete.",
+      "action": "pinned False explicitly on the dbt recipe"
+    },
+    {
+      "defect": "GlueSourceConfig REJECTS convert_urns_to_lowercase",
+      "detail": "setting it there failed with `Extra inputs are not permitted [type=extra_forbidden]`. That is how we learned the Glue side has no such switch and never lowercases — so False on dbt MATCHES Glue rather than being a preference. Found by running the recipe, not by reading documentation.",
+      "action": "removed from the Glue recipe"
+    },
+    {
+      "defect": "use_identifiers is deprecated",
+      "detail": "warned on every dbt run",
+      "action": "removed from the generated recipe"
+    }
+  ],
+  "open": {
+    "dbt_catalog_incomplete": "dbt/target/catalog.json is 269 bytes; `dbt docs generate` has not been run, so schema metadata for several mart models is missing. The ingestion warns 'Node missing from catalog'. Not a blocker for lineage, which comes from the manifest."
+  },
+  "datahub_state_after": {"datasets": 147},
+  "cost": "$0 — local DataHub, read-only AWS calls"
+}

@@ -1,0 +1,55 @@
+{
+  "captured_at": "2026-09-30T05:59:15Z",
+  "phase": "DRP3 / DRP12 gate — the RESIDENT Airflow deployment emits OpenLineage",
+  "verdict": "LIVE PASS — unconditional. This supersedes the earlier isolated-pod evidence.",
+  "what_changed": "scripts/airflow-enable-lineage.sh --execute rolled Helm revision 2: image airflow-openlineage:3.2.2-ol2.20.2 and the four AIRFLOW__OPENLINEAGE__* variables the deployed release had never carried.",
+  "deployment": {
+    "helm_revision": 2,
+    "image": "airflow-openlineage:3.2.2-ol2.20.2",
+    "provider": "apache-airflow-providers-openlineage==2.20.2",
+    "openlineage_python": "1.53.0",
+    "matches_spark_jar_pin": true,
+    "executor": "KubernetesExecutor",
+    "env": {
+      "AIRFLOW__OPENLINEAGE__DISABLED": "false",
+      "AIRFLOW__OPENLINEAGE__TRANSPORT": "{\"type\":\"console\"}",
+      "AIRFLOW__OPENLINEAGE__NAMESPACE": "cdc-lakehouse-dev",
+      "AIRFLOW__OPENLINEAGE__DISABLE_SOURCE_CODE": "true"
+    },
+    "env_present_on": ["airflow-scheduler", "airflow-dag-processor", "worker pods"]
+  },
+  "evidence": {
+    "method": "real DAG run through KubernetesExecutor; three worker pods; logs scraped while the pods were alive",
+    "dag": "cdc_health_check",
+    "run_id": "scheduled__2026-09-30T05:00:00+00:00",
+    "task": "same_pk_same_partition",
+    "worker_pods": ["cdc-health-check-connector-status-a93tswjp",
+                    "cdc-health-check-same-pk-same-partition-zz5ljm8v",
+                    "cdc-health-check-topic-offsets-advancing-0j2oyt9q"],
+    "transport_line": "OpenLineageClient will use `console` transport",
+    "events": [
+      {"type": "START", "id": "01a0f0af-1080-7d67-8e13-a535f44e4b9e",
+       "confirmation": "Successfully emitted OpenLineage `START` event"},
+      {"type": "FAIL", "id": "01a0f0af-1080-7d67-8e13-a535f44e4b9e",
+       "confirmation": "Successfully emitted OpenLineage `FAIL` event"}
+    ],
+    "facets_observed": ["documentation", "jobType", "ownership", "tags"],
+    "job_type": "TASK",
+    "integration": "AIRFLOW",
+    "producer": "https://github.com/apache/airflow/tree/providers-openlineage/2.20.2",
+    "ownership": "data-platform — the DAG's real owner, carried through to the event",
+    "documentation": "Connector liveness, topic flow and source-position advance — the DAG's real docstring"
+  },
+  "note_on_the_FAIL": "the task itself failed (a connector liveness probe; the CDC runtime is not currently serving). That is unrelated to lineage and PRE-EXISTING. It is in fact stronger evidence: FAIL events emit too, so a failing task is not invisible to the lineage graph.",
+  "attempts_that_did_not_work_and_why": [
+    {"attempt": "write a probe DAG onto the dags PVC", "result": "Permission denied — the PVC is not writable from the pod"},
+    {"attempt": "airflow dags test in the SCHEDULER", "result": "Dag could not be found — in Airflow 3 only the dag-processor mounts the dags volume"},
+    {"attempt": "airflow dags test in the DAG-PROCESSOR", "result": "exit 137, OOM-killed: the container is limited to 512Mi and the Airflow 3.2.2 task SDK needs more. The listener WAS active — it logged its emission policy for the task before the kill."},
+    {"attempt": "airflow tasks test (single EmptyOperator)", "result": "exit 137 as well — the limit binds on import, not on the task"}
+  ],
+  "operational_notes": [
+    "there is NO remote logging configured, so worker-pod logs are lost when the pod is deleted (delete_worker_pods defaults to true). Capturing lineage from task logs requires scraping while the pod lives, or enabling remote logging.",
+    "the DAG was re-paused after the run; it was paused before."
+  ],
+  "cost": "$0 — one DAG run on an already-running cluster"
+}

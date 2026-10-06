@@ -1,0 +1,69 @@
+{
+  "captured_at": "2026-09-30T03:22:00Z",
+  "phase": "DRP11 scenario 1 — one correlated EMR run, not three segments",
+  "verdict": "LIVE PASS for the certification chain in a SINGLE run; the Spark DATASET-lineage hop is the one part still missing, with a named cause and a named fix",
+  "run": {
+    "emr_application": "00g941dubedckq25",
+    "job_run_id": "00g95hkdnkfkl827",
+    "name": "eod-scenario1-cob20",
+    "state": "SUCCESS",
+    "release": "emr-7.2.0",
+    "spark": "3.5.1-amzn-0"
+  },
+  "result": {
+    "eod_run_id": "eod-2026-09-20-032143Z",
+    "table": "oracle.coredb.corebank.account",
+    "cob_date": "2026-09-20",
+    "cutoff_utc": "2026-09-21T00:00:00+00:00",
+    "rows": 320,
+    "deletes": 0,
+    "dq_status": "PASS",
+    "reconciliation_status": "PASS",
+    "status": "CERTIFIED",
+    "source_snapshot_id": "80230069689276128",
+    "target_snapshot_id": "3683870259747946533"
+  },
+  "why_this_closes_the_segmentation_gap": "the DQ verdict, the reconciliation, the certification and the Iceberg snapshot ids before and after all carry ONE run_id from ONE EMR submission. The earlier PASS stitched these from three separate captures.",
+  "two_earlier_submissions_that_failed_correctly": [
+    {
+      "run": "00g95hd7olrde827", "cob": "2026-09-29",
+      "outcome": "EOD_WAITING_SOURCE — source watermark 481 min behind the cutoff",
+      "verdict": "CORRECT REFUSAL. The readiness gate did its job; this is not a defect."
+    },
+    {
+      "run": "00g95hgf9l04p827", "cob": "2026-09-28",
+      "outcome": "EMPTY_WINDOW: zero events inside the cutoff, status BUILT_NOT_CERTIFIED, watermark HELD",
+      "verdict": "CORRECT REFUSAL. The table has events only on 2026-09-20 and 2026-09-29, which a query confirmed. Certifying an empty window is exactly what the gate exists to prevent."
+    }
+  ],
+  "openlineage_on_emr": {
+    "listener_attached": true,
+    "events_emitted": 1,
+    "event": "APPLICATION START, namespace cdc-lakehouse-dev, processing_engine spark/3.5.1-amzn-0, adapter 1.53.0",
+    "dataset_events": 0,
+    "root_cause": "OpenLineage arrives via `spark.jars` while the Iceberg connector sits in /usr/lib/spark/jars, so the two load under DIFFERENT classloaders. The integration then cannot read Iceberg's write plans. The driver log says so itself: 'Failed to load OpenLineageExtensionProvider class', 19 times, alongside 19 'Glue catalog ARN is unavailable' warnings.",
+    "why_it_is_dangerous": "it is not an error. Lineage looks enabled, the job succeeds, and every dataset event is simply absent.",
+    "attempted_fix": "spark.driver/executor.extraClassPath pointing at the downloaded jar — OpenLineage's own documented cure",
+    "attempt_result": "REFUSED BY THE PLATFORM at submit time: ValidationException: Option 'spark.driver.extraClassPath' is not supported. It cost nothing because EMR Serverless validates before starting.",
+    "the_only_remaining_route": "a CUSTOM EMR SERVERLESS IMAGE with openlineage-spark_2.12-1.53.0.jar baked into /usr/lib/spark/jars, then update the application to use it",
+    "config_state": "`jar_runtime_path` is deliberately EMPTY; a value there makes every OPENLINEAGE=1 submission fail validation. Two tests hold that empty and keep the mechanism for platforms that do allow it."
+  },
+  "other_defects_found_by_this_run": [
+    {
+      "defect": "spark.jars.packages cannot resolve in this VPC",
+      "detail": "EMR Serverless runs in private subnets and there is NO NAT (cost invariant 2) — only gateway endpoints. Maven resolution retries and the job dies during resolution having done no work, which reads as a Spark problem rather than a networking one.",
+      "fix": "the pinned jar is staged in S3 and referenced with spark.jars over the S3 gateway endpoint; sha1 verified against Maven's published .sha1 AND the staged object"
+    },
+    {
+      "defect": "the derived conf would have SILENTLY REPLACED the Iceberg jar",
+      "detail": "spark.jars is one comma-separated key and emr-submit.sh already set it to the Iceberg runtime. A second --conf spark.jars= wins, and every Iceberg read would fail with a ClassNotFound that looks nothing like a lineage change.",
+      "fix": "emr-submit.sh merges the OL jar into JARS instead of letting a second flag through"
+    },
+    {
+      "defect": "job.name was 'unknown'",
+      "detail": "on EMR Serverless spark.app.name is not readable when the APPLICATION START event fires, so every job would land on ONE graph node called 'unknown' — the collapse ADR-090 exists to prevent, approached from the other side.",
+      "fix": "spark.openlineage.appName is derived and emr-submit.sh passes the submission name"
+    }
+  ],
+  "cost": "4 EMR Serverless submissions; two failed in ~2 minutes on correct refusals, one succeeded, one was rejected at validation for $0"
+}

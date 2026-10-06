@@ -1,0 +1,9 @@
+== FULL_CDC row counts
+[['account', '0'], ['digital_event', '0'], ['loan', '0']]
+== OPS control tables
+  streaming_app_state [['0']]
+  eod_info FAILED: TABLE_NOT_FOUND: line 1:22: Table 'awsdatacatalog.kafka_dev_lab_dev_ops.eod_info' does not
+  eod_run_hist FAILED: TABLE_NOT_FOUND: line 1:22: Table 'awsdatacatalog.kafka_dev_lab_dev_ops.eod_run_hist' does
+  realtime_run [['0']]
+  eod_run [['0']]
+  cdc_event_index [['0']]

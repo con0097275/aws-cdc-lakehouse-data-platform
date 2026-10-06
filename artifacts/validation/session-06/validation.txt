@@ -1,0 +1,26 @@
+# Session 06 — validation transcript
+# Captured: 2026-08-14T07:49:25Z
+
+=== LIVE AWS STATE ===
+  MSK clusters : 0
+  EC2 running  : 0
+  => the stack is still unapplied; end-to-end streaming was NOT run
+
+=== UNIT + LOCAL SPARK TESTS (these RAN) ===
+.................................................                        [100%]
+49 passed in 12.08s
+
+=== TEST BREAKDOWN ===
+spark/tests/test_quarantine.py::TestPayloadReference::test_falls_back_to_kafka_coordinates_when_event_id_underivable
+
+49 tests collected in 0.16s
+
+=== TERRAFORM ===
+$ terraform validate
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+$ terraform plan (all flags on)
+  161 to add, 0 to change, 0 to destroy
+
+=== CHECKOV ===
+Passed checks: 406, Failed checks: 28, Skipped checks: 0

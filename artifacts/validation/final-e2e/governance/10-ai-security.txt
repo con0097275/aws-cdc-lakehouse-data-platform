@@ -1,0 +1,27 @@
+AI PLATFORM SECURITY REVIEW
+
+  [PASS] dedicated ai role, no broadened workload role        
+  [PASS] bedrock:InvokeModel scoped to pinned model ids       
+  [PASS] raw CDC denied at the IAM layer (runtime)            
+  [PASS] raw CDC denied at the IAM layer (knowledge base)     
+  [PASS] no DynamoDB mutation verb granted                    
+  [PASS] no Glue mutation verb granted                        
+  [PASS] exactly one S3 write grant, scoped to query-results  
+  [PASS] no static credentials anywhere in ai/                0 hits
+  [PASS] no NAT gateway, no vpc_config on the runtime         
+  [PASS] no public endpoint / no 0.0.0.0/0                    
+  [PASS] KMS on the vector index and the log group            
+  [PASS] WRITE_TOOLS is empty                                 
+  [PASS] every tool is read_only                              
+  [PASS] no shell/exec/terraform tool exists                  
+  [PASS] every tool has a timeout and a result cap            
+  [PASS] every tool is audited                                
+  [PASS] Athena mutation/exfil attempts blocked               9/9
+  [PASS] no secrets or account ids in prompts                 
+  [PASS] corpus quarantined nothing / excluded nothing unexpectedly quarantined=0 excluded=0
+  [PASS] no secret in any published chunk                     1622 chunks
+  [PASS] PII-denied dataset refused                           bi_access inherited
+  [PASS] metrics FAIL OPEN on sink outage                     
+  [PASS] no always-on AI component                            12 components costed
+
+  ALL CHECKS PASSED

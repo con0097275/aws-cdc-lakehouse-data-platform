@@ -1,0 +1,28 @@
+-------------------------------------------------------------------------------
+Terraform state backend bootstrap (ADR-021, OPEN-01)
+-------------------------------------------------------------------------------
+  bucket = aws-cdc-lakehouse-tfstate-111122223333
+  key    = aws-cdc-lakehouse/dev/terraform.tfstate
+  cmk    = alias/aws-cdc-lakehouse-tfstate
+  region = ap-southeast-1
+
+WARNING: This bucket is created OUT OF BAND and must never appear in the stack's state.
+
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+REFUSING: refusing to run non-interactively; a human must type the confirmation phrase

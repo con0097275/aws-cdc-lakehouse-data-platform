@@ -1,0 +1,5 @@
+_note: Per-table cutover state (ADR-067). Reviewed and committed like any other config;
+  never edited by an automated run.
+modes:
+  oracle.coredb.corebank.account: PER_TABLE
+  sqlserver.digital.dbo.digital_event: PER_TABLE

@@ -1,0 +1,228 @@
+# Governance OVERLAY for assets above the CDC layers.
+#
+# THIS FILE CANNOT INVENT AN ASSET.
+#
+# Every key under `assets:` must resolve to something the platform actually produces,
+# derived from:
+#
+#   reporting/curated/entities.yaml      the conformed CURATED entities (ADR-080)
+#   spark/dimensions/dim_builder.py      DIMENSIONS, parsed -- not imported
+#   spark/jobs/curated/curated_build.py  dim_date / dim_time / dim_currency
+#   dbt/target/manifest.json             CURATED sources and MART models
+#
+# An overlay key naming anything else is a COMPILE ERROR. That single rule is what stops
+# this file becoming `governance/catalog/domains.yml`, which the DRP0 audit measured at 12
+# declared datasets and 1 live one.
+#
+# The inverse is also checked: a derived asset with no overlay entry still enters the
+# inventory and is REPORTED as ungoverned. Silence is never taken for coverage.
+
+version: 1
+updated: 2026-09-30
+
+# Defaults applied to every derived asset of a kind, before the per-asset entry.
+kind_defaults:
+
+  curated:
+    domain: shared
+    subdomain: conformed_dimension
+    retention_class: long
+    criticality: tier_2
+    contract_policy: curated_conformed_contract
+    dq_policy: eod_snapshot_dq
+    reconciliation_policy: full_cdc_to_eod_rowcount
+    certification_policy: certified_eod
+    freshness_slo_minutes: 1440
+    tags: [curated]
+
+  mart:
+    domain: shared
+    retention_class: standard
+    criticality: tier_1
+    contract_policy: mart_serving_contract
+    dq_policy: mart_certified_dq
+    reconciliation_policy: eod_to_mart_measure
+    certification_policy: certified_eod
+    freshness_slo_minutes: 1440
+    tags: [mart, bi-readable]
+
+assets:
+
+  # ---------------------------------------------------------------- CURATED conformed
+  # These carry the business columns projected out of the EOD payload (ADR-080). They keep
+  # the SOURCE domain, not `shared`: a conformance step does not change who owns the data.
+  curated:banking_customer:
+    domain: core_banking
+    subdomain: customer
+    description: Conformed customer entity projected from the EOD snapshot.
+    criticality: tier_1
+    glossary_terms: [current_state]
+    pii_fields:
+      - {column: full_name, category: direct_identifier}
+      - {column: dob, category: direct_identifier}
+  curated:banking_account:
+    domain: core_banking
+    subdomain: account
+    description: Conformed account entity, including the ledger balance.
+    criticality: tier_1
+    glossary_terms: [account_balance]
+    pii_fields:
+      - {column: balance, category: financial}
+  curated:banking_transaction:
+    domain: core_banking
+    subdomain: transaction
+    description: Conformed transaction entity.
+    criticality: tier_1
+    pii_fields:
+      - {column: amount, category: financial}
+  curated:banking_branch:
+    domain: core_banking
+    subdomain: reference
+    description: Conformed branch entity.
+    criticality: tier_3
+  curated:digital_app_user:
+    domain: digital_channel
+    subdomain: identity
+    description: Conformed digital app user entity.
+    pii_fields:
+      - {column: user_id, category: pseudonymous}
+  curated:digital_event:
+    domain: digital_channel
+    subdomain: engagement
+    description: Conformed digital event entity.
+    glossary_terms: [channel_engagement]
+  curated:digital_channel:
+    domain: digital_channel
+    subdomain: reference
+    description: Conformed channel reference entity.
+    criticality: tier_3
+  curated:digital_merchant:
+    domain: digital_channel
+    subdomain: reference
+    description: Conformed merchant reference entity.
+    criticality: tier_3
+
+  # ---------------------------------------------------------------- CURATED dimensions
+  # `pii_fields` for dim_customer is DERIVED from `DimensionSpec.pii_columns` in
+  # `spark/dimensions/dim_builder.py` and must not be restated here — the compiler reads it
+  # and refuses an overlay that contradicts it.
+  curated:dim_customer:
+    domain: core_banking
+    subdomain: customer
+    description: SCD2 customer dimension.
+    criticality: tier_1
+  curated:dim_account:
+    domain: core_banking
+    subdomain: account
+    description: SCD2 account dimension.
+    criticality: tier_1
+  curated:dim_product:
+    domain: core_banking
+    subdomain: reference
+    description: SCD2 product dimension.
+  curated:dim_branch:
+    domain: core_banking
+    subdomain: reference
+    description: SCD2 branch dimension.
+  curated:dim_channel:
+    domain: digital_channel
+    subdomain: reference
+    description: SCD2 channel dimension.
+  curated:dim_merchant:
+    domain: digital_channel
+    subdomain: reference
+    description: SCD2 merchant dimension.
+  curated:dim_date:
+    subdomain: calendar
+    description: Generated date dimension. Reference data, no source system.
+    criticality: tier_2
+  curated:dim_time:
+    subdomain: calendar
+    description: Generated time-of-day dimension (1,440 rows).
+    criticality: tier_3
+  curated:dim_currency:
+    subdomain: reference
+    description: Currency reference data. Not CDC — no source system publishes FX here.
+    criticality: tier_3
+
+  # ---------------------------------------------------------------- CURATED facts
+  curated:fact_transaction:
+    domain: core_banking
+    subdomain: transaction
+    description: Transaction fact at event grain.
+    criticality: tier_1
+  curated:fact_account_daily_snapshot:
+    domain: core_banking
+    subdomain: account
+    description: Periodic snapshot fact, one row per account per COB.
+    criticality: tier_1
+    glossary_terms: [account_balance, cob_date]
+  curated:fact_digital_engagement_daily:
+    domain: digital_channel
+    subdomain: engagement
+    description: Daily digital engagement fact.
+    glossary_terms: [channel_engagement]
+
+  # ---------------------------------------------------------------- MART (published)
+  mart:mart_customer_360_daily:
+    description: One row per customer per COB, joining banking and digital measures.
+    glossary_terms: [customer_360, cob_date, certified_number]
+  mart:mart_account_balance_daily:
+    domain: core_banking
+    description: Certified daily account balances.
+    glossary_terms: [account_balance, cob_date, certified_number]
+  mart:mart_account_balance_monthly:
+    domain: core_banking
+    description: Certified monthly account balances.
+    glossary_terms: [account_balance, certified_number]
+  mart:mart_account_risk_daily:
+    domain: core_banking
+    description: Daily account risk measures.
+    glossary_terms: [cob_date, certified_number]
+  mart:mart_channel_engagement_daily:
+    domain: digital_channel
+    description: Daily channel engagement mart.
+    glossary_terms: [channel_engagement, cob_date]
+  mart:mart_channel_performance_daily:
+    domain: digital_channel
+    description: Daily channel performance mart.
+    glossary_terms: [channel_engagement, cob_date]
+  # NOT certified, and that is the contract: a 10-minute surveillance aggregate is a
+  # REALTIME-tier figure. Declaring `certified_eod` here would let the ladder stamp a
+  # number that can still move.
+  mart:mart_transaction_monitoring_10m:
+    domain: core_banking
+    description: Ten-minute transaction surveillance aggregate. Never certified.
+    criticality: tier_2
+    certification_policy: realtime_overlay
+    reconciliation_policy: none
+    dq_policy: realtime_overlay_dq
+    glossary_terms: [transaction_monitoring, event_window]
+    tags: [not-certified]
+
+  # ---------------------------------------------------------------- MART (intermediate)
+  # `int_*` and `stg_*` are dbt models that materialise as real tables. They are NOT
+  # published, and listing them is the point: an unlisted table is an ungoverned one, which
+  # is the whole DRP0 finding. They are tier_3 and tagged so a BI consumer can see they are
+  # not a serving surface.
+  mart:stg_fact_transaction:      {criticality: tier_3, tags: [intermediate], description: dbt staging model over the curated transaction fact.}
+  mart:stg_fact_account_daily_snapshot: {criticality: tier_3, tags: [intermediate], description: dbt staging model over the curated snapshot fact.}
+  mart:stg_fact_digital_engagement: {criticality: tier_3, tags: [intermediate], description: dbt staging model over the curated engagement fact.}
+  mart:int_customer_daily_balance: {criticality: tier_3, tags: [intermediate], description: dbt intermediate model — daily balance per customer.}
+  mart:int_customer_daily_digital: {criticality: tier_3, tags: [intermediate], description: dbt intermediate model — daily digital activity per customer.}
+  mart:int_customer_daily_txn:    {criticality: tier_3, tags: [intermediate], description: dbt intermediate model — daily transaction activity per customer.}
+
+# Assets that EXIST but whose existence is declared only in Python, not in config.
+#
+# `dim_customer_bi` is built by the reporting leg and appears in no YAML at all. Listing it
+# here governs it, and `registration: undeclared` keeps the gap VISIBLE rather than closing
+# it by fiat — a table nobody can find from config is a table nobody can onboard, decommission
+# or reason about. DRP4 reconciles this list against the live Glue catalogue.
+undeclared_assets:
+  curated:dim_customer_bi:
+    declared_in: spark/reporting/ (Python only)
+    reason: BI-facing customer dimension with no config declaration
+    domain: core_banking
+    subdomain: customer
+    description: BI-facing customer dimension. Built in Python; not declared in any config.
+    criticality: tier_2

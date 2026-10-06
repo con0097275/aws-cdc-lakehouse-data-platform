@@ -1,0 +1,33 @@
+=== sample REAL object encryption
+key=warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/00000-8bd2cf12-ad7f-4bf5-9d99-4de911bd0bb4.metadata.json
+{
+    "SSE": "aws:kms",
+    "KeyId": "arn:aws:kms:ap-southeast-1:111122223333:key/2746e5f4-fbfc-4fd9-bc54-41137880887d",
+    "Modified": "Thu, 10 Sep 2026 11:15:11 GMT"
+}
+=== can we actually READ it?
+{
+  "format-version" : 2,
+  "table-uuid" : "755a657f-c9ab-4028-b938-90633c26397c",
+  "location" : "s3://kafka-dev-lab-dev-lake-111122223333/warehouse/full_cdc/cdc_oracle_coredb_corebank_loan",
+  "last
+read_exit=0
+=== ALL KMS keys (incl. pending deletion)
+0b5b383b-5628-4e2f-a130-9be8b7345ae8 Enabled CUSTOMER 2026-09-20 None
+2746e5f4-fbfc-4fd9-bc54-41137880887d Enabled CUSTOMER 2026-09-10 None
+28b39c6a-5feb-4841-895f-320fc3ce75c8 PendingDeletion CUSTOMER 2026-09-17 2026-09-24
+2fd510a7-2119-4b03-af29-d377d2bc31fd Enabled CUSTOMER 2026-09-03 None
+383f6d53-9195-4ad8-a602-1dc306c5f93e Enabled CUSTOMER 2026-08-28 None
+3cdedee2-7f5a-422d-9d47-01837e9a4c5a Enabled CUSTOMER 2026-09-20 None
+3fb01807-c81b-4529-9886-f0e096087c4b Enabled AWS 2024-09-21 None
+44bf584e-b681-4a55-b13b-8adb145eaf2b Enabled CUSTOMER 2026-08-25 None
+5cc57a74-ebd0-4c6b-9757-0d5e850f5ea9 Enabled AWS 2026-08-16 None
+63c92f94-f0d3-4c9f-bbd1-059cc3081066 Enabled AWS 2025-01-22 None
+7f03af9e-509c-4477-b983-8e46d2d8d9f7 Enabled AWS 2024-09-22 None
+8d20ebe1-39e8-4f10-be31-957cd4b8fad2 Enabled CUSTOMER 2026-08-20 None
+98a2a6f6-b1fc-4d25-9210-c7e829a1e368 Enabled AWS 2026-08-20 None
+a0a30d17-bbbe-4d79-b21c-ac14d3e5f117 Enabled AWS 2024-09-21 None
+cb59785d-a88c-4774-ad04-5705ddea9e64 Enabled AWS 2024-06-15 None
+cd7c3d82-932b-479f-9f25-577311cec8a7 PendingDeletion CUSTOMER 2026-09-17 2026-09-24
+d8ef38fe-c3d6-44b8-b3ae-4c1e910a9afd Enabled CUSTOMER 2026-09-06 None
+e66f4dfa-3c59-4a63-a637-1bc4836e1866 Enabled CUSTOMER 2026-08-27 None

@@ -1,0 +1,112 @@
+# DQ rules per dataset. Derived from governance/catalog/domains.yml — the SLA values here
+# must match the registry, and test_dq_rules_match_registry_slas asserts it.
+#
+# SEVERITY
+#   ERROR  blocks the certified publish (and blocks on NOT_EVALUATED too)
+#   WARN   recorded, never blocks
+#
+# Neither ever deletes. Invalid rows are COPIED to quarantine; L1/L2 keep them because they
+# are the audit record and the replay source.
+
+version: 1
+
+datasets:
+
+  # ------------------------------------------------------------------ L1
+  - name: stream.oracle_corebank_customer
+    layer: L1
+    predicate: "source_commit_ts >= TIMESTAMP '${business_date} 00:00:00' AND source_commit_ts < TIMESTAMP '${business_date} 23:59:59.999'"
+    checks:
+      - {type: freshness, column: l1_write_ts, sla_minutes: 15, severity: ERROR}
+      # event_id is the idempotency key (CLAUDE.md §5.3). A duplicate means replay is
+      # no longer safe, so it blocks.
+      - {type: uniqueness, columns: [event_id], severity: ERROR}
+      - {type: completeness, column: primary_key, max_null_pct: 0.0, severity: ERROR}
+      - {type: completeness, column: source_commit_ts, max_null_pct: 0.0, severity: ERROR}
+      # A delete legitimately has a NULL `after`, so this is a WARN, not an ERROR: making
+      # it blocking would fail every day that contains a deletion.
+      - {type: completeness, column: after, max_null_pct: 20.0, severity: WARN}
+      - {type: validity, name: operation_is_known,
+         expression: "operation IN ('c','u','d','r')", severity: ERROR}
+
+  # ------------------------------------------------------------------ L1 -> L2
+  - name: full_cdc.oracle_corebank_customer
+    layer: L2
+    predicate: "source_commit_ts >= TIMESTAMP '${business_date} 00:00:00' AND source_commit_ts < TIMESTAMP '${business_date} 23:59:59.999'"
+    checks:
+      - {type: uniqueness, columns: [event_id], severity: ERROR}
+      # EXACT. Both layers keep every event, so a difference is a lost or duplicated
+      # record and must be explained, never rounded away.
+      - type: reconciliation
+        name: l1_to_l2_events
+        left: stream.oracle_corebank_customer
+        right: full_cdc.oracle_corebank_customer
+        left_predicate: "source_commit_ts >= TIMESTAMP '${business_date} 00:00:00' AND source_commit_ts < TIMESTAMP '${business_date} 23:59:59.999'"
+        right_predicate: "source_commit_ts >= TIMESTAMP '${business_date} 00:00:00' AND source_commit_ts < TIMESTAMP '${business_date} 23:59:59.999'"
+        tolerance_pct: 0.0
+        severity: ERROR
+
+  # ------------------------------------------------------------------ L2 -> L3
+  - name: snapshot.banking_customer
+    layer: L3
+    predicate: "snapshot_date = DATE '${business_date}'"
+    checks:
+      # THE L3 invariant: one active row per PK (S08).
+      - {type: uniqueness, columns: [primary_key], severity: ERROR}
+      - {type: completeness, column: primary_key, max_null_pct: 0.0, severity: ERROR}
+      - {type: completeness, column: source_event_id, max_null_pct: 0.0, severity: ERROR}
+      - {type: freshness, column: l3_write_ts, sla_minutes: 1440, severity: WARN}
+
+  # ------------------------------------------------------------------ Kimball
+  - name: mart.dim_customer
+    layer: KIMBALL
+    checks:
+      - {type: uniqueness, columns: [customer_sk], severity: ERROR}
+      # effective_to is a SENTINEL, never NULL (S10-6): a NULL end date makes the current
+      # version match nothing in a point-in-time join, so every recent fact silently falls
+      # back to the unknown member.
+      - {type: completeness, column: effective_to, max_null_pct: 0.0, severity: ERROR}
+      - {type: validity, name: validity_interval_ordered,
+         expression: "effective_from < effective_to", severity: ERROR}
+
+  - name: mart.fact_transaction
+    layer: KIMBALL
+    predicate: "business_date = DATE '${business_date}'"
+    checks:
+      - {type: uniqueness, columns: [transaction_id], severity: ERROR}
+      - {type: referential_integrity, column: customer_sk,
+         parent: mart.dim_customer, parent_column: customer_sk, severity: ERROR}
+      - {type: referential_integrity, column: channel_sk,
+         parent: mart.dim_channel, parent_column: channel_sk, severity: ERROR}
+      - {type: validity, name: amount_non_negative,
+         expression: "amount_original >= 0", severity: ERROR}
+      # amount_base is NULL while the FX rate is unresolved (S09-8) — expected, and
+      # full-fill resolves it. A WARN surfaces it without blocking the day.
+      - {type: completeness, column: amount_base, max_null_pct: 5.0, severity: WARN}
+      - {type: validity, name: status_is_known,
+         expression: "processing_status IN ('PROVISIONAL_NRT','PROVISIONAL_CORRECTED','RECONCILED','CERTIFIED')",
+         severity: ERROR}
+
+  - name: mart.fact_account_daily_snapshot
+    layer: KIMBALL
+    predicate: "business_date = DATE '${business_date}'"
+    checks:
+      - {type: uniqueness, columns: [account_sk, business_date], severity: ERROR}
+      - {type: referential_integrity, column: account_sk,
+         parent: mart.dim_account, parent_column: account_sk, severity: ERROR}
+
+  # ------------------------------------------------------------------ Mart
+  - name: mart.mart_customer_360_daily
+    layer: MART
+    predicate: "business_date = DATE '${business_date}'"
+    checks:
+      - {type: uniqueness, columns: [customer_sk, business_date], severity: ERROR}
+      - {type: freshness, column: built_at, sla_minutes: 1440, severity: WARN}
+      - type: reconciliation
+        name: l3_to_mart
+        left: snapshot.banking_transaction
+        right: mart.fact_transaction
+        left_predicate: "snapshot_date = DATE '${business_date}'"
+        right_predicate: "business_date = DATE '${business_date}'"
+        tolerance_pct: 0.0
+        severity: ERROR

@@ -1,0 +1,14 @@
+Resolving the deployed catalog
+-------------------------------------------------------------------------------
+  workgroup   = kafka-dev-lab-dev-wg
+  glue prefix = kafka_dev_lab_dev_*
+-------------------------------------------------------------------------------
+Smoke queries
+-------------------------------------------------------------------------------
+LABEL                      EXECUTION_ID                           STATE         BYTES  VERDICT
+01_layer_smoke.sql         eb3f83b0-5e95-494c-8504-243aa9f2ce89   FAILED            0  BLOCKED_BY_DESIGN
+02_partition_pruning.sql   6186959d-9502-4c8d-9ba3-f0e2dda397db   FAILED            0  BLOCKED_BY_DESIGN
+03_join_aggregate.sql      25b22c14-af1e-4fb0-8a32-033ca73b8575   FAILED            0  BLOCKED_BY_DESIGN
+04_iceberg_metadata.sql    c341e1f9-1af6-41d0-8901-eccc2e45acb8   FAILED            0  BLOCKED_BY_DESIGN
+05_reconciliation.sql      9d066ca8-5538-4878-8976-b2e94099f8a6   FAILED            0  BLOCKED_BY_DESIGN
+06_bi_role_security.sql    46dd04a0-bcc9-4da9-8e2d-55fb4f5d42c6   FAILED            0  BLOCKED_BY_DESIGN

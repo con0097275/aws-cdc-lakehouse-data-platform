@@ -1,0 +1,62 @@
+=== warehouse/full_cdc (tables with data)
+                           PRE cdc_events/
+                           PRE cdc_oracle_coredb_corebank_account/
+                           PRE cdc_oracle_coredb_corebank_branch/
+                           PRE cdc_oracle_coredb_corebank_customer/
+                           PRE cdc_oracle_coredb_corebank_loan/
+                           PRE cdc_oracle_coredb_corebank_transaction/
+                           PRE cdc_sqlserver_digital_dbo_app_user/
+                           PRE cdc_sqlserver_digital_dbo_channel/
+                           PRE cdc_sqlserver_digital_dbo_digital_event/
+                           PRE cdc_sqlserver_digital_dbo_merchant/
+                           PRE cdc_sqlserver_digital_dbo_payment_method/
+2026-09-20 15:17:13          0 
+=== one table's metadata presence
+2026-09-10 20:58:49       7479 warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/00005-7bc28ae9-cbb9-4a56-9e53-f3b9aa4a3e53.metadata.json
+2026-09-17 21:49:36       8956 warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/b27b07a3-8240-431f-8ce2-d2c4d20cae77-m0.avro
+2026-09-10 20:58:49       8921 warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/bf2f7d28-722e-4606-bbfd-18a028342c7c-m0.avro
+2026-09-17 21:49:36       4276 warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/snap-374243542530539609-1-b27b07a3-8240-431f-8ce2-d2c4d20cae77.avro
+2026-09-10 20:58:49       4276 warehouse/full_cdc/cdc_oracle_coredb_corebank_loan/metadata/snap-5042295091124590611-1-bf2f7d28-722e-4606-bbfd-18a028342c7c.avro
+=== mart / snapshot / stream
+-- mart
+                           PRE mart_account_balance_daily/
+                           PRE mart_account_risk_daily/
+2026-09-20 15:17:12          0 
+-- snapshot
+                           PRE eod_oracle_coredb_corebank_account/
+                           PRE eod_oracle_coredb_corebank_branch/
+                           PRE eod_oracle_coredb_corebank_customer/
+                           PRE eod_oracle_coredb_corebank_loan/
+                           PRE eod_oracle_coredb_corebank_transaction/
+                           PRE eod_sqlserver_digital_dbo_app_user/
+-- stream
+                           PRE cdc_events/
+                           PRE cdc_events_realtime/
+                           PRE rt_account_base/
+                           PRE rt_account_stream/
+                           PRE rt_oracle_coredb_corebank_account/
+                           PRE rt_oracle_coredb_corebank_customer/
+-- curated
+                           PRE fact_account_daily_snapshot/
+2026-09-20 15:17:13          0 
+-- ops
+                           PRE cdc_event_index/
+                           PRE emr_smoke/
+                           PRE eod_run/
+                           PRE eod_watermark/
+                           PRE realtime_run/
+                           PRE rt_base_watermark/
+=== ai/ prefix
+2026-09-10 11:13:15     544786 ai/features/account_behavior/as_of=2026-09-06/featrun-20260906T072330Z.json
+2026-09-20 15:17:13          0 ai/knowledge/
+=== KMS key on an OLD object vs current lake CMK
+sample=warehouse/full_cdc/
+None
+
+An error occurred (404) when calling the HeadObject operation: Not Found
+current lake CMK arn:
+{
+    "Arn": "arn:aws:kms:ap-southeast-1:111122223333:key/0b5b383b-5628-4e2f-a130-9be8b7345ae8",
+    "State": "Enabled",
+    "Created": 1789892211.741
+}

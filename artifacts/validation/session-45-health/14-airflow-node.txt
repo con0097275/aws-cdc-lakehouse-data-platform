@@ -1,0 +1,30 @@
+=== airflow node: k3s + pods
+active
+airflow airflow-api-server-68475dd647-rgs2x Running 1
+airflow airflow-cleanup-29831580-mxwk7 Completed 0
+airflow airflow-dag-processor-6f9f97d6b6-jvfgt Running 0
+airflow airflow-postgresql-0 Running 0
+airflow airflow-scheduler-54bc458f74-jjz8k Running 0
+airflow airflow-triggerer-0 Running 0
+kube-system coredns-54996dc9b4-r2rrj Running 0
+kube-system local-path-provisioner-58d557dc48-vrjbr Running 0
+kube-system metrics-server-6dc596dfb8-cmsp8 Running 0
+
+=== airflow bootstrap log tail
+-rw-r--r--.  1 root   root             22635 Sep 20 08:52 airflow-bootstrap.log
+  pool spark_jobs = 4 slots
+  pool streaming_apps = 2 slots
+  pool maintenance = 1 slots
+Created symlink /etc/systemd/system/multi-user.target.wants/airflow-ui-forward.service → /etc/systemd/system/airflow-ui-forward.service.
+== bootstrap complete 2026-09-20T08:52:10+00:00 ==
+NAME                                     READY   STATUS      RESTARTS        AGE
+airflow-api-server-68475dd647-rgs2x      1/1     Running     1 (100s ago)    5m22s
+airflow-create-user-fmr7d                0/1     Completed   1 (3m13s ago)   5m21s
+airflow-dag-processor-6f9f97d6b6-jvfgt   2/2     Running     0               5m21s
+airflow-postgresql-0                     1/1     Running     0               5m21s
+airflow-run-airflow-migrations-ntvsm     0/1     Completed   0               5m21s
+airflow-scheduler-54bc458f74-jjz8k       2/2     Running     0               5m21s
+airflow-triggerer-0                      2/2     Running     0               5m21s
+UI: aws ssm start-session --target $(curl -s -H "X-aws-ec2-metadata-token: $(curl -sX PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/meta-data/instance-id) --document-name AWS-StartPortForwardingSession --parameters '{"portNumber":["8080"],"localPortNumber":["8080"]}'
+.169.254/latest/meta-data/instance-id) --document-name AWS-StartPortForwardingSession --parameters '{"portNumber":["8080"],"localPortNumber":["8080"]}'
+

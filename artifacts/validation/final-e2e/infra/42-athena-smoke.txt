@@ -1,0 +1,32 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+Resolving the deployed catalog
+-------------------------------------------------------------------------------
+  workgroup   = kafka-dev-lab-dev-wg
+  glue prefix = kafka_dev_lab_dev_*
+-------------------------------------------------------------------------------
+Smoke queries
+-------------------------------------------------------------------------------
+LABEL                      EXECUTION_ID                           STATE         BYTES  VERDICT
+01_layer_smoke.sql         43f6772d-e588-4d21-8610-842c23256090   FAILED            0  BLOCKED_BY_DESIGN
+02_partition_pruning.sql   0e86f2d7-7dc6-4be1-8292-7849dd3c1846   FAILED            0  BLOCKED_BY_DESIGN
+03_join_aggregate.sql      fd560651-16ca-4434-a866-49d4274345b4   FAILED            0  BLOCKED_BY_DESIGN
+04_iceberg_metadata.sql    71d16c86-9946-46e2-9ba2-bf076c61c3d4   FAILED            0  BLOCKED_BY_DESIGN
+05_reconciliation.sql      281874f8-9f6f-4ea7-a173-b1036293694f   FAILED            0  BLOCKED_BY_DESIGN
+06_bi_role_security.sql    31a48a9d-2c56-4413-b425-7fbe1825547e   FAILED            0  BLOCKED_BY_DESIGN

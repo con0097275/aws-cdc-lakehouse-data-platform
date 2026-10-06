@@ -1,0 +1,32 @@
+# Session 20 — pre-apply verification (8 checks). NOT APPLIED.
+Date: 2026-08-15T12:04:56Z
+Account 111122223333 | Region ap-southeast-1 | Profile my-aws-profile | Workspace default
+
+1 BACKEND     bucket exists, ap-southeast-1, versioning Enabled, AES256+BucketKey,
+              BucketOwnerEnforced, lifecycle active, 4/4 public-access blocks,
+              anon GET 403, TLS-only + unencrypted-upload deny, Project tag present
+2 INIT/STATE  backend=s3, key=aws-cdc-lakehouse/dev/terraform.tfstate, use_lockfile=true,
+              workspace=default (only), state EMPTY (no state file yet), no local tfstate,
+              terraform validate OK, Terraform 1.15.8 / AWS provider 6.56.0
+3 IDENTITY    arn:aws:iam::111122223333:user/my-aws-profile
+4 PLAN        saved to terraform/envs/dev/tfplan via scripts/tf.sh plan
+5 ACTIONS     CREATE 32 | UPDATE 0 | REPLACE 0 | DESTROY 0 | READ 4
+6 COST        +$0.0000/hr, ~+$1.00/month (1 lake KMS CMK); new run-rate ~$1.01/month
+7 MSK/KAFKA   0 msk resources, 0 module.kafka_platform addresses  -> NOT CREATED
+8 EXPENSIVE   0 NAT, 0 EKS, 0 Redshift, 0 Trino, 0 EC2, 0 EMR, 0 RDS, 0 VPC endpoint,
+              0 Secrets Manager, 0 LB, 0 ElastiCache
+
+ADR-021       0 plan resources reference the state bucket (stack does not manage own state)
+
+## Cost preview output
+  32 to add, 0 to change, 0 to destroy
+  hourly while running : $0.0000/hr
+  6-hour window        : $0.00
+  30 days 24/7         : $0.00
+  KMS CMKs (floor)     : $1.00/month
+  NAT gateways         : 0   (CLAUDE.md 4.2 requires 0)
+  Secrets Manager      : 0   (ADR-031 requires 0)
+
+## Plan file
+  81567 bytes  terraform/envs/dev/tfplan
+  sha256: f11f39804432d59871846b8e2df0b8e7b8f0daac1765a5bed0240153e8f46a34

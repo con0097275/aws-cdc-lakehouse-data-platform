@@ -1,0 +1,89 @@
+PHASE 14 PRE-FLIGHT — 2026-08-20T04:30Z.  TWO BLOCKERS FOUND, NOTHING APPLIED BY CLAUDE.
+
+STATE OF THE WORLD
+  terraform state          198 resources   (platform applied by the operator ~03:56Z)
+  MSK kafka-dev-lab-dev    ACTIVE, 3 x kafka.m7g.large, up since 2026-08-20T03:56:48Z
+  EC2 running              3   (t3a.xlarge 03:56, t3.large 04:22, t3.small 04:22)
+  EMR Serverless           1 application
+  module.reporting_ops     0 resources          <-- NOT APPLIED
+  DynamoDB tables          0                    <-- NOT APPLIED
+  burn rate                ~$1.1244/hr  ->  24h = $26.99 = 90% of the $30 monthly budget
+
+  So "REPORTING_INFRA_APPLIED_AND_VERIFIED" is true for the PLATFORM and false for the
+  REPORTING infrastructure. Phase 14 cannot capture execution_id, watermark before/after,
+  attempt_number or coordinator_run_id as durable evidence, because the runtime state store
+  those live in does not exist. The Airflow adapter falls back to an in-memory repository:
+  process-local, gone at the task boundary.
+
+--------------------------------------------------------------------------------
+BLOCKER 1 — changing auto_destroy_after REPLACES THE MSK CLUSTER
+--------------------------------------------------------------------------------
+  A/B isolation, same config otherwise:
+
+    auto_destroy_after = "2026-08-20T10:30:00Z"   ->  27 add, 112 change, 18 DESTROY
+    auto_destroy_after = "2026-08-16T18:00:00Z"   ->   9 add,   1 change,  0 destroy
+
+  The 18 are replacements, and they include:
+
+    module.kafka_platform[0].aws_msk_cluster.this        forced by client_subnets
+    module.kafka_platform[0].aws_subnet.{public,private}[0..2]   forced by availability_zone
+    module.emr_serverless[0].aws_emrserverless_application.spark forced by subnet_ids
+    module.{cdc_runtime,source_lab,kafka_platform}[0].aws_instance.*  forced by subnet_id
+
+  The planned availability_zone is UNKNOWN, not a different AZ. `local.azs` is
+  `slice(data.aws_availability_zones.available.names, 0, var.az_count)`
+  (modules/kafka_platform/locals.tf:4). `auto_destroy_after` feeds provider default_tags,
+  so changing it changes the PROVIDER configuration; the data source is then re-read at
+  apply time, its value is unknown during plan, and every subnet must be replaced -- which
+  cascades into MSK, EMR and all three EC2 instances.
+
+  ADR-027 REQUIRES updating auto_destroy_after for each new window. Following that rule
+  today destroys and recreates the Kafka cluster, losing every topic and all CDC state.
+
+  Not fixed here: pinning the AZs (e.g. an explicit az_names variable, or ignore_changes on
+  availability_zone) changes network identity and belongs in a reviewed decision.
+
+--------------------------------------------------------------------------------
+BLOCKER 2 — the untargeted plan SILENTLY REVOKES TWO MSK INGRESS RULES
+--------------------------------------------------------------------------------
+  Even with auto_destroy_after left alone, the 1 remaining `update` is:
+
+    module.kafka_platform[0].aws_security_group.msk
+
+  and the diff REMOVES two ingress rules on port 9098:
+
+    "MSK IAM SASL from EMR Serverless workers"   (sg-073bcf5116a43f851)
+    "MSK IAM SASL from the CDC runtime"          (sg-068cb5490766980c5)
+
+  Cause: `aws_security_group.msk` declares INLINE `ingress` blocks, while the rules above
+  are separate resources in other modules --
+
+    module.emr_serverless[0].aws_vpc_security_group_ingress_rule.msk_from_emr
+    module.cdc_runtime[0].aws_vpc_security_group_ingress_rule.msk_from_cdc_runtime
+
+  The AWS provider forbids mixing the two styles on one security group: the inline block is
+  authoritative and revokes rules it does not know about. The separate resources are in
+  state and unchanged, so they are NOT re-added in the same apply -- EMR Serverless and the
+  CDC runtime would lose Kafka access until a subsequent apply restored it.
+
+  That is the exact path Phase 14's CDC pipeline runs on.
+
+  Not fixed here: converting the inline rules to separate resources on a LIVE security
+  group in front of a running MSK cluster is a reviewed change, not a side effect of
+  unblocking a test.
+
+--------------------------------------------------------------------------------
+THE SAFE PATH TAKEN INSTEAD
+--------------------------------------------------------------------------------
+  terraform plan -target=module.reporting_ops -out=tfplan
+
+    actions   9 create, 0 update, 0 delete   (10 no-op, 1 read)
+    contents  4 DynamoDB tables, 1 IAM role, 2 IAM policies, 2 attachments
+    cost      $0.0000/hr, $0.00 idle
+    touches   nothing outside module.reporting_ops -- the MSK SG is not in it
+
+  -target is normally a smell. Here it is the point: it adds an isolated new module without
+  touching a live platform that has a latent plan-flap in front of it.
+
+  The saved plan is at terraform/envs/dev/tfplan. Apply is gated and cannot be
+  self-approved:  bash scripts/tf.sh apply --execute

@@ -1,0 +1,19 @@
+=== Oracle: users + CDC user + tables
+COREBANK_USER=1
+CDC_USER=0
+COREBANK_TABLES=5
+
+=== apicurio listening ports + compose
+--- compose apicurio ---
+  apicurio:
+    image: ${APICURIO_IMAGE}
+    container_name: cdc-apicurio
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: ${BOOTSTRAP}
+      # Risk R3: the registry is itself an MSK IAM client. Identical config to Connect's,
+      # and it fails more confusingly — REST starts, then 500s on every write.
+      # PROVEN NOT READ (2026-08-20). With only the KAFKASQL_* names below, Apicurio's
+      # Kafka clients came up as:
+

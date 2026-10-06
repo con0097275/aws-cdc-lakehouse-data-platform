@@ -1,0 +1,108 @@
+{
+ "oracle.coredb.corebank.account": {
+  "at": "2026-09-10T10:22:19.112342+00:00",
+  "config_version": "cdccfg-579dad0cdaef3d69",
+  "outcomes": [
+   {
+    "detail": "observed True",
+    "name": "event_identity_completeness",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "full_cdc_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "eod_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "realtime_window_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "dq",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "schema_comparison",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "consumer_test",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "latency",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "benchmark_measured",
+    "status": "PASS"
+   }
+  ],
+  "passed": true,
+  "table_id": "oracle.coredb.corebank.account"
+ },
+ "sqlserver.digital.dbo.digital_event": {
+  "at": "2026-09-10T10:22:26.463200+00:00",
+  "config_version": "cdccfg-579dad0cdaef3d69",
+  "outcomes": [
+   {
+    "detail": "observed True",
+    "name": "event_identity_completeness",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "full_cdc_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "eod_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "realtime_window_equivalence",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "dq",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "schema_comparison",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "consumer_test",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "latency",
+    "status": "PASS"
+   },
+   {
+    "detail": "observed True",
+    "name": "benchmark_measured",
+    "status": "PASS"
+   }
+  ],
+  "passed": true,
+  "table_id": "sqlserver.digital.dbo.digital_event"
+ }
+}

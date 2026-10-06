@@ -1,0 +1,52 @@
+# OPEN-03 SETTLED FROM CLOUDTRAIL — kafka.t3.small is NOT offered in ap-southeast-1
+# Captured: 2026-08-13T03:48:43Z by the Session 00 closeout pass
+# This is a CAPTURED API RESPONSE, not a code comment. No probe is required.
+
+Timeline reconstructed from CloudTrail, account 111122223333, ap-southeast-1:
+  2026-07-26T13:01:14Z  CreateCluster  kafka.t3.small   -> BadRequestException
+  2026-07-26T13:19:09Z  CreateCluster  kafka.m7g.large  -> SUCCESS
+  2026-07-26T19:09:46Z  DeleteCluster                   -> the destroy
+
+The rejection response, in full:
+
+  errorCode        : BadRequestException
+  invalidParameter : instanceType
+  eventTime        : 2026-07-26T13:01:14Z
+  awsRegion        : ap-southeast-1
+
+  message:
+    Unsupported InstanceType specified.
+    [express.m7g.12xlarge, express.m7g.16xlarge, express.m7g.2xlarge, express.m7g.4xlarge, express.m7g.8xlarge, express.m7g.large, express.m7g.xlarge, kafka.m5.12xlarge, kafka.m5.16xlarge, kafka.m5.24xlarge, kafka.m5.2xlarge, kafka.m5.4xlarge, kafka.m5.8xlarge, kafka.m5.large, kafka.m5.xlarge, kafka.m7g.12xlarge, kafka.m7g.16xlarge, kafka.m7g.2xlarge, kafka.m7g.4xlarge, kafka.m7g.8xlarge, kafka.m7g.large, kafka.m7g.xlarge]
+
+  Valid values, parsed:
+    - express.m7g.12xlarge
+    - express.m7g.16xlarge
+    - express.m7g.2xlarge
+    - express.m7g.4xlarge
+    - express.m7g.8xlarge
+    - express.m7g.large
+    - express.m7g.xlarge
+    - kafka.m5.12xlarge
+    - kafka.m5.16xlarge
+    - kafka.m5.24xlarge
+    - kafka.m5.2xlarge
+    - kafka.m5.4xlarge
+    - kafka.m5.8xlarge
+    - kafka.m5.large
+    - kafka.m5.xlarge
+    - kafka.m7g.12xlarge
+    - kafka.m7g.16xlarge
+    - kafka.m7g.2xlarge
+    - kafka.m7g.4xlarge
+    - kafka.m7g.8xlarge
+    - kafka.m7g.large
+    - kafka.m7g.xlarge
+
+CONCLUSION
+  kafka.t3.small is absent from the valid list. The smallest kafka.* broker offered
+  is kafka.m5.large / kafka.m7g.large. Repo A's choice of kafka.m7g.large was forced,
+  not preferred, and is already the cheapest available option (Graviton undercuts m5).
+  express.m7g.large exists but is MSK Express, a different pricing model - NOT costed.
+
+  OPEN-03 CLOSED, negative. scripts/probe-msk-instance-type.sh and its Gate 1
+  package are NO LONGER REQUIRED.

@@ -1,0 +1,2 @@
+qid=9a0e997e-6421-4de9-85a7-9033699a0f73 bytes=1240
+total_closing_balance	accounts	avg_balance	2031880937.77	321	6329847.16

@@ -1,0 +1,558 @@
+{
+  "summary": {
+    "failed": 39,
+    "failure_reasons": {
+      "<table>.eod_oracle_coredb_corebank_branch payload_after unreadable": 4,
+      "<table>.eod_oracle_coredb_corebank_transaction payload_after unreadable": 9,
+      "<table>.eod_sqlserver_digital_dbo_merchant payload_after unreadable": 3,
+      "<table>.mart_account_balance_daily has no column daily_row_count": 1,
+      "table <table>.int_customer_daily_balance does not exist in Glue": 5,
+      "table <table>.int_customer_daily_digital does not exist in Glue": 5,
+      "table <table>.int_customer_daily_txn does not exist in Glue": 5,
+      "table <table>.stg_fact_account_daily_snapshot does not exist in Glue": 2,
+      "table <table>.stg_fact_digital_engagement does not exist in Glue": 2,
+      "table <table>.stg_fact_transaction does not exist in Glue": 3
+    },
+    "total": 67,
+    "validated": 28,
+    "validated_pct": 41.8
+  },
+  "verdicts": [
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "customer_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "CUSTOMER_ID",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "full_name",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "FULL_NAME",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "dob",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "DOB",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "segment_code",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "SEGMENT_CODE",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "status",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "STATUS",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_customer",
+      "downstream_column": "branch_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_customer",
+      "upstream_column": "BRANCH_ID",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "account_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "ACCOUNT_ID",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "customer_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "CUSTOMER_ID",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "product_code",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "PRODUCT_CODE",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "currency",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "CURRENCY",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "status",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "STATUS",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_account",
+      "downstream_column": "balance",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_account",
+      "upstream_column": "BALANCE",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_branch",
+      "downstream_column": "branch_id",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch",
+      "upstream_column": "BRANCH_ID",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_branch",
+      "downstream_column": "branch_name",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch",
+      "upstream_column": "BRANCH_NAME",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_branch",
+      "downstream_column": "region_code",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch",
+      "upstream_column": "REGION_CODE",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_branch",
+      "downstream_column": "status",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_branch",
+      "upstream_column": "STATUS",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "transaction_id",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "TRANSACTION_ID",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "account_id",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "ACCOUNT_ID",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "txn_ts",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "TXN_TS",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "txn_type",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "TXN_TYPE",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "amount",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "AMOUNT",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "currency",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "CURRENCY",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "channel_code",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "CHANNEL_CODE",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "merchant_id",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "MERCHANT_ID",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.banking_transaction",
+      "downstream_column": "status",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_oracle_coredb_corebank_transaction",
+      "upstream_column": "STATUS",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_channel",
+      "downstream_column": "channel_code",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_channel",
+      "upstream_column": "channel_code",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_channel",
+      "downstream_column": "channel_name",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_channel",
+      "upstream_column": "channel_name",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_channel",
+      "downstream_column": "channel_group",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_channel",
+      "upstream_column": "channel_group",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_merchant",
+      "downstream_column": "merchant_id",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant",
+      "upstream_column": "merchant_id",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_merchant",
+      "downstream_column": "merchant_name",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant",
+      "upstream_column": "merchant_name",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_merchant",
+      "downstream_column": "category_code",
+      "reason": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant payload_after unreadable",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_merchant",
+      "upstream_column": "category_code",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_app_user",
+      "downstream_column": "user_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_app_user",
+      "upstream_column": "user_id",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_app_user",
+      "downstream_column": "customer_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_app_user",
+      "upstream_column": "customer_id",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_app_user",
+      "downstream_column": "device_type",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_app_user",
+      "upstream_column": "device_type",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_app_user",
+      "downstream_column": "status",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_app_user",
+      "upstream_column": "status",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "event_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "event_id",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "user_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "user_id",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "event_ts",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "event_ts",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "event_name",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "event_name",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "session_id",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "session_id",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_curated.digital_event",
+      "downstream_column": "device_type",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_snapshot.eod_sqlserver_digital_dbo_digital_event",
+      "upstream_column": "device_type",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "downstream_column": "account_sk",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot",
+      "upstream_column": "account_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "downstream_column": "closing_balance",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_account_daily_snapshot",
+      "upstream_column": "closing_balance",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_channel_performance_daily",
+      "downstream_column": "channel_sk",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_transaction does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_transaction",
+      "upstream_column": "channel_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_channel_performance_daily",
+      "downstream_column": "avg_txn_amount",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_transaction does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_transaction",
+      "upstream_column": "avg_txn_amount",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_monthly",
+      "downstream_column": "account_sk",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "upstream_column": "account_sk",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_monthly",
+      "downstream_column": "business_date",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "upstream_column": "business_date",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_monthly",
+      "downstream_column": "closing_balance",
+      "reason": "",
+      "upstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "upstream_column": "closing_balance",
+      "validated": true
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_account_balance_monthly",
+      "downstream_column": "daily_row_count",
+      "reason": "kafka_dev_lab_dev_mart.mart_account_balance_daily has no column daily_row_count",
+      "upstream": "kafka_dev_lab_dev_mart.mart_account_balance_daily",
+      "upstream_column": "daily_row_count",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_transaction_monitoring_10m",
+      "downstream_column": "bucket_start",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_transaction does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_transaction",
+      "upstream_column": "bucket_start",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "customer_sk",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_txn does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_txn",
+      "upstream_column": "customer_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "customer_sk",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_balance does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_balance",
+      "upstream_column": "customer_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "customer_sk",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_digital does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_digital",
+      "upstream_column": "customer_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "business_date",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_txn does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_txn",
+      "upstream_column": "business_date",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "business_date",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_balance does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_balance",
+      "upstream_column": "business_date",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "business_date",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_digital does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_digital",
+      "upstream_column": "business_date",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "processing_status",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_txn does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_txn",
+      "upstream_column": "processing_status",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "processing_status",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_balance does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_balance",
+      "upstream_column": "processing_status",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "processing_status",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_digital does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_digital",
+      "upstream_column": "processing_status",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "run_id",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_txn does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_txn",
+      "upstream_column": "run_id",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "run_id",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_balance does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_balance",
+      "upstream_column": "run_id",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "run_id",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_digital does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_digital",
+      "upstream_column": "run_id",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "built_at",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_txn does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_txn",
+      "upstream_column": "built_at",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "built_at",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_balance does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_balance",
+      "upstream_column": "built_at",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_customer_360_daily",
+      "downstream_column": "built_at",
+      "reason": "table kafka_dev_lab_dev_mart.int_customer_daily_digital does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.int_customer_daily_digital",
+      "upstream_column": "built_at",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_channel_engagement_daily",
+      "downstream_column": "channel_sk",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_digital_engagement does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_digital_engagement",
+      "upstream_column": "channel_sk",
+      "validated": false
+    },
+    {
+      "downstream": "kafka_dev_lab_dev_mart.mart_channel_engagement_daily",
+      "downstream_column": "business_date",
+      "reason": "table kafka_dev_lab_dev_mart.stg_fact_digital_engagement does not exist in Glue",
+      "upstream": "kafka_dev_lab_dev_mart.stg_fact_digital_engagement",
+      "upstream_column": "business_date",
+      "validated": false
+    }
+  ]
+}

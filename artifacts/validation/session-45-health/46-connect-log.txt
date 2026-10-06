@@ -1,0 +1,9 @@
+-- ERROR/WARN count in the last 2000 log lines:
+2
+-- distinct ERROR lines:
+-- last snapshot/stream milestones:
+[2026-09-20 09:58:35,390] INFO [oracle-corebank-source|task-0] Snapshot completed (io.debezium.pipeline.source.AbstractSnapshotChangeEventSource:112)
+[2026-09-20 09:58:35,446] INFO [oracle-corebank-source|task-0] Starting streaming (io.debezium.pipeline.ChangeEventSourceCoordinator:312)
+[2026-09-20 09:58:37,442] INFO [sqlserver-digital-source|task-0] Snapshot completed (io.debezium.pipeline.source.AbstractSnapshotChangeEventSource:112
+[2026-09-20 09:58:37,479] INFO [sqlserver-digital-source|task-0] Starting streaming (io.debezium.connector.sqlserver.SqlServerChangeEventSourceCoordin
+

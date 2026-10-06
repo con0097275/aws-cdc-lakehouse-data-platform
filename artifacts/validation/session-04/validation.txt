@@ -1,0 +1,32 @@
+# Session 04 — validation transcript
+# Captured: 2026-08-14T07:15:51Z
+
+=== IDENTITY GUARD (CLAUDE.md section 2) ===
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+profile=my-aws-profile region=ap-southeast-1 workspace=default
+
+$ terraform fmt -recursive -check
+  clean
+
+$ terraform validate
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+
+$ terraform plan -var enable_source_lab=true -var enable_cdc_runtime=true
+  156 to add, 0 to change, 0 to destroy
+
+$ checkov -d terraform
+Passed checks: 400, Failed checks: 27, Skipped checks: 0
+
+$ bash -n on shell assets
+  ok   cdc-runtime.sh
+  ok   create-topics.sh
+  ok   verify-artifacts.sh
+  ok   smoke-test.sh
+
+$ tflint
+  ABSENT — OPEN-06 still open. Not claimed as passing.

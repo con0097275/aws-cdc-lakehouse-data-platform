@@ -1,0 +1,367 @@
+{
+  "approval": {
+    "approval_id": "apr:f52370e95c57",
+    "approval_scope": "4088ac6f5e957d31",
+    "approved_at": "2026-09-30T09:50:29.495716+00:00",
+    "approver_identity": "alice",
+    "environment": "dev",
+    "expires_at": "2026-09-30T13:50:29.495716+00:00",
+    "plan_hash": "76854f12a2808b86",
+    "plan_id": "aigr1:76854f12a2808b86"
+  },
+  "captured_at": "2026-09-30T09:49:52+00:00",
+  "defect": {
+    "affected_keys": [
+      "A001",
+      "A002"
+    ],
+    "correct_total": 1125.0,
+    "mart": "kafka_dev_lab_dev_curated.aigr_mart_balance",
+    "nature": "2 balances restated by the source after EOD closed",
+    "table": "kafka_dev_lab_dev_curated.aigr_eod_account",
+    "wrong_total": 1000.0
+  },
+  "execution": {
+    "detail": "7 statement(s) executed",
+    "execution_id": "exe:73bdfbbce2ed",
+    "idempotency_key": "76854f12a2808b86",
+    "plan_hash": "76854f12a2808b86",
+    "plan_id": "aigr1:76854f12a2808b86",
+    "state": "SUCCEEDED",
+    "turns_completed": 4
+  },
+  "intent": {
+    "model_reply": "EXECUTE",
+    "usage": {
+      "error": "ResourceNotFoundException: Model use case details have not been submitted for this account. Fill out the Anthropic use case details form before usi",
+      "skipped": "no invokable Bedrock model"
+    }
+  },
+  "model": "",
+  "model_available": false,
+  "model_candidates_tried": [
+    "global.anthropic.claude-haiku-4-5-20251001-v1:0",
+    "apac.anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "apac.anthropic.claude-3-haiku-20240307-v1:0"
+  ],
+  "model_error": "ResourceNotFoundException: Model use case details have not been submitted for this account. Fill out the Anthropic use case details form before usi",
+  "narration": {
+    "text": "",
+    "usage": {
+      "error": "ResourceNotFoundException: Model use case details have not been submitted for this account. Fill out the Anthropic use case details form before usi",
+      "skipped": "no invokable Bedrock model"
+    }
+  },
+  "phase": "AIGR10 LIVE",
+  "plan": {
+    "actions": [
+      {
+        "action": "EOD_REBUILD",
+        "granularity": "COB_DATE",
+        "job_id": "eod_build",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "aa8d671a0b9915c6",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 0,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data | widened to COB_DATE: the job cannot recompute a key subset",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "eod:oracle_coredb_corebank_account",
+        "turn": 0
+      },
+      {
+        "action": "MART_RERUN",
+        "granularity": "BUSINESS_KEY_SET",
+        "job_id": "reporting",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "4088ac6f5e957d31",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 2,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "mart:aigr_mart_balance",
+        "turn": 2
+      },
+      {
+        "action": "DQ_RECHECK",
+        "granularity": "COB_DATE",
+        "job_id": "eod_build",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "aa8d671a0b9915c6",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 0,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data | widened to COB_DATE: the job cannot recompute a key subset",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "eod:oracle_coredb_corebank_account",
+        "turn": 1
+      },
+      {
+        "action": "RECONCILE",
+        "granularity": "COB_DATE",
+        "job_id": "eod_build",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "aa8d671a0b9915c6",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 0,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data | widened to COB_DATE: the job cannot recompute a key subset",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "eod:oracle_coredb_corebank_account",
+        "turn": 1
+      },
+      {
+        "action": "CERTIFY",
+        "granularity": "COB_DATE",
+        "job_id": "eod_build",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "aa8d671a0b9915c6",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 0,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data | widened to COB_DATE: the job cannot recompute a key subset",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "eod:oracle_coredb_corebank_account",
+        "turn": 1
+      },
+      {
+        "action": "DQ_RECHECK",
+        "granularity": "BUSINESS_KEY_SET",
+        "job_id": "reporting",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "4088ac6f5e957d31",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 2,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "mart:aigr_mart_balance",
+        "turn": 3
+      },
+      {
+        "action": "RECONCILE",
+        "granularity": "BUSINESS_KEY_SET",
+        "job_id": "reporting",
+        "scope": {
+          "affected_partitions": [],
+          "bounded": true,
+          "cob_dates": [
+            "2026-09-28"
+          ],
+          "environment": "dev",
+          "fingerprint": "4088ac6f5e957d31",
+          "flow_mode": "",
+          "from_date": null,
+          "key_count": 2,
+          "key_set_ref": "",
+          "reason": "column lineage VALIDATED against real data",
+          "request_id": "req-e05047b7",
+          "requested_by": "alice",
+          "root_asset_id": "eod:oracle_coredb_corebank_account",
+          "root_column": "BALANCE",
+          "scope_confidence": "VALIDATED",
+          "scope_source": "COLUMN_LINEAGE",
+          "to_date": null
+        },
+        "target": "mart:aigr_mart_balance",
+        "turn": 3
+      }
+    ],
+    "created_at": "2026-09-30T09:50:29.495456+00:00",
+    "environment": "dev",
+    "excluded": [
+      {
+        "asset": "stream:digital_events",
+        "reason": "not downstream of EOD ACCOUNT"
+      }
+    ],
+    "incident_id": "inc-e05047b7",
+    "plan_hash": "76854f12a2808b86",
+    "plan_id": "aigr1:76854f12a2808b86",
+    "root_asset_id": "eod:oracle_coredb_corebank_account",
+    "root_cause": {
+      "category": "LATE_SOURCE_EVENT",
+      "confidence": 0.93,
+      "detail": "2 of 4 rows disagree with FULL_CDC",
+      "disposition": "AUTO_CORRECT",
+      "evidence_refs": [
+        "dq:aigr-e05047b7"
+      ],
+      "failure_class": "late_arriving_data",
+      "may_recover": true
+    },
+    "scope": {
+      "affected_partitions": [],
+      "bounded": true,
+      "cob_dates": [
+        "2026-09-28"
+      ],
+      "environment": "dev",
+      "fingerprint": "4088ac6f5e957d31",
+      "flow_mode": "",
+      "from_date": null,
+      "key_count": 2,
+      "key_set_ref": "",
+      "reason": "column lineage VALIDATED against real data",
+      "request_id": "req-e05047b7",
+      "requested_by": "alice",
+      "root_asset_id": "eod:oracle_coredb_corebank_account",
+      "root_column": "BALANCE",
+      "scope_confidence": "VALIDATED",
+      "scope_source": "COLUMN_LINEAGE",
+      "to_date": null
+    },
+    "turn_count": 4
+  },
+  "policy": {
+    "outcome": "AUTO_EXECUTE_ALLOWED",
+    "reasons": [
+      "bounded scope, validated lineage, known repairable cause, small blast radius, no prior failed attempt"
+    ]
+  },
+  "resolution": {
+    "asset": {
+      "asset_id": "eod:oracle_coredb_corebank_account",
+      "classification": "confidential",
+      "domain": "core_banking",
+      "kind": "eod",
+      "name": "oracle_coredb_corebank_account",
+      "owner": "my-aws-profile"
+    },
+    "column_confidence": "VALIDATED",
+    "column_edges": 3,
+    "table_impacted": 16
+  },
+  "root_cause": {
+    "category": "LATE_SOURCE_EVENT",
+    "confidence": 0.93,
+    "detail": "2 of 4 rows disagree with FULL_CDC",
+    "disposition": "AUTO_CORRECT",
+    "evidence_refs": [
+      "dq:aigr-e05047b7"
+    ],
+    "failure_class": "late_arriving_data",
+    "may_recover": true
+  },
+  "scenario": "source-update",
+  "scope_path": {
+    "column_lineage_validated": true,
+    "column_scope_refused": false,
+    "downgraded": false,
+    "scope": {
+      "affected_partitions": [],
+      "bounded": true,
+      "cob_dates": [
+        "2026-09-28"
+      ],
+      "environment": "dev",
+      "fingerprint": "4088ac6f5e957d31",
+      "flow_mode": "",
+      "from_date": null,
+      "key_count": 2,
+      "key_set_ref": "",
+      "reason": "column lineage VALIDATED against real data",
+      "request_id": "req-e05047b7",
+      "requested_by": "alice",
+      "root_asset_id": "eod:oracle_coredb_corebank_account",
+      "root_column": "BALANCE",
+      "scope_confidence": "VALIDATED",
+      "scope_source": "COLUMN_LINEAGE",
+      "to_date": null
+    }
+  },
+  "verdict": "PASS",
+  "verification": {
+    "dq_after": "PASS",
+    "expected": 1125.0,
+    "mart_after": 1125.0,
+    "mart_before": 1000.0,
+    "violations_after": 0,
+    "violations_before": 2
+  }
+}

@@ -1,0 +1,15 @@
+=== 28b39c6a (previous data-lake CMK) state
+{
+    "State": "Enabled",
+    "Enabled": true,
+    "Deletion": null,
+    "Desc": "kafka-dev-lab-dev data lake encryption (S01-11)"
+}
+=== can we read the previously-blocked objects now?
+  artifacts/cdc/table-plan.json          HEAD ok
+  artifacts/cdc/table-plan.json (GET)    READABLE
+  artifacts/code/cdc-framework.zip       HEAD ok
+  artifacts/code/cdc-framework.zip (GET) READABLE
+=== a warehouse data file from 2026-09-17
+  sample: warehouse/full_cdc/
+  READABLE

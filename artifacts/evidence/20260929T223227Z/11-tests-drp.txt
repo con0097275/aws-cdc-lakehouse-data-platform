@@ -1,0 +1,34 @@
+$ python3 -m pytest spark/tests/test_drp1_metadata.py spark/tests/test_drp1_contracts.py spark/tests/test_drp2_datahub.py spark/tests/test_drp3_openlineage.py spark/tests/test_drp4_ingestion.py spark/tests/test_drp5_quality.py spark/tests/test_drp6_lineage.py spark/tests/test_drp8_impact_recovery.py spark/tests/test_drp10_observability.py -q
+
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+........................................................................ [ 94%]
+.....................                                                    [100%]
+=============================== warnings summary ===============================
+spark/tests/test_drp2_datahub.py::TestUrnIdentity::test_one_urn_per_table_across_every_lake_layer
+spark/tests/test_drp5_quality.py::TestDataHubAssertions::test_every_check_becomes_an_assertion
+  ~/.local/lib/python3.10/site-packages/_pytest/fixtures.py:1313: PytestRemovedIn10Warning: Class-scoped fixture defined as instance method is deprecated.
+  Instance attributes set in this fixture will NOT be visible to test methods,
+  as each test gets a new instance while the fixture runs only once per class.
+  Use @classmethod decorator and set attributes on cls instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#class-scoped-fixture-as-instance-method
+    fixturefunc = resolve_fixture_function(fixturedef, request)
+
+spark/tests/test_drp2_datahub.py::TestLiveSchemaDefects::test_the_transport_reports_what_the_server_rejected
+  ~/.local/lib/python3.10/site-packages/_pytest/unraisableexception.py:67: PytestUnraisableExceptionWarning: Exception ignored in: <function _TemporaryFileCloser.__del__ at 0x76143d146c20>
+  
+  Traceback (most recent call last):
+    File "/usr/local/lib/python3.10/tempfile.py", line 450, in __del__
+      self.close()
+    File "/usr/local/lib/python3.10/tempfile.py", line 443, in close
+      self.file.close()
+  AttributeError: '_Body' object has no attribute 'close'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnraisableExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+381 passed, 3 warnings in 2.16s

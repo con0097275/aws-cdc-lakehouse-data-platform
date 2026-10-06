@@ -1,0 +1,35 @@
+# Session 10 — validation transcript
+# Captured: 2026-08-14T10:40:24Z
+
+=== LIVE AWS STATE ===
+  MSK clusters       : 0
+  EC2 running        : 0
+  EMR Serverless apps: 0
+  Glue databases     : 1  <- 'vannk-dev-oracle-db', NOT from this stack
+  => unapplied; partition/file-layout and MERGE BENCHMARK not measurable -> NOT_TESTED
+
+  NOTE: earlier sessions recorded the account as empty. It is not quite: a Glue database
+  'vannk-dev-oracle-db' exists, predating this project's Terraform (our Glue databases are
+  stream/full_cdc/snapshot/mart/ops and none are present). It is an orphan from earlier
+  work, not something Session 10 created. It holds 39 TABLES and has no crawler attached.
+
+  Cost is negligible (Glue Data Catalog is free below 1M objects), so this is not a budget
+  issue -- but 39 catalogued tables of unknown provenance in the target region are a
+  governance and naming-collision concern for Session 14, and prior sessions' "the account
+  is empty" was not accurate. Tracked as OPEN-20. NOT deleted: it is outside this session's
+  scope, and destroying unidentified catalogued data needs an explicit decision.
+
+=== FULL SUITE ===
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+...............................................................          [100%]
+207 passed in 102.17s (0:01:42)
+
+=== SESSION 10 SUITES ===
+  test_scd2            27   SCD2 versioning, deterministic SKs, point-in-time join
+  test_kimball_spark   19   facts, additivity registry, four marts
+  (Sessions 06-09     161   unchanged)
+
+=== STATIC VALIDATION ===
+14 passed, 0 failed, 0 skipped
+  shellcheck ABSENT - skipped (OPEN-06)

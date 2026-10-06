@@ -1,0 +1,61 @@
+# Lineage edges that exist only in Python, declared here so the graph is not broken.
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# `spark/jobs/curated/curated_build.py::build_facts` reads conformed entities and dimensions
+# and writes the Kimball facts. Nothing in config says so, so the graph built from config
+# alone has a HOLE exactly between CURATED and MART -- and a hole reads as "nothing depends
+# on this", which is the most dangerous wrong answer an impact query can give.
+#
+# These edges are `declared`, not `derived`, and that distinction is the point: they are a
+# human's reading of a Python function, not an instruction the function follows. A recovery
+# plan may not cross a declared edge automatically
+# (docs/LINEAGE_SOURCE_MATRIX.md 5), so a mart rebuild that depends on one of these is
+# always operator-approved. That is the correct outcome while the producer is undeclared.
+#
+# The permanent fix is to move the fact builders onto a config contract like
+# `reporting/curated/entities.yaml`, at which point these entries are DELETED and the edges
+# become derived. Tracked as a DRP6 open item, not silently left as an equivalent.
+
+version: 1
+updated: 2026-09-30
+
+edges:
+
+  # The Kimball FACTS moved to `reporting/curated/facts.yaml` (2026-09-30) and are now
+  # DERIVED, because `build_facts` asserts its inputs against that file at runtime. They were
+  # here while the claim was only a human's reading of the code -- which is exactly the
+  # distinction this file's header describes, applied to itself.
+
+  # ---- Generated reference dimensions. No source system publishes them. -------------
+  - downstream: curated:dim_date
+    upstreams: []
+    job: curated_build
+    declared_in: spark/jobs/curated/curated_build.py
+    reason: >-
+      GENERATED, not derived from any source. Recorded with an empty upstream list so the
+      audit does not report it as an orphan -- "no parent" is the correct answer here, and
+      leaving it undeclared would make a real orphan indistinguishable from this one.
+  - downstream: curated:dim_time
+    upstreams: []
+    job: curated_build
+    declared_in: spark/jobs/curated/curated_build.py
+    reason: Generated 1,440-row time-of-day dimension.
+  - downstream: curated:dim_currency
+    upstreams: []
+    job: curated_build
+    declared_in: spark/jobs/curated/curated_build.py
+    reason: Reference data. No source system publishes an FX rate here.
+  - downstream: curated:dim_product
+    upstreams: []
+    job: curated_build
+    declared_in: spark/dimensions/dim_builder.py
+    reason: Product reference dimension with no CDC source in this lab.
+  - downstream: curated:dim_customer_bi
+    upstreams:
+      - curated:dim_customer
+    job: reporting
+    declared_in: spark/reporting/ (Python only)
+    reason: >-
+      The BI-facing customer dimension. Also carried as an `undeclared_asset` finding by the
+      governance compile -- this entry gives it lineage; it does not close the registration gap.

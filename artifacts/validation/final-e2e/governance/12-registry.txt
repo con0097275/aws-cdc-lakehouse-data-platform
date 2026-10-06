@@ -1,0 +1,6 @@
+  datasets: 12   domains: 3
+  fields missing (counting defaults as present): {}
+  classifications: ['confidential', 'internal', 'operational', 'restricted']
+  pii datasets   : 6
+  bi_access mix  : ['denied', 'read']
+  deletion_blocked: 2

@@ -1,0 +1,31 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+1. RUNNING COMPUTE — billed per hour, STOPPABLE
+-------------------------------------------------------------------------------
+  these are the ones worth stopping between sessions
+  MSK clusters               0
+  EC2 running                0
+  EMR Serverless apps        0
+  EMR jobs RUNNING           0
+  EKS clusters               0
+  RDS instances              0
+  Redshift workgroups        0
+
+  EC2 detail (Component tag identifies the workload):
+      (no EC2 instances in any state)

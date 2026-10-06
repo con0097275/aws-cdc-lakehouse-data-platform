@@ -1,0 +1,38 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+source lab health
+-------------------------------------------------------------------------------
+  command id ccfa98ac-1f79-4bad-a155-d7fa23efd179 — waiting
+
+=== containers ===
+  [PASS] source-oracle healthy
+  [PASS] source-sqlserver healthy
+
+=== Oracle CDC preconditions ===
+  [PASS] log_mode=ARCHIVELOG
+  [PASS] supplemental logging MIN=YES
+
+=== SQL Server CDC preconditions ===
+  [PASS] SQL Server Agent Running
+  [PASS] database CDC enabled
+  [PASS] 4 tables tracked by CDC
+
+=== result ===
+  ALL CHECKS PASSED - safe to deploy connectors
+

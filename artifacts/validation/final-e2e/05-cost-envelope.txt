@@ -1,0 +1,35 @@
+=== HOURLY BASELINE (everything up, no EMR job running) ===
+  MSK 3 x kafka.m7g.large        0.7650 /hr   (62.0% of baseline)
+  EC2 airflow t3.large           0.1056 /hr
+  EC2 cdc-runtime t3.large       0.1056 /hr
+  EC2 toolbox t3.small           0.0264 /hr
+  EC2 source-lab t3a.xlarge      0.1888 /hr
+  EC2 subtotal                   0.4264 /hr
+  EBS 150 GiB gp3              0.0197 /hr   (bills while STOPPED too)
+  MSK storage 60 GiB            0.0099 /hr   (ONE-WAY RATCHET, cannot shrink)
+  Glue interface endpoint x1     0.0130 /hr   (per AZ; 3 AZ would be 0.0390)
+  NAT gateway                    0.0000 /hr   (0 required, 0 planned)
+  BASELINE                       1.2340 /hr
+
+=== METERED ON TOP (only while working) ===
+  EMR Serverless ARM at MAX (16 vCPU/64 GB)  1.2091 /hr
+  EMR Serverless ARM at HALF (8 vCPU/32 GB)  0.6046 /hr
+  Athena, one query at the 10 GiB cutoff  0.0488 each (workgroup-enforced ceiling)
+
+=== 2h WINDOW ===
+  baseline 2h                             2.47
+  EXPECTED  (EMR half x 1.0h, 40 light queries, misc)   ~$ 4.07
+  HARD CAP  (EMR MAX all 2h, 40 queries ALL at cutoff)  $ 7.34
+  >>> ABORT THRESHOLD (hard cap, rounded up)   $ 8.00
+
+=== 4h WINDOW ===
+  baseline 4h                             4.94
+  EXPECTED  (EMR half x 2.0h, 80 light queries, misc)   ~$ 7.95
+  HARD CAP  (EMR MAX all 4h, 80 queries ALL at cutoff)  $ 14.18
+  >>> ABORT THRESHOLD (hard cap, rounded up)   $ 15.00
+
+=== RETAINED AFTER DESTROY (per month, until deleted) ===
+  2 new KMS CMKs from this plan            $2.00/mo
+  4 lake CMKs already Enabled              $4.00/mo
+  S3 lake 85.6 MB + new objects           ~$0.01/mo
+  NOTE: 4 further CMKs are PendingDeletion and drain to $0 by 2026-09-05.

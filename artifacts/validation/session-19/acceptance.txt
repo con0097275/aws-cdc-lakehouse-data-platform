@@ -1,0 +1,38 @@
+# Session 19 — final end-to-end acceptance test
+# Captured: 2026-08-15T08:43:10Z
+
+=== THE RESULT THAT DETERMINES ALL OTHERS ===
+  The end-to-end pipeline acceptance test COULD NOT BE EXECUTED.
+  Verified live for this report:
+    MSK=0 EC2=0 EMR=0 tagged=0
+    terraform state: none — never applied
+  Blocker: scripts/bootstrap-state-backend.sh --execute has never been run.
+
+  Blocked criteria are labelled BLOCKED, not NOT_TESTED. A named unmet prerequisite
+  is different from an omission, and calling one the other would misrepresent both.
+
+=== SCENARIOS: 11 PASS / 3 BLOCKED / 1 PARTIAL / 0 FAIL ===
+=== CRITERIA : 9 PASS / 4 BLOCKED / 2 PARTIAL / 0 FAIL ===
+
+=== GAP FOUND AND FIXED IN THIS SESSION ===
+  Schema evolution was classified BLOCKED — then found to be blocked for the WRONG
+  reason: it had NO EXECUTABLE TEST AT ALL, not merely no deployment.
+  The lake's tolerance for schema change needs no registry, broker or AWS.
+  5 tests added, mutation-checked. 400 -> 405 tests.
+
+=== FULL SUITE AFTER THE FIX ===
+405 passed, 5 warnings in 104.28s (0:01:44)
+Closing down clientserver connection
+
+=== NEW TESTS ===
+.....                                                                    [100%]
+5 passed in 13.98s
+
+=== MUTATION CHECK ON THE NEW TESTS ===
+  E1: relax the completeness threshold so a dropped column passes silently
+      -> FAILED test_the_silent_null_is_detectable_by_a_completeness_check
+
+=== VERDICT ===
+  READY_FOR_PORTFOLIO
+  NOT ready as a validated end-to-end pipeline — 3 scenarios and 4 criteria remain
+  BLOCKED on a first deployment. Nothing was destroyed; no spend was approved.

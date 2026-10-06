@@ -1,0 +1,79 @@
+{
+ "cob_date": "2026-08-22",
+ "detail": {
+  "consumer": {
+   "legacy": [
+    [
+     "r",
+     "6000"
+    ]
+   ],
+   "per_table": [
+    [
+     "r",
+     "6000"
+    ]
+   ]
+  },
+  "counts": {
+   "legacy_identities": 6000,
+   "legacy_rows": 12000,
+   "legacy_rows_without_identity": 6000,
+   "per_table_identities": 6000,
+   "per_table_rows": 6000
+  },
+  "dq": {
+   "event_date_is_null": 0,
+   "event_id": 0,
+   "user_id": 0
+  },
+  "eod": {
+   "legacy": [
+    "6000",
+    "3000"
+   ],
+   "per_table": [
+    "6000",
+    "3000"
+   ]
+  },
+  "identity": {
+   "in_both": 6000,
+   "only_in_legacy": 0,
+   "only_in_per_table": 0
+  },
+  "latency": {
+   "legacy_ms": 534.0,
+   "per_table_ms": 543.0
+  },
+  "realtime": {
+   "legacy": 6000,
+   "per_table": 6000
+  },
+  "schema": {
+   "legacy_only_breaking": [],
+   "legacy_only_ingest_artifacts": {
+    "loaded_at": "written by the old staging job; no consumer reads it"
+   },
+   "per_table_extra": [
+    "dv_pk_hash",
+    "ingest_job",
+    "ingest_run_id",
+    "schema_global_id",
+    "source_database"
+   ]
+  }
+ },
+ "observed": {
+  "benchmark_measured": true,
+  "consumer_test": true,
+  "dq": true,
+  "eod_equivalence": true,
+  "event_identity_completeness": true,
+  "full_cdc_equivalence": true,
+  "latency": true,
+  "realtime_window_equivalence": true,
+  "schema_comparison": true
+ },
+ "table_id": "sqlserver.digital.dbo.digital_event"
+}

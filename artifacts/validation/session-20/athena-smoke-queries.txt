@@ -1,0 +1,6 @@
+01_layer_smoke.sql|14d00150-8cc7-4b91-aea3-99b088a3dd45|FAILED|0|SCHEMA_NOT_FOUND: line 1:64: Schema 'stream' does not exist
+02_partition_pruning.sql|9ce940cc-0b43-44c6-bd58-c436c02e3bb0|FAILED|0|SCHEMA_NOT_FOUND: line 1:62: Schema 'mart' does not exist
+03_join_aggregate.sql|71f31778-6948-4654-8c89-35a75070ad92|FAILED|0|SCHEMA_NOT_FOUND: line 1:87: Schema 'mart' does not exist
+04_iceberg_metadata.sql|9683265f-fe74-4edd-a468-4d2260e55842|FAILED|0|SCHEMA_NOT_FOUND: line 1:189: Schema 'mart' does not exist
+05_reconciliation.sql|1231f558-cfcb-4dbe-9e10-e32508dfe796|FAILED|0|SCHEMA_NOT_FOUND: line 1:40: Schema 'stream' does not exist
+06_bi_role_security.sql|9115d84c-9a7f-4b6a-92a6-a808376dccef|FAILED|0|SCHEMA_NOT_FOUND: line 1:22: Schema 'stream' does not exist

@@ -1,0 +1,69 @@
+CDC E2E — SOURCE + DEBEZIUM + KAFKA EVIDENCE
+Captured 2026-09-03T09:47-09:50Z. Controlled PK 990001 on both engines.
+============================================================================
+
+ORACLE  COREBANK.CUSTOMER   (PK CUSTOMER_ID, reserved 990001; table MAXPK was 100200)
+  step                  SCN        source timestamp
+  O1_INSERT             3087594    2026-09-03T09:47:11.212+00:00
+  O2_UPDATE_NONKEY      3087601    2026-09-03T09:47:11.487+00:00
+  O3_UPDATE_SECOND      3087608    2026-09-03T09:47:11.767+00:00
+  O4_DELETE             3087615    2026-09-03T09:47:12.044+00:00
+  O5_RECREATE_SAME_PK   3087622    2026-09-03T09:47:12.353+00:00
+  SCN strictly increasing across all five steps.
+  final row : 990001 | E2E Alpha REBORN | PRIORITY | ACTIVE | branch 2
+  table count 200 -> 201
+
+SQLSERVER  dbo.app_user   (PK user_id, reserved 990001; table MAXPK was 700150)
+  step                  max LSN after commit           source timestamp
+  S1_INSERT             0x0000002B00001D380003         2026-09-03T09:49:28.522
+  S2_UPDATE_NONKEY      0x0000002B00001D380003         2026-09-03T09:49:29.755
+  S3_UPDATE_SECOND      0x0000002B00001D380003         2026-09-03T09:49:31.016
+  S4_DELETE             0x0000002B00001D380003         2026-09-03T09:49:32.228
+  S5_RECREATE_SAME_PK   0x0000002B00001DD80005         2026-09-03T09:49:33.530
+  final row : 990001 | 100002 | WEB | ACTIVE       table count 150 -> 151
+
+  cdc.dbo_app_user_CT rows for PK 990001 (source-side truth, ordered by start_lsn,seqval):
+    __$start_lsn                    op  device   status      meaning
+    0x0000002B00001D380003          2   IOS      ACTIVE      insert            (S1)
+    0x0000002B00001D500003          3   IOS      ACTIVE      update before-img (S2)
+    0x0000002B00001D500003          4   ANDROID  ACTIVE      update after-img  (S2)
+    0x0000002B00001D580003          3   ANDROID  ACTIVE      update before-img (S3)
+    0x0000002B00001D580003          4   ANDROID  SUSPENDED   update after-img  (S3)
+    0x0000002B00001DD00005          1   ANDROID  SUSPENDED   delete            (S4)
+    0x0000002B00001DD80005          2   WEB      ACTIVE      insert/recreate   (S5)
+  op codes: 1=delete 2=insert 3=update-before 4=update-after.
+  LSNs are fixed-width hex and strictly increasing lexicographically -- which is why
+  spark/jobs/l1_stream/ordering.py VALIDATES the triplet rather than zero-padding it.
+
+KAFKA
+  offsets before Oracle DML : CUSTOMER  p0=67 p1=69 p2=64
+  offsets after             : CUSTOMER  p0=67 p1=69 p2=70     -> +6 on p2 ONLY
+  offsets before SS DML     : app_user  p0=54 p1=55 p2=41
+  offsets after             : app_user  p0=54 p1=55 p2=47     -> +6 on p2 ONLY
+
+  SAME-PK PARTITION STABILITY (CLAUDE.md 5.1): every event for PK 990001 landed on ONE
+  partition on both engines; the other two partitions did not move.
+
+  6 events for 5 DML statements = 5 change events + 1 TOMBSTONE (tombstones.on.delete=true).
+
+  cdc.oracle.COREBANK.CUSTOMER partition 2, offsets 64-69:
+    off  CreateTime      headers                                            step
+    64   1788428834841   key.globalId + value.globalId + value.encoding     O1 insert  (c)
+    65   1788428834842   key.globalId + value.globalId + value.encoding     O2 update  (u)
+    66   1788428834843   key.globalId + value.globalId + value.encoding     O3 update  (u)
+    67   1788428834843   key.globalId + value.globalId + value.encoding     O4 delete  (d)
+    68   1788428834843   key.globalId ONLY -- NO value headers              TOMBSTONE (null value)
+    69   1788428834844   key.globalId + value.globalId + value.encoding     O5 recreate (c)
+
+  Offset 68 carries key headers but NO value headers. That is the null-valued tombstone,
+  and it is the concrete proof of CLAUDE.md 5.7: a delete emits BOTH a 'd' envelope
+  (offset 67) AND a tombstone (offset 68), and both reach the topic.
+
+  cdc.sqlserver.digital.dbo.app_user partition 2, offsets 41-46: 6 new messages,
+  CreateTime 1788428971282 (S1) then 1788428973331-332 (S2..S5 + tombstone).
+  Offsets 39-40 carry the older snapshot CreateTime 1788427698xxx.
+
+  Wire format: apicurio.value.globalId (8-byte big-endian) + encoding=BINARY, raw Avro
+  with NO magic-byte prefix -- so Confluent's kafka-avro-console-consumer cannot decode
+  these; decoding is proven at the FULL_CDC layer via from_avro against the registry
+  schema export, which is the correct place for it.

@@ -1,0 +1,137 @@
+KAFKA CONNECT — 96 RESTARTS, FOUR STACKED DEFECTS.  Resolved 2026-08-20T07:20Z.
+
+FINAL STATE
+  restarts=0
+  GET /  -> {"version":"7.7.1-ccs","kafka_cluster_id":"4uJJ2i1oSwyOqP1j3xHfHA"}
+  GET /connectors -> []
+  GET /connector-plugins ->
+      io.debezium.connector.oracle.OracleConnector      2.7.3.Final
+      io.debezium.connector.sqlserver.SqlServerConnector 2.7.3.Final
+
+Each defect hid the one behind it. Only the last one was fatal on its own; the first three
+had to be cleared before the real error was even reachable in the logs.
+
+--------------------------------------------------------------------------------
+1. plugin.path scanned the entire Confluent image
+--------------------------------------------------------------------------------
+   plugin.path=/usr/share/java,/usr/share/confluent-hub-components,/opt/connect-plugins
+   `/usr/share/java` is the whole image, confluent-control-center included: ~15 s per
+   directory, and the log always ended inside it, which made this look like the cause.
+   FIXED: plugin.path=/opt/connect-plugins (71 MB, the connectors this project uses).
+   ServiceLoaderScanner went from minutes to 1449 ms.
+   NOT the fatal defect -- it only made diagnosis slow.
+
+--------------------------------------------------------------------------------
+2. THE WRONG APICURIO ARTIFACT WAS STAGED  (the original killer)
+--------------------------------------------------------------------------------
+   ConfigException: Invalid value io.apicurio.registry.serde.avro.AvroConverter for
+   configuration key.converter: Class ... could not be found
+
+   versions.env stages apicurio-registry-serdes-avro-serde-2.6.2.Final.jar. That jar holds
+   AvroKafkaSerializer / AvroKafkaDeserializer / AvroSchemaParser -- and NO converter:
+
+     $ unzip -l apicurio-serde.jar | grep .class
+       io/apicurio/registry/serde/avro/AvroKafkaSerializer.class
+       io/apicurio/registry/serde/avro/AvroKafkaDeserializer.class
+       ... no AvroConverter anywhere
+
+   In Apicurio 2.x the Kafka Connect CONVERTER is a DIFFERENT artifact,
+   apicurio-registry-utils-converter, class io.apicurio.registry.utils.converter.AvroConverter.
+   The repo staged the serde and configured a converter class that only exists in the
+   converter artifact. This is OPEN-14 landing for real: the artifact list was never
+   verified against a running worker.
+
+   FIXED on the host: downloaded apicurio-registry-utils-converter-2.6.2.Final.jar (74 KB,
+   contains io/apicurio/registry/utils/converter/AvroConverter.class) and pointed
+   key.converter/value.converter at the correct class.
+   REPO FIX STILL NEEDED: docker/cdc-runtime/versions.env must stage the converter artifact
+   (URL + SHA256), and the worker properties template must use the utils.converter class.
+
+--------------------------------------------------------------------------------
+3. THE MSK IAM JAR WAS NOT ON THE WORKER CLASSPATH
+--------------------------------------------------------------------------------
+   ConfigException: Invalid value software.amazon.msk.auth.iam.IAMClientCallbackHandler
+   for configuration sasl.client.callback.handler.class
+
+   plugin.path feeds ISOLATED plugin classloaders; the worker's OWN Kafka clients resolve
+   the SASL callback handler from the SYSTEM classpath, which /opt/connect-plugins/libs is
+   not on.
+
+   A CLASSPATH env var was tried first and made things worse -- it REPLACED the image's
+   classpath instead of appending, so jvm.classpath became only our four jars and Connect
+   lost its own dependencies. Reverted.
+
+   FIXED by mounting the jar where the image's classpath already looks:
+     - /opt/connect-plugins/libs/aws-msk-iam-auth.jar:/usr/share/java/kafka/aws-msk-iam-auth.jar:ro
+
+--------------------------------------------------------------------------------
+4. THE CONNECT ROLE COULD NOT CONSUME  (the last one, and the real fatal defect)
+--------------------------------------------------------------------------------
+   TopicAuthorizationException: Not authorized to access topics: [connect-status]
+                                                                [connect-configs]
+                                                                [connect-offsets]
+
+   Attached to kafka-dev-lab-dev-connect:
+     AmazonSSMManagedInstanceCore, secrets-read, bootstrap-read, msk-PRODUCE
+   Missing: msk-CONSUME.
+
+   A Debezium SOURCE connector only produces business data, so "produce only" reads as
+   correct -- but a DISTRIBUTED Connect worker stores its configs, offsets and status in
+   three Kafka topics and must READ THEM BACK to form a cluster. Authentication succeeded
+   the whole time; authorization was the wall.
+
+   FIXED live: attach-role-policy kafka-dev-lab-dev-msk-consume -> kafka-dev-lab-dev-connect
+   FIXED in Terraform: modules/lake_iam/main.tf now has "connect:consume".
+   The live attachment and the Terraform entry match, so the next plan shows no drift.
+
+--------------------------------------------------------------------------------
+STILL GATED (operator, typed phrase)
+--------------------------------------------------------------------------------
+  bash scripts/cdc-runtime.sh create-topics --execute   # CREATE TOPICS
+  bash scripts/register-connectors.sh --execute         # REGISTER CONNECTORS
+
+================================================================================
+APICURIO REGISTRY — 47 restarts, two further defects.  2026-08-20T08:06Z
+================================================================================
+Connect is UP and healthy. The registry it depends on is not, and the Avro converter
+cannot serialize a single record without it.
+
+5. THE MSK IAM JAR WAS NOT IN THE APICURIO IMAGE EITHER
+   The apicurio service declared SASL_SSL / AWS_MSK_IAM / IAMLoginModule /
+   IAMClientCallbackHandler -- correctly -- but had NO volume mounts, so
+   software.amazon.msk.auth.iam.IAMLoginModule was not on its classpath at all.
+   Apicurio is a Quarkus FAST-JAR started with `java -jar`, so CLASSPATH is ignored and
+   dropping a jar into /deployments/lib does not join the manifest classpath.
+   FIXED: mount the jar and append it to the BOOT classpath, which `java -jar` does honour:
+       JAVA_OPTS_APPEND: -Xbootclasspath/a:/opt/msk/aws-msk-iam-auth.jar
+       volumes: /opt/connect-plugins/libs/aws-msk-iam-auth.jar:/opt/msk/...:ro
+   VERIFIED in /proc/1/cmdline, and the log now has ZERO ClassNotFound/LoginException.
+   restarts went 47 -> 0.
+
+6. REGISTRY_AUTH_ENABLED=true REQUIRES AN OIDC SERVER THAT DOES NOT EXIST  (OPEN)
+     WARN OIDC server is not available at the
+          'http://localhost:8090/auth/realms/apicurio-local' URL
+     WARN Tenant 'Default': 'OIDC Server is not available'
+   docker-compose.yml sets REGISTRY_AUTH_ENABLED=true, ANONYMOUS_READ_ACCESS=false and
+   REGISTRY_ADMIN_PASSWORD. In Apicurio 2.x that combination expects a Keycloak/OIDC
+   provider; an admin password alone does not stand one up. Nothing in this stack runs one.
+   NOT CHANGED: turning registry auth off is a security-posture decision, not a fix, and it
+   is the operator's to make -- the same reasoning that left the S3 bucket policy alone.
+
+7. ADMINCLIENT METADATA STILL FAILING  (OPEN)
+     INFO [AdminClient clientId=adminclient-1] Metadata update failed
+   Repeats every 30 s across all three brokers. The IAM policies on the instance role look
+   sufficient -- Connect, DescribeCluster, ReadData, WriteData, DescribeTopic, CreateTopic,
+   DescribeGroup, AlterGroup -- and CONNECT USES THE SAME ROLE AND WORKS, so this is not a
+   plain authorization gap. Undiagnosed. Quarkus never reaches "started in", so
+   /q/health returns 000 and the registry never serves.
+
+STATE AT HANDOFF
+  Kafka Connect      UP, restarts=0, cluster 4uJJ2i1oSwyOqP1j3xHfHA, 0 connectors
+  Apicurio           restarts=0 but NOT serving (defects 6 and 7)
+  Topics             all 11 present, incl. 8 CDC topics and 3 connect internals
+  Oracle             ARCHIVELOG + supplemental logging + seeded, PASS
+  SQL Server         CDC enabled, 4 capture instances, seeded, PASS
+  EMR/Iceberg/Glue   PROVEN (job 00g84kussh41e827, table ops.emr_smoke)
+
+  Registering connectors now would produce records the converter cannot serialize.

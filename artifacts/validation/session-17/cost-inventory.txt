@@ -1,0 +1,81 @@
+-------------------------------------------------------------------------------
+Identity guard (CLAUDE.md section 2)
+-------------------------------------------------------------------------------
+  profile     = my-aws-profile
+  region      = ap-southeast-1
+  environment = dev
+
+{
+    "UserId": "AIDATWDWDSBMTLBUJH6IE",
+    "Account": "111122223333",
+    "Arn": "arn:aws:iam::111122223333:user/my-aws-profile"
+}
+
+  account = 111122223333  OK
+  arn     = arn:aws:iam::111122223333:user/my-aws-profile
+  identity guard OK
+
+-------------------------------------------------------------------------------
+1. RUNNING COMPUTE — billed per hour, STOPPABLE
+-------------------------------------------------------------------------------
+  these are the ones worth stopping between sessions
+  MSK clusters               0
+  EC2 running                0
+  EMR Serverless apps        0
+  EMR jobs RUNNING           0
+  EKS clusters               0
+  RDS instances              0
+  Redshift workgroups        0
+
+  EC2 detail (Component tag identifies the workload):
+      (no EC2 instances in any state)
+-------------------------------------------------------------------------------
+2. STOPPED-BUT-BILLING — stopping does NOT stop these
+-------------------------------------------------------------------------------
+WARNING: this is the section that surprises people
+  EBS volumes                0
+    ...unattached            0
+  EBS snapshots              0
+  Elastic IPs                0
+    ...unassociated          0
+    an EIP is FREE while attached to a running instance and BILLED when it is not —
+    so stopping an instance can INCREASE what its address costs
+-------------------------------------------------------------------------------
+3. ALWAYS-BILLING — only DESTROY stops these
+-------------------------------------------------------------------------------
+  NAT gateways               0
+    CLAUDE.md 4.2: no NAT by default. Any NAT here is an unplanned ~$0.05/hr + data.
+  VPC endpoints              0
+    Interface endpoints bill hourly per AZ; Gateway endpoints (S3/DynamoDB) are free.
+  S3 buckets                 44
+  KMS customer keys          5
+    Only CUSTOMER-managed keys bill (~$1/mo). AWS-managed (alias/aws/*) are FREE —
+    check KeyManager before assuming, see below.
+  CloudWatch log grps        3
+    ...no retention          3
+WARNING:   a log group with NO retention grows forever and is billed forever
+
+  KMS key manager (AWS = free, CUSTOMER = billed):
+    AWS       alias/aws/backup
+    AWS       alias/aws/secretsmanager
+    AWS       alias/aws/s3
+    AWS       alias/aws/elasticfilesystem
+    AWS       alias/aws/codecommit
+-------------------------------------------------------------------------------
+4. THIS PROJECT'S FOOTPRINT (tag Project=kafka-dev-lab)
+-------------------------------------------------------------------------------
+  everything above is the ACCOUNT; this is what this repo is responsible for
+    tagged resources: 0
+-------------------------------------------------------------------------------
+5. GUARDRAILS
+-------------------------------------------------------------------------------
+    budget: My Monthly Cost Budget	30.0	MONTHLY
+    budget: My Zero-Spend Budget	1.0	MONTHLY
+    athena workgroup: primary
+-------------------------------------------------------------------------------
+COST REFERENCE
+-------------------------------------------------------------------------------
+  Unit prices: docs/PRICE_REFERENCE.md (collected 2026-08-12, RE-COLLECT if stale)
+  Worksheet:   docs/COST.md — hours x rate, GB x rate, TB scanned x rate
+  This script reports QUANTITIES on purpose. A price hardcoded here would go stale
+  silently, and a stale price in a cost tool is worse than no price.

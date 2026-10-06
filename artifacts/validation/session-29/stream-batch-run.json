@@ -1,0 +1,183 @@
+{
+  "config_version": "cfg-14fcc535ac8c1e70",
+  "plan_hash": "14fcc535ac8c1e70bcafd77ca6a80801712250b44ba0b6f2ed857fef3dc4d371",
+  "flow_config": {
+    "source_layer_policy": "REALTIME",
+    "schedule": "*/10 * * * *",
+    "safety_overlap_minutes": 2,
+    "watermark_type": "TIMESTAMP",
+    "retry_count": 1,
+    "execution_timeout_seconds": 480,
+    "cost_guard": {
+      "max_bytes_scanned_gb": 5,
+      "max_execution_minutes": 8
+    }
+  },
+  "write_contract": {
+    "target_database": "kafka_dev_lab_dev_mart",
+    "target_table": "mart_account_balance_daily",
+    "primary_key": [
+      "account_sk",
+      "business_date"
+    ],
+    "partition_spec": [
+      "business_date"
+    ],
+    "merge_strategy": "MERGE_LADDER",
+    "delete_strategy": "SOFT"
+  },
+  "source_layer": {
+    "database": "kafka_dev_lab_dev_full_cdc",
+    "status": "SUBSTITUTED",
+    "substituted_for": "kafka_dev_lab_dev_realtime",
+    "bounded_predicate": "source_commit_ts >= :window_start AND source_commit_ts < :window_end"
+  },
+  "steps": [
+    {
+      "step": "cold_start",
+      "note": "no watermark: a bounded 24h window, never the whole history",
+      "execution_id": "demo-1:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1",
+      "attempt_number": 1,
+      "turn": 1,
+      "window": "[2026-08-19T10:00:00+00:00, 2026-08-20T10:00:00+00:00) (cold start)",
+      "cold_start": true,
+      "rows_read": 1,
+      "upserts": 1,
+      "deletes": 0,
+      "duplicates_collapsed": 0,
+      "affected_keys": [
+        "k1"
+      ],
+      "source_layer_substituted": true,
+      "reconciliation_gaps": [],
+      "status": "SUCCEEDED",
+      "watermark_before_step": null,
+      "watermark_after_step": "2026-08-20T10:00:00+00:00",
+      "watermark_advanced": true,
+      "detail": "committed to 2026-08-20T10:00:00+00:00"
+    },
+    {
+      "step": "busy_window",
+      "note": "insert, update, delete, a duplicate and an out-of-order arrival",
+      "execution_id": "demo-2:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1",
+      "attempt_number": 1,
+      "turn": 1,
+      "window": "[2026-08-20T09:58:00+00:00, 2026-08-20T10:10:00+00:00) (+2m overlap)",
+      "cold_start": false,
+      "rows_read": 6,
+      "upserts": 2,
+      "deletes": 1,
+      "duplicates_collapsed": 3,
+      "affected_keys": [
+        "k1",
+        "k2",
+        "k3"
+      ],
+      "source_layer_substituted": true,
+      "reconciliation_gaps": [],
+      "status": "SUCCEEDED",
+      "watermark_before_step": "2026-08-20T10:00:00+00:00",
+      "watermark_after_step": "2026-08-20T10:10:00+00:00",
+      "watermark_advanced": true,
+      "detail": "committed to 2026-08-20T10:10:00+00:00"
+    },
+    {
+      "step": "quiet_window",
+      "note": "nothing changed: SUCCEEDS and still advances, so the next window is fresh",
+      "execution_id": "demo-3:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1",
+      "attempt_number": 1,
+      "turn": 1,
+      "window": "[2026-08-20T10:08:00+00:00, 2026-08-20T10:20:00+00:00) (+2m overlap)",
+      "cold_start": false,
+      "rows_read": 0,
+      "upserts": 0,
+      "deletes": 0,
+      "duplicates_collapsed": 0,
+      "affected_keys": [],
+      "source_layer_substituted": true,
+      "reconciliation_gaps": [],
+      "status": "SUCCEEDED",
+      "watermark_before_step": "2026-08-20T10:10:00+00:00",
+      "watermark_after_step": "2026-08-20T10:20:00+00:00",
+      "watermark_advanced": true,
+      "detail": "no changes in [2026-08-20T10:08:00+00:00, 2026-08-20T10:20:00+00:00) (+2m overlap)"
+    },
+    {
+      "step": "engine_failure",
+      "note": "THE invariant: the watermark must not move",
+      "execution_id": "demo-4:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1",
+      "attempt_number": 1,
+      "turn": 1,
+      "window": "[2026-08-20T10:18:00+00:00, 2026-08-20T10:30:00+00:00) (+2m overlap)",
+      "cold_start": false,
+      "rows_read": 1,
+      "upserts": 1,
+      "deletes": 0,
+      "duplicates_collapsed": 0,
+      "affected_keys": [
+        "k4"
+      ],
+      "source_layer_substituted": true,
+      "reconciliation_gaps": [],
+      "status": "FAILED",
+      "watermark_before_step": "2026-08-20T10:20:00+00:00",
+      "watermark_after_step": "2026-08-20T10:20:00+00:00",
+      "watermark_advanced": false,
+      "detail": "MERGE INTO mart_account_balance_daily failed"
+    },
+    {
+      "step": "retry_recovers",
+      "note": "same window re-read from the unmoved position; attempt 2, same turn",
+      "execution_id": "demo-4:STREAM_BATCH:mart_account_balance_daily:2026-08-20:2",
+      "attempt_number": 2,
+      "turn": 1,
+      "window": "[2026-08-20T10:18:00+00:00, 2026-08-20T10:30:00+00:00) (+2m overlap)",
+      "cold_start": false,
+      "rows_read": 1,
+      "upserts": 1,
+      "deletes": 0,
+      "duplicates_collapsed": 0,
+      "affected_keys": [
+        "k4"
+      ],
+      "source_layer_substituted": true,
+      "reconciliation_gaps": [],
+      "status": "SUCCEEDED",
+      "watermark_before_step": "2026-08-20T10:20:00+00:00",
+      "watermark_after_step": "2026-08-20T10:30:00+00:00",
+      "watermark_advanced": true,
+      "detail": "committed to 2026-08-20T10:30:00+00:00"
+    },
+    {
+      "step": "overlap_refused",
+      "note": "a second run while one is live is SKIPPED, not FAILED: it was never eligible",
+      "execution_id": "demo-6:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1",
+      "attempt_number": 1,
+      "turn": 1,
+      "window": null,
+      "cold_start": false,
+      "rows_read": null,
+      "upserts": null,
+      "deletes": null,
+      "duplicates_collapsed": null,
+      "affected_keys": null,
+      "source_layer_substituted": false,
+      "reconciliation_gaps": [],
+      "status": "SKIPPED",
+      "watermark_before_step": "2026-08-20T10:30:00+00:00",
+      "watermark_after_step": "2026-08-20T10:30:00+00:00",
+      "watermark_advanced": false,
+      "detail": "mart_account_balance_daily/STREAM_BATCH already has a run in flight: demo-live:STREAM_BATCH:mart_account_balance_daily:2026-08-20:1 (PLANNED). Two concurrent micro-batches would read overlapping windows and do the same work twice. Airflow's max_active_runs=1 does not cover a manual trigger, a retry of a stuck task, or a worker that died leaving the record non-terminal."
+    }
+  ],
+  "final_watermark": "2026-08-20T10:30:00+00:00",
+  "terminal_history_rows": 6,
+  "invariants": {
+    "failed_run_did_not_advance_the_watermark": true,
+    "retry_kept_the_same_turn": true,
+    "retry_was_a_new_attempt": true,
+    "overlapping_run_was_skipped_not_failed": true,
+    "every_run_recorded_the_substituted_layer": true,
+    "cold_start_was_bounded": true
+  }
+}

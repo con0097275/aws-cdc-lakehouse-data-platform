@@ -1,0 +1,22 @@
+$ python3 -c 
+import sys; sys.path.insert(0,'.')
+from datetime import date
+from cdc.dq_catalog import evaluate_publish
+from cdc.quality import DqResult, DataInterval, ResultStatus
+from cdc.contracts import CheckType, Severity
+def dq(sev, st=ResultStatus.FAIL):
+    return DqResult(dq_run_id='d', run_id='r', dataset_id='eod:x', check_id='one_row_per_key',
+                    check_type=CheckType.UNIQUENESS, severity=sev,
+                    interval=DataInterval(cob_date=date(2026,9,28)), status=st,
+                    expected_rule='one active row per key', engine='spark',
+                    config_version='v', rows_examined=670, failed_count=0 if st is ResultStatus.PASS else 1)
+for label, r in (('BLOCKER', dq(Severity.BLOCKER)), ('ERROR', dq(Severity.ERROR)),
+                 ('clean  ', dq(Severity.ERROR, ResultStatus.PASS))):
+    d = evaluate_publish(committed=True, dq_results=[r])
+    print(f'{label} -> outcome {d.outcome.value:22s} watermark {str(d.advance_watermark):5s} '
+          f'certify {str(d.certify):5s} invalid {d.mark_snapshot_invalid}')
+
+
+BLOCKER -> outcome INVALID                watermark False certify False invalid True
+ERROR -> outcome PUBLISHED_UNCERTIFIED  watermark True  certify False invalid False
+clean   -> outcome PUBLISHED_UNCERTIFIED  watermark True  certify False invalid False

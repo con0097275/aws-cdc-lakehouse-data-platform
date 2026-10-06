@@ -1,0 +1,29 @@
+# Session 03 — RDS vs container pricing proof
+# Captured: 2026-08-14T04:13:57Z, ap-southeast-1, AWS Pricing API
+# Read-only. Supports ADR-032.
+
+RDS Oracle SE2, db.t3.xlarge, Single-AZ:
+  Bring your own license   $0.4160/hr
+  License included         $0.7040/hr
+
+RDS SQL Server, db.t3.xlarge, Single-AZ (license included, by edition):
+  $0.4160 / $0.4580 / $1.1090 / $2.3200 per hour
+
+EC2 Linux, ap-southeast-1:
+  t3.large    $0.1056/hr    8 GiB  - REJECTED, memory
+  t3a.xlarge  $0.1888/hr   16 GiB  - CHOSEN (AMD, still x86_64)
+  t3.xlarge   $0.2112/hr   16 GiB  - fallback if t3a absent in the AZ
+
+COMPARISON (both engines):
+  containers on t3a.xlarge          $0.1888/hr
+  RDS both, license included        $1.1620/hr   = 6.2x
+  RDS both, BYOL                    $0.8740/hr   = 4.6x
+
+Over the 19 source-lab hours in SESSION_DEPENDENCY_GRAPH.md section 5:
+  containers   $3.59
+  RDS          $22.08   = 62% of the entire $30 monthly budget
+
+CONCLUSION: RDS is technically viable (RDS Oracle supports LogMiner CDC;
+RDS SQL Server supports msdb.dbo.rds_cdc_enable_db) but costs 6.2x for
+identical transaction-log semantics on synthetic, disposable data.
+REJECTED. CLAUDE.md 4.3 upheld with evidence, not assertion.

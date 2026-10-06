@@ -1,0 +1,186 @@
+# OpenLineage runtime lineage — the DRP3 configuration.
+#
+# NOT the same file as `governance/lineage/openlineage.yml`. That one is the Session-14
+# DECLARED graph, which the DRP0 audit found marking Spark hops `evidence: observed` while
+# nothing in the repository injected a listener. It is left in place until DRP6 replaces it
+# with edges that are actually emitted; this file configures the emission.
+#
+# VERSIONS RESOLVED 2026-09-30, NOT CHOSEN
+# -----------------------------------------
+# `openlineage-spark_2.12` was resolved from `maven-metadata.xml`, NOT from the Maven search
+# API -- the search index reported the latest as 1.34.0 while the metadata had 1.53.0,
+# nineteen releases stale. Pinning from the index would have shipped a year-old jar with a
+# resolve to point at.
+
+version: 1
+updated: 2026-09-30
+
+# Off by default, exactly like the metadata plane. A listener that is always on is a
+# listener nobody can turn off during an incident.
+enabled: false
+
+namespace_from: metadata_plane        # `environments.<env>.namespace` -- one source, not two
+
+versions:
+  spark:
+    # Spark 3.5 / Scala 2.12 (EMR 7.2.0), verified against Iceberg 1.5.2.
+    package: "io.openlineage:openlineage-spark_2.12:1.53.0"
+    jar: openlineage-spark_2.12-1.53.0.jar
+    sha1: af24560ba5f93a6da925440eaf74277c7c399ca4
+    listener_class: io.openlineage.spark.agent.OpenLineageSparkListener
+    # STAGED, not resolved from Maven at submit time. EMR Serverless runs in the private
+    # subnets and this VPC has NO NAT GATEWAY (cost invariant 2) -- only S3 and one other
+    # gateway endpoint. `spark.jars.packages` therefore cannot reach repo1.maven.org: Ivy
+    # retries and the job dies in resolution having done no work, which reads like a Spark
+    # problem rather than a networking one. The jar is uploaded to the lake and referenced
+    # with `spark.jars`, which goes over the S3 endpoint.
+    #
+    # Verified on upload: the sha1 above equals Maven's published .sha1 for this artifact
+    # AND the sha1 of the staged object.
+    jar_location: "s3://kafka-dev-lab-dev-lake-111122223333/artifacts/jars/openlineage-spark_2.12-1.53.0.jar"
+    # EMPTY ON PURPOSE -- and the empty value is the finding, not an omission.
+    #
+    # OpenLineage and the Iceberg connector load under DIFFERENT classloaders when the OL
+    # jar arrives via `spark.jars` and Iceberg sits in /usr/lib/spark/jars. The integration
+    # then cannot read Iceberg's write plans, and the symptom is not an error: the
+    # APPLICATION event is emitted, every DATASET event is missing, and lineage looks
+    # enabled while carrying nothing. Observed 2026-09-30 --
+    # "Failed to load OpenLineageExtensionProvider class", 19 times, 1 event, 0 datasets.
+    #
+    # OpenLineage's own guidance is to load both through the same mechanism, i.e. put the
+    # jar on the system classpath. On EMR Serverless that is IMPOSSIBLE at submit time:
+    #     ValidationException: Option 'spark.driver.extraClassPath' is not supported
+    # The only supported route is a CUSTOM EMR SERVERLESS IMAGE with the jar baked into
+    # /usr/lib/spark/jars. Until that image exists this stays empty, because a value here
+    # makes every OPENLINEAGE=1 submission fail validation outright.
+    #
+    # Set it on a platform that DOES allow the option (EMR on EC2, a local spark-submit).
+    jar_runtime_path: ""
+  airflow:
+    # Airflow 3.2.2 is deployed. This provider requires `apache-airflow>=2.11.0`, so it
+    # loads -- which closes the DRP0 open constraint about the provider major. The
+    # workstation's Airflow 2.9.3 is NOT a valid test bed for it.
+    package: apache-airflow-providers-openlineage
+    version: "2.20.2"
+    requires_airflow: ">=2.11.0"
+  python:
+    package: openlineage-python
+    version: "1.53.0"
+  dbt:
+    package: openlineage-dbt
+    version: "1.53.0"
+    # docs/VERSIONS.md:104 -- the EMR wheelhouse must be rebuilt whenever a dbt-side pin moves.
+    requires_wheelhouse_rebuild: true
+
+transport:
+  # DataHub's OpenLineage ingestion endpoint. `console` is the default so that turning the
+  # listener on without a destination prints events instead of failing a Spark job.
+  type: console
+  datahub:
+    endpoint_path: /openapi/openlineage/api/v1/lineage
+    # Resolved from the metadata plane; never a literal here.
+    url_env: DATAHUB_GMS_URL
+    token_env: DATAHUB_GMS_TOKEN
+  # Emission must NEVER fail the job it is observing. A lineage backend outage that takes
+  # down a pipeline has inverted the priority: lineage is metadata about the work, not the work.
+  fail_on_error: false
+  timeout_seconds: 10
+
+# DETERMINISTIC JOB NAMES. One name per flow, everywhere -- Airflow, Spark and the facets.
+# A job whose lineage name is derived from a DAG id in one place and a Spark app name in
+# another appears in the graph twice, and neither copy has the full run history.
+jobs:
+  full_cdc_ingestion:
+    description: Kafka -> FULL_CDC, append-only Structured Streaming
+    engine: spark_streaming
+  realtime_materialize:
+    description: FULL_CDC -> REALTIME overlay
+    engine: spark_batch
+  eod_build:
+    description: FULL_CDC -> EOD snapshot at the COB cutoff
+    engine: spark_batch
+  dbt_spark_build:
+    description: CURATED/EOD -> MART via dbt-spark
+    engine: dbt
+  auto_correct:
+    description: bounded relook after late events
+    engine: spark_batch
+  fulfill:
+    description: historical gap repair
+    engine: spark_batch
+  stream_batch:
+    description: near-real-time batch over the REALTIME layer
+    engine: spark_batch
+  streaming_rt:
+    description: continuous REALTIME materialisation
+    engine: spark_streaming
+  iceberg_maintenance:
+    description: compaction, manifest rewrite, snapshot expiry, orphan removal
+    engine: spark_batch
+
+# Facets this platform publishes. A CLOSED ALLOWLIST, because the failure mode of a facet
+# builder is that someone adds "just the failing row" for debugging and a restricted column
+# reaches a metadata store that dashboards read.
+facets:
+  allow:
+    - environment            # dev | test | prod
+    - flow_mode              # EOD | AUTO_CORRECT | FULFILL | STREAM_BATCH | STREAMING_RT
+    - table_id               # the canonical CDC table id
+    - job_id                 # the deterministic job name above
+    - cob_date
+    - data_interval_start
+    - data_interval_end
+    - config_version         # GovernanceInventory.config_version()
+    - config_hash
+    - source_snapshot_id     # Iceberg, before
+    - target_snapshot_id     # Iceberg, after
+    - watermark_before
+    - watermark_after
+    - spark_app_id
+    - airflow_dag_id
+    - airflow_run_id
+    - airflow_task_id
+    - airflow_try_number
+    - attempt
+    - certification_tier     # a REFERENCE to the decision, never the evidence
+    - certification_run_id
+    - dq_run_id
+    - recon_run_id
+    - rows_read
+    - rows_written
+    - datahub_urn            # the canonical identity -- see `identity` below
+  # These guard the ALLOWLIST above, not the facets directly. The allowlist is the primary
+  # control -- a key must be on it -- and this list makes it impossible to ADD a reviewed-
+  # looking name that is really a data carrier. Checked at config load, not only at emit.
+  #
+  # A bare `row` was tried first and was wrong: it rejected `rows_read`, which is a COUNT,
+  # and counts are exactly what a facet SHOULD carry. The rule is about values, not nouns.
+  deny_substrings:
+    - token
+    - password
+    - secret
+    - credential
+    - access_key
+    - private_key
+    - sample
+    - payload
+    - before_image
+    - after_image
+    - raw_value
+    - column_value
+
+identity:
+  # THE DRP3/DRP4 JOIN. A Spark-emitted dataset and a Glue-ingested dataset must resolve to
+  # ONE DataHub asset.
+  #
+  # Rather than relying on both sides INFERRING the same name from a namespace, every emitted
+  # dataset carries its canonical URN as a facet, minted by `cdc/urns.py`. Inference is a rule
+  # that lives in two codebases and drifts silently; a carried identity is checkable.
+  carry_canonical_urn: true
+  urn_facet: datahub_urn
+  # The namespace the listener will use per platform, recorded so a mismatch is visible.
+  namespaces:
+    glue: "glue://ap-southeast-1"
+    kafka: "kafka://msk"
+    oracle: "oracle://coredb"
+    mssql: "mssql://digital"

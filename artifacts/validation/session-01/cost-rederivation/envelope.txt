@@ -1,0 +1,60 @@
+# Session 01 cost re-derivation at the real $30 budget (ADR-030)
+# Captured: 2026-08-13T04:08:56Z
+# Reproduce: python3 scripts/derive-cost-envelope.py --budget 30
+
+==============================================================================
+COST ENVELOPE — derived, budget of record $30.00/month
+Prices: ap-southeast-1, collected 2026-08-12 (docs/PRICE_REFERENCE.md)
+==============================================================================
+
+Full-stack hourly burn: $1.5323/hr
+  MSK share of that burn: 50.6%   <- the dominant driver
+
+--- ALWAYS-ON FLOOR ---
+item                          baseline   optimised
+s3_lake_storage                  0.250       0.250
+kms_cmks                         3.000       2.000
+secretsmanager                   1.600       0.000
+ssm_secure_params                0.000       0.000
+cloudwatch_alarms                0.600       0.000
+cloudwatch_logs                  0.150       0.030
+state_bucket                     0.000       0.000
+TOTAL                             5.60        2.28
+saved                                         3.32   (11.1% of the $30 budget)
+
+--- OPEN-12: MSK Express ---
+  kafka.m7g.large        $0.2550/hr
+  express.m7g.large      $0.5100/hr
+  premium per broker     $+0.2550/hr
+  storage it would save  $0.0033/hr
+  => Express costs 2x and saves only bundled storage. REJECT.
+
+--- PACKAGE A  3 brokers, t3.xlarge source lab ---
+  W1     4h  $  4.42   03 + 04 + 05
+  W2     5h  $  6.53   06 + 07
+  W3     4h  $  6.16   09
+  W4     8h  $  2.53   08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)
+  W5     6h  $  8.34   12 + 15 + 17 + 19  (merged)
+  windows $ 27.97
+  floor   $  2.28
+  TOTAL   $ 30.25   OVER $30   headroom $-0.25
+
+--- PACKAGE A- 3 brokers, t3.large source lab ---
+  W1     4h  $  4.00   03 + 04 + 05
+  W2     5h  $  6.00   06 + 07
+  W3     4h  $  5.74   09
+  W4     8h  $  2.53   08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)
+  W5     6h  $  7.70   12 + 15 + 17 + 19  (merged)
+  windows $ 25.97
+  floor   $  2.28
+  TOTAL   $ 28.25   FITS $30   headroom $+1.75
+
+--- PACKAGE B  2 brokers, t3.large source lab ---
+  W1     4h  $  2.96   03 + 04 + 05
+  W2     5h  $  4.71   06 + 07
+  W3     4h  $  4.70   09
+  W4     8h  $  2.53   08 + 10 + 11 + 13 + 14 + 18  (lake only, no Kafka)
+  W5     6h  $  6.15   12 + 15 + 17 + 19  (merged)
+  windows $ 21.06
+  floor   $  2.28
+  TOTAL   $ 23.34   FITS $30   headroom $+6.66

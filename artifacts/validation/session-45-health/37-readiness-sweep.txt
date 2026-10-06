@@ -1,0 +1,23 @@
+### 2026-09-20T10:04:22Z
+== schemas.json export (needed by Spark decode)
+2026-09-17 21:38:23      83052 schemas.json
+== deployed plan
+   S3 config_version cdccfg-1c0796dd6d3b65b0 schema 8 apps True
+   LOCAL config_version cdccfg-1c0796dd6d3b65b0 schema 8
+== cdc-framework.zip
+2026-09-20 17:03:02     121916 cdc-framework.zip
+== Glue tables
+   full_cdc     0
+   stream       0
+   snapshot     0
+   ops          0
+   curated      0
+   mart         0
+   serving      0
+   quarantine   0
+== EMR
+CREATED
+== KMS pending
+   cd7c3d82-932b-479f-9f25-577311cec8a7 PendingDeletion
+== Budget
+51.686	95.579

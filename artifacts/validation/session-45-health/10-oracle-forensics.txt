@@ -1,0 +1,40 @@
+=== volumes
+DRIVER    VOLUME NAME
+local     source-lab_mssql-data
+local     source-lab_oracle-data
+
+=== memory
+               total        used        free      shared  buff/cache   available
+Mem:              15           1           0           1          13          11
+Swap:              0           0           0
+--- OOM ---
+
+=== cloud-init last 25 lines
+ 9ec103b6e275 Extracting [==================================================>]     229B/229B
+ 9ec103b6e275 Pull complete 
+ f6a8af0be82f Extracting [================================>                  ]  32.77kB/50.35kB
+ f6a8af0be82f Extracting [==================================================>]  50.35kB/50.35kB
+ f6a8af0be82f Pull complete 
+ 92f086a2c5c6 Extracting [==================================================>]  4.061kB/4.061kB
+ 92f086a2c5c6 Extracting [==================================================>]  4.061kB/4.061kB
+ 92f086a2c5c6 Pull complete 
+ 6bb22823d4ee Extracting [==================================================>]  3.797kB/3.797kB
+ 6bb22823d4ee Extracting [==================================================>]  3.797kB/3.797kB
+ 6bb22823d4ee Pull complete 
+ oracle Pulled 
+ Volume "source-lab_oracle-data"  Creating
+ Volume "source-lab_oracle-data"  Created
+ Container source-oracle  Creating
+ Container source-oracle  Created
+ Container source-oracle  Starting
+ Container source-oracle  Started
+=== bootstrap complete ===
+CDC is NOT enabled automatically: Oracle needs a restart into ARCHIVELOG mode.
+From your workstation, run:
+  bash scripts/source-lab.sh enable-cdc --execute
+  bash scripts/source-lab.sh seed --execute
+  bash scripts/source-lab.sh verify-cdc
+Cloud-init v. 22.2.2 finished at Sun, 20 Sep 2026 09:01:00 +0000. Datasource DataSourceEc2.  Up 985.82 seconds
+
+=== docker events last hour (container die/destroy)
+

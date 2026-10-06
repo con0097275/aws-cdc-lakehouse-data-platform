@@ -1,0 +1,25 @@
+# Session 09 — validation transcript
+# Captured: 2026-08-14T10:05:15Z
+
+=== LIVE AWS STATE ===
+  MSK clusters       : 0
+  EC2 running        : 0
+  EMR Serverless apps: 0
+  => stack unapplied; freshness/latency NOT measurable, recorded NOT_TESTED
+
+=== FULL SUITE ===
+........................................................................ [ 44%]
+........................................................................ [ 89%]
+.................                                                        [100%]
+161 passed in 83.09s (0:01:23)
+
+=== SESSION 09 SUITES ===
+  test_flows              17   ladder, anti-downgrade, FlowContext guards
+  test_reconcile          14   variance, tolerance, zero-baseline trap
+  test_four_flows_spark   16   real Iceberg + real MERGE scenarios
+  (Sessions 06-08 suites  114   unchanged)
+
+=== STATIC VALIDATION ===
+14 passed, 0 failed, 0 skipped
+  ok   scripts/run-flow.sh
+  shellcheck ABSENT - skipped (OPEN-06)

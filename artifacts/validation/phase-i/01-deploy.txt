@@ -1,0 +1,8 @@
+Completed 14.5 KiB/14.5 KiB (27.1 KiB/s) with 1 file(s) remainingupload: spark/jobs/full_cdc/per_table.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/per_table.py
+Completed 12.7 KiB/12.7 KiB (32.2 KiB/s) with 1 file(s) remainingupload: spark/jobs/full_cdc/backfill.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/backfill.py
+Completed 17.6 KiB/17.6 KiB (25.6 KiB/s) with 1 file(s) remainingupload: spark/jobs/realtime/realtime_engine.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/realtime_engine.py
+Completed 42.5 KiB/42.5 KiB (74.1 KiB/s) with 1 file(s) remainingupload: spark/jobs/eod/eod_engine.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/eod_engine.py
+Completed 11.2 KiB/11.2 KiB (25.6 KiB/s) with 1 file(s) remainingupload: spark/ops/provision_cdc_tables.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/provision_cdc_tables.py
+Completed 7.9 KiB/7.9 KiB (15.6 KiB/s) with 1 file(s) remainingupload: spark/ops/cdc_maintenance_job.py to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/cdc_maintenance_job.py
+Completed 38.0 KiB/38.0 KiB (54.2 KiB/s) with 1 file(s) remainingupload: ../../../../tmp/tmp.pMmGrxZOMJ/table-plan.json to s3://kafka-dev-lab-dev-lake-111122223333/artifacts/cdc/table-plan.json
+deployed. entrypoints run as: s3://kafka-dev-lab-dev-lake-111122223333/artifacts/code/<name>.py

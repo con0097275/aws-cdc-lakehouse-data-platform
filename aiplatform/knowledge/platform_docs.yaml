@@ -1,0 +1,14 @@
+# Architecture, ADRs and runbooks. The three sources the approved architecture identified
+# as highest value and NOT reached by the current corpus builder are runbooks, DQ rules and
+# dbt descriptions; runbooks are covered here, the other two below.
+source_id: platform_docs
+document_type: architecture
+owner: data-platform
+domain: ops
+classification: internal
+description: Target architecture, ADRs, runbooks and decision log.
+include:
+  - "docs/*.md"
+  - "docs/adr/*.md"
+  - "docs/runbooks/*.md"
+  - "DECISION_LOG.md"

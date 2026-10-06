@@ -1,0 +1,21 @@
+{
+  "job_id": "mart_account_balance_daily",
+  "flow_mode": "STREAMING_RT",
+  "coordinator_run_id": "p14s34-s8-1787379252",
+  "execution_id": "rt_dep-20260822T061412Z-p14s34",
+  "turn": null,
+  "attempt_number": null,
+  "dependencies": [],
+  "config_version": "cfg-20237926f3c07ed2",
+  "business_date": "2026-08-22",
+  "application_name": "rt_dev_mart_account_balance_daily",
+  "deployment_id": "rt_dep-20260822T061412Z-p14s34",
+  "source_decision": "FULL_CDC_APPEND",
+  "checkpoint_location": "s3://kafka-dev-lab-dev-lake-111122223333/checkpoints/reporting/dev/mart_account_balance_daily/STREAMING_RT/",
+  "checkpoint_state_at_start": "EMPTY",
+  "checkpoint_read_from": "S3 (S3CheckpointInspector)",
+  "is_enabled": false,
+  "restart_count": 0,
+  "status": "STOPPED",
+  "finished_at": "2026-08-22T06:14:13.027765+00:00"
+}

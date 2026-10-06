@@ -1,0 +1,25 @@
+# Can dbt's incremental merge express the anti-downgrade rule?  NO.
+#
+# dbt-spark 1.9.2 `spark__get_merge_sql` emits an UNCONDITIONAL `when matched then update
+# set`. Its only lever, `incremental_predicates`, is appended to the ON clause:
+#
+#     on {{ predicates | join(' and ') }}
+#
+# Putting the rank test there is NOT equivalent to `WHEN MATCHED AND <cond>`. If the test
+# fails the row is NOT MATCHED, so `when not matched then insert *` fires.
+#
+# Reproduced against real Iceberg (script: dbt-merge-proof.py):
+#   target: T1 / 100.00 / CERTIFIED
+#   source: T1 / 999.00 / PROVISIONAL_NRT   (a downgrade that must be REJECTED)
+
+ROWCOUNT: 2
+   Row(transaction_id='T1', amount=Decimal('100.00'), processing_status='CERTIFIED')
+   Row(transaction_id='T1', amount=Decimal('999.00'), processing_status='PROVISIONAL_NRT')
+VERDICT: DUPLICATE FACT CREATED
+
+# The certified row survived, and the mart now holds TWO rows for one transaction --
+# breaking the declared grain and double-counting every measure. That is WORSE than the
+# downgrade the rule exists to prevent.
+#
+# Conclusion: the guarded MERGE stays in PySpark (S11-1). The dbt marts use
+# insert_overwrite on business_date, which is idempotent and needs no row-level condition.

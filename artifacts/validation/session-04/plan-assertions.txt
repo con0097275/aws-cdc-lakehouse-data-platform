@@ -1,0 +1,39 @@
+# Session 04 plan assertions — against the plan JSON, not the config
+
+TOTAL: 156 create, 0 change, 0 destroy
+
+=== BY MODULE ===
+    43  module.kafka_platform[0]
+    39  module.lake_iam[0]
+    23  module.source_lab[0]
+    22  module.data_lake
+    15  module.cdc_runtime[0]
+     7  module.glue_catalog
+     3  root
+     2  module.vpc_endpoints[0]
+     1  module.athena[0]
+     1  module.budget_guardrails
+
+=== CDC RUNTIME: 15 resources ===
+     8  aws_s3_object
+     3  aws_vpc_security_group_ingress_rule
+     1  aws_instance
+     1  aws_security_group
+     1  aws_ssm_parameter
+     1  random_password
+
+=== ASSERTIONS ===
+  [PASS] MSK clusters (reuse, do NOT rebuild)         expected   1  got   1
+  [PASS] VPCs (reuse, do NOT rebuild)                 expected   1  got   1
+  [PASS] EC2 instances (toolbox+source+cdc)           expected   3  got   3
+  [PASS] Prometheus stacks created (extend only)      expected   0  got   0
+  [PASS] CloudWatch alarms (6 inherited, no dupes)    expected   6  got   6
+  [PASS] RDS instances                                expected   0  got   0
+  [PASS] Secrets Manager secrets (ADR-031)            expected   0  got   0
+  [PASS] NAT gateways (CLAUDE.md 4.2)                 expected   0  got   0
+  [PASS] Ingress rules using a CIDR (must be 0)       expected   0  got   0
+  [INFO] SG-to-SG ingress rules created                              got   5
+  [PASS] SSH key pairs (CLAUDE.md 3.4)                expected   0  got   0
+  [PASS] 0.0.0.0/0 INGRESS (CLAUDE.md 3.3)            expected   0  got   0
+
+  OVERALL: ALL ASSERTIONS PASS

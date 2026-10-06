@@ -1,0 +1,33 @@
+# Session 18 — portfolio packaging, claim verification
+# Captured: 2026-08-15T08:26:58Z
+
+=== EVERY NUMBER IN THE PORTFOLIO DOCS, VERIFIED ===
+  400 Python tests   : 400 passed
+  47 dbt tests       : from Session 11 dbt build (PASS=47)
+  166 decisions      : 166
+  22 ADRs            : 22
+  11 tf modules      : 11
+  8 DAGs             : 8 (DagBag import)
+  5019 lines non-test python, 4388 lines tests
+
+=== LABELS APPLIED ===
+  LIVE TESTED : transformation logic (real Spark + Iceberg), dbt build, FinOps audit,
+                4 recovery properties, AI tier 1
+  IMPLEMENTED : DAG structure, governance registry, serving views, SLIs
+  DESIGN ONLY : ALL infrastructure, the entire CDC plane, every runtime behaviour
+  OPTIONAL    : Redshift, Trino, Marquez, Lake Formation, Glue DQ, AI tier 2
+
+=== THE CLAIM THAT GOVERNS ALL OTHERS ===
+  This platform has NEVER been deployed. No AWS resource was ever created by it.
+  No CDC event has ever flowed. Total spend $0.00, verified live in Session 17.
+  Therefore NO throughput, latency, volume, user-count or uptime figure appears
+  anywhere in the repository — not softened, not estimated, absent.
+
+=== FABRICATED-CLAIM SWEEP ===
+  grep for TB/day|events/sec|N users|99.9%|enterprise scale|production system
+  across README + all 4 portfolio docs:
+    only matches are inside the explicit 'lines to avoid' table and the
+    'What this is NOT' disclaimers. No affirmative claim found.
+
+=== DOC VALIDATION ===
+14 passed, 0 failed, 0 skipped

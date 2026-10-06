@@ -1,0 +1,238 @@
+{
+ "claims": {
+  "auto_correct": "auto_correct: per-table is cheaper on 7/9 metrics, more expensive on 1. athena_bytes_scanned 87 -> 0 (-100.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 759106 (-61.4%); planning_time_ms 488 -> 145 (-70.3%); runtime_ms 1467 -> 547 (-62.7%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 379553 (+170.1%); output_rows 0 -> 0 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "eod_source_scan": "eod_source_scan: per-table is cheaper on 5/9 metrics, more expensive on 3. athena_bytes_scanned 113261 -> 105163 (-7.1%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 759106 (-61.4%); planning_time_ms 156 -> 495 (+217.3%); runtime_ms 647 -> 1656 (+156.0%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 379553 (+170.1%); output_rows 3000 -> 3000 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "fulfill": "fulfill: per-table is cheaper on 5/9 metrics, more expensive on 3. athena_bytes_scanned 427 -> 79 (-81.5%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 759106 (-61.4%); planning_time_ms 200 -> 359 (+79.5%); runtime_ms 662 -> 1177 (+77.8%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 379553 (+170.1%); output_rows 3000 -> 3000 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "one_table_one_day": "one_table_one_day: per-table is cheaper on 6/9 metrics, more expensive on 2. athena_bytes_scanned 348 -> 0 (-100.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 759106 (-61.4%); planning_time_ms 128 -> 127 (-0.8%); runtime_ms 534 -> 543 (+1.7%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 379553 (+170.1%); output_rows 3000 -> 3000 (+0.0%); partitions_scanned 3 -> 2 (-33.3%)",
+  "one_table_seven_days": "one_table_seven_days: per-table is cheaper on 6/9 metrics, more expensive on 3. athena_bytes_scanned 946 -> 0 (-100.0%); spark_input_files 14 -> 2 (-85.7%); spark_input_bytes 1.96764e+06 -> 759106 (-61.4%); planning_time_ms 190 -> 455 (+139.5%); runtime_ms 671 -> 2347 (+249.8%); file_count 14 -> 2 (-85.7%); avg_file_size_bytes 140546 -> 379553 (+170.1%); output_rows 12000 -> 6000 (-50.0%); partitions_scanned 3 -> 2 (-33.3%)"
+ },
+ "cob_date": "2026-08-22",
+ "detail": {
+  "legacy": {
+   "auto_correct": {
+    "bytes_scanned": 87,
+    "planning_ms": 488,
+    "query_id": "50907a1d-3cfa-4f60-a8c4-9ad7435ec534",
+    "rows": 0,
+    "runtime_ms": 1467,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'sqlserver' AND upper(source_table) = 'DIGITAL_EVENT' AND op IN ('u','d') AND event_date > DATE '2026-08-22' - INTERVAL '3' DAY",
+    "total_ms": 1629
+   },
+   "eod_source_scan": {
+    "bytes_scanned": 113261,
+    "planning_ms": 156,
+    "query_id": "bfa1d109-49c4-46e2-9a6d-0ae98b170c25",
+    "rows": 3000,
+    "runtime_ms": 647,
+    "sql": "SELECT COUNT(DISTINCT dv_event_id) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'sqlserver' AND upper(source_table) = 'DIGITAL_EVENT' AND source_commit_ts < TIMESTAMP '2026-08-22 00:00:00'",
+    "total_ms": 785
+   },
+   "fulfill": {
+    "bytes_scanned": 427,
+    "planning_ms": 200,
+    "query_id": "4c1bdadd-387c-450b-a35e-f640ef48ddd4",
+    "rows": 3000,
+    "runtime_ms": 662,
+    "sql": "SELECT COUNT(*), MAX(source_commit_ts) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'sqlserver' AND upper(source_table) = 'DIGITAL_EVENT' AND event_date = DATE '2026-08-22'",
+    "total_ms": 780
+   },
+   "one_table_one_day": {
+    "bytes_scanned": 348,
+    "planning_ms": 128,
+    "query_id": "f9231fb9-3205-4f7c-89e3-fd9be89ec55a",
+    "rows": 3000,
+    "runtime_ms": 534,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'sqlserver' AND upper(source_table) = 'DIGITAL_EVENT' AND event_date = DATE '2026-08-22'",
+    "total_ms": 642
+   },
+   "one_table_seven_days": {
+    "bytes_scanned": 946,
+    "planning_ms": 190,
+    "query_id": "112d7600-ff98-4da0-ad25-5546bd9170fe",
+    "rows": 12000,
+    "runtime_ms": 671,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_events\" WHERE source_system = 'sqlserver' AND upper(source_table) = 'DIGITAL_EVENT' AND event_date > DATE '2026-08-22' - INTERVAL '7' DAY AND event_date <= DATE '2026-08-22'",
+    "total_ms": 789
+   }
+  },
+  "per_table": {
+   "auto_correct": {
+    "bytes_scanned": 0,
+    "planning_ms": 145,
+    "query_id": "b2247e6a-9fb8-45fd-8f41-15cd25182bdb",
+    "rows": 0,
+    "runtime_ms": 547,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_sqlserver_digital_dbo_digital_event\" WHERE op IN ('u','d') AND event_date > DATE '2026-08-22' - INTERVAL '3' DAY",
+    "total_ms": 638
+   },
+   "eod_source_scan": {
+    "bytes_scanned": 105163,
+    "planning_ms": 495,
+    "query_id": "5c204c7f-a768-4a99-bde2-31beac81f10a",
+    "rows": 3000,
+    "runtime_ms": 1656,
+    "sql": "SELECT COUNT(DISTINCT dv_event_id) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_sqlserver_digital_dbo_digital_event\" WHERE source_commit_ts < TIMESTAMP '2026-08-22 00:00:00'",
+    "total_ms": 1816
+   },
+   "fulfill": {
+    "bytes_scanned": 79,
+    "planning_ms": 359,
+    "query_id": "023cf673-16df-4589-a4a9-fe1b13557571",
+    "rows": 3000,
+    "runtime_ms": 1177,
+    "sql": "SELECT COUNT(*), MAX(source_commit_ts) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_sqlserver_digital_dbo_digital_event\" WHERE event_date = DATE '2026-08-22'",
+    "total_ms": 1296
+   },
+   "one_table_one_day": {
+    "bytes_scanned": 0,
+    "planning_ms": 127,
+    "query_id": "57053bf0-4d68-411a-a559-ef698e446a3b",
+    "rows": 3000,
+    "runtime_ms": 543,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_sqlserver_digital_dbo_digital_event\" WHERE event_date = DATE '2026-08-22'",
+    "total_ms": 688
+   },
+   "one_table_seven_days": {
+    "bytes_scanned": 0,
+    "planning_ms": 455,
+    "query_id": "24816bb1-80c8-4efc-abcc-40362324d8f4",
+    "rows": 6000,
+    "runtime_ms": 2347,
+    "sql": "SELECT COUNT(*) FROM \"kafka_dev_lab_dev_full_cdc\".\"cdc_sqlserver_digital_dbo_digital_event\" WHERE event_date > DATE '2026-08-22' - INTERVAL '7' DAY AND event_date <= DATE '2026-08-22'",
+    "total_ms": 2657
+   }
+  }
+ },
+ "measurements": {
+  "complete": {
+   "auto_correct": true,
+   "eod_source_scan": true,
+   "fulfill": true,
+   "one_table_one_day": true,
+   "one_table_seven_days": true
+  },
+  "scenarios": {
+   "auto_correct": {
+    "legacy": {
+     "athena_bytes_scanned": 87.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 0.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 488.0,
+     "runtime_ms": 1467.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 0.0,
+     "avg_file_size_bytes": 379553.0,
+     "file_count": 2.0,
+     "output_rows": 0.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 145.0,
+     "runtime_ms": 547.0,
+     "spark_input_bytes": 759106.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "eod_source_scan": {
+    "legacy": {
+     "athena_bytes_scanned": 113261.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 156.0,
+     "runtime_ms": 647.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 105163.0,
+     "avg_file_size_bytes": 379553.0,
+     "file_count": 2.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 495.0,
+     "runtime_ms": 1656.0,
+     "spark_input_bytes": 759106.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "fulfill": {
+    "legacy": {
+     "athena_bytes_scanned": 427.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 200.0,
+     "runtime_ms": 662.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 79.0,
+     "avg_file_size_bytes": 379553.0,
+     "file_count": 2.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 359.0,
+     "runtime_ms": 1177.0,
+     "spark_input_bytes": 759106.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "one_table_one_day": {
+    "legacy": {
+     "athena_bytes_scanned": 348.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 128.0,
+     "runtime_ms": 534.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 0.0,
+     "avg_file_size_bytes": 379553.0,
+     "file_count": 2.0,
+     "output_rows": 3000.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 127.0,
+     "runtime_ms": 543.0,
+     "spark_input_bytes": 759106.0,
+     "spark_input_files": 2.0
+    }
+   },
+   "one_table_seven_days": {
+    "legacy": {
+     "athena_bytes_scanned": 946.0,
+     "avg_file_size_bytes": 140545.57142857142,
+     "file_count": 14.0,
+     "output_rows": 12000.0,
+     "partitions_scanned": 3.0,
+     "planning_time_ms": 190.0,
+     "runtime_ms": 671.0,
+     "spark_input_bytes": 1967638.0,
+     "spark_input_files": 14.0
+    },
+    "per_table": {
+     "athena_bytes_scanned": 0.0,
+     "avg_file_size_bytes": 379553.0,
+     "file_count": 2.0,
+     "output_rows": 6000.0,
+     "partitions_scanned": 2.0,
+     "planning_time_ms": 455.0,
+     "runtime_ms": 2347.0,
+     "spark_input_bytes": 759106.0,
+     "spark_input_files": 2.0
+    }
+   }
+  }
+ },
+ "table_id": "sqlserver.digital.dbo.digital_event"
+}

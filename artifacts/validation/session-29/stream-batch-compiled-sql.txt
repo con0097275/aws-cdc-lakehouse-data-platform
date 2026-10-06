@@ -1,0 +1,38 @@
+STREAM_BATCH compiled SQL — the per-mode filter, from scripts/dbt-compile-modes.sh
+Generated 2026-08-20. dbt compile only; no warehouse touched, $0.
+
+vars: {"flow_mode":"STREAM_BATCH","cob_date":"2026-08-18",
+       "watermark_before":"2026-08-18 06:00:00","window_end":"2026-08-18 06:10:00"}
+
+The four modes compile from ONE model file; only this predicate differs.
+----------------------------------------------------------------------
+=== EOD ===
+        WHERE business_date = CAST('2026-08-18' AS DATE)
+=== AUTO_CORRECT ===
+        WHERE business_date > DATE_SUB(CAST('2026-08-18' AS DATE), 3)
+            AND business_date <= CAST('2026-08-18' AS DATE)
+=== FULFILL ===
+        WHERE business_date >= CAST('2026-08-01' AS DATE) AND business_date <= CAST('2026-08-05' AS DATE)
+=== STREAM_BATCH ===
+        WHERE business_date >= DATE(CAST('2026-08-18 06:00:00' AS TIMESTAMP))
+                 AND business_date <= DATE(CAST('2026-08-18 06:10:00' AS TIMESTAMP))
+----------------------------------------------------------------------
+
+DEFECT FOUND AND FIXED IN THIS SESSION
+
+Before the fix, STREAM_BATCH compiled to:
+    WHERE business_date >= CAST('2026-08-18 06:00:00' AS TIMESTAMP)
+      AND business_date <  CAST('2026-08-18 06:10:00' AS TIMESTAMP)
+
+business_date is a DATE. Spark promotes it to midnight, so 00:00:00 >= 06:00:00 is
+false for every row on the window's own date: the model selected NOTHING, every run,
+then succeeded and advanced the watermark past data it had never written. No error,
+no empty-result warning -- the flow's own 'quiet window' path treats zero rows as a
+legitimate outcome, which it is, and could not tell the two apart.
+
+Pinned by spark/tests/test_reporting_stream_batch_sql.py, which evaluates BOTH
+predicates in real Spark rather than reading the macro text:
+  test_the_defective_predicate_selects_nothing          0 rows  (the bug)
+  test_the_date_projected_predicate_selects_...          2 rows  (the fix)
+  test_it_does_not_reach_back_beyond_the_window          1 date
+  test_an_event_column_takes_the_precise_half_open_branch  keys [2, 3]

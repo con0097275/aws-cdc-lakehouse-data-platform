@@ -1,0 +1,69 @@
+# Business AI insight registration.
+#
+# THIS FILE IS THE WHOLE REGISTRATION. Adding a KPI to the daily insight run adds ZERO
+# Airflow DAG files -- the same property ADR-039 makes the acceptance test for the reporting
+# framework. One configurable flow reads this list; there is no per-KPI DAG.
+#
+# Every metric_id here must exist in aiplatform/metrics/business_metrics.yaml. The loader
+# refuses an unknown metric rather than skipping it: a KPI silently absent from the digest
+# is indistinguishable from a KPI with nothing to report.
+
+version: 1
+insight_version: insight:v1
+owner: my-aws-profile
+
+defaults:
+  enabled: true
+  required_certification: RECONCILED
+  comparison: previous_day
+  driver_dimensions: []
+  anomaly:
+    enabled: true
+    methods: [zscore, iqr, ewma]
+    min_severity_to_report: MODERATE
+  forecast:
+    enabled: false          # four business dates; see BAI-P0 gap 2
+  severity_thresholds:
+    moderate_delta_pct: 0.05
+    high_delta_pct: 0.15
+  history_days: 30
+  max_queries: 6
+
+insights:
+  - metric_id: total_closing_balance
+    enabled: true
+    # The pilot KPI. Semi-additive, certified daily, and the only metric whose mart is
+    # actually materialised.
+    required_certification: RECONCILED
+    comparison: previous_day
+    driver_dimensions: [account_sk]
+    forecast:
+      enabled: false
+    severity_thresholds:
+      moderate_delta_pct: 0.03
+      high_delta_pct: 0.10
+    owner: risk-data
+
+  - metric_id: total_txn_count
+    enabled: true
+    required_certification: RECONCILED
+    comparison: previous_day
+    driver_dimensions: [account_sk]
+    owner: risk-data
+
+  - metric_id: net_cash_flow
+    enabled: true
+    required_certification: RECONCILED
+    comparison: previous_day
+    driver_dimensions: [account_sk]
+    owner: risk-data
+
+  - metric_id: active_account_count
+    enabled: false
+    # Deliberately OFF: COUNT(DISTINCT) is non-additive, so a driver breakdown by segment
+    # would not sum to the total. It can be reported as a value, but not decomposed, and a
+    # digest entry with no explainable movement is noise.
+    disabled_reason: "non-additive; driver decomposition would not sum to the total"
+    required_certification: RECONCILED
+    comparison: previous_day
+    owner: risk-data
